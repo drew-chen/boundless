@@ -1,10 +1,11 @@
 # Installation Guide
 
-The current system utilizes googles firebase. We plan to support other server side databases in the future (e.g., mongodb). Two thirds of the installation centers around setting up the firebase database, storage and server side functions. 
+The current system utilizes google's firebase database, storage and serverless functions (to manage the data and storage). We plan to support other server side databases in the future (e.g., mongodb). Two thirds of the installation centers around setting up the firebase database, storage and server side functions. 
 
 ## Prerequisites
   * create a dedeciate Google gmail account (with Firebase enabled)
   * a computer to build the the boundless application (**build computer**)
+    * will need access to a bash terminal with GNU make installed. 
   * a computer server to serve up the application (**server computer**) - could use also firebase, the build computer or another dedicated server (e.g., running Apache server)
 
 ## Firebase Project Creation and Credentials
