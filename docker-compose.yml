@@ -1,0 +1,30 @@
+version: '3.7'
+services:
+  boundless:
+    build:
+      context: .
+      args:
+        apiKey: "[VALUE]"
+        authDomain: "[VALUE]"
+        databaseURL: "[VALUE]"
+        projectId: "[VALUE]"
+        storageBucket: "[VALUE]"
+        messagingSenderId: "[VALUE]"
+        appId: "[VALUE]"
+      dockerfile: boundless.Dockerfile
+    image: boundless:0.1.12-alpine
+    container_name: boundlessApp
+    expose:
+      - '80'
+    ports:
+      - '80:80'
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+    networks:
+      - boundnet
+    tty: true
+    
+networks:
+  boundnet:
