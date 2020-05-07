@@ -6,7 +6,7 @@ The current system utilizes google's firebase database, storage and serverless f
   * create a dedeciate Google gmail account (with Firebase enabled)
   * a computer to build the the boundless application (**build computer**)
     * will need access to a bash terminal with GNU make installed. 
-  * a computer server to serve up the application (**server computer**) - could use also firebase, the build computer or another dedicated server (e.g., running Apache server)
+  * a computer server to serve up the application (**server computer**) - could use also firebase hosting, the build computer or another dedicated server (e.g., running Apache server)
 
 ## Firebase Project Creation and Credentials
 Log into firebase console via the following link: https://firebase.google.com/
@@ -51,6 +51,9 @@ Log into firebase console via the following link: https://firebase.google.com/
         }
       }
       ```
+We need to set the server side functions. In order to config Firebase functions you will need to install firebase-tools
+Although we provide instructions here, a more details installation guide can be found here:
+https://firebase.google.com/docs/functions/get-started
 * Set up Functions
   1. Select "**Functions**" tab on left menu under "**Develop**"
   1. Choose [**Get started**] and complete
@@ -73,12 +76,7 @@ Log into firebase console via the following link: https://firebase.google.com/
   1. Select [**Continue to console**]
 <br />
 
-## Config Firebase-Functions
-We need to set the server side functions. In order to config Firebase functions you will need to install firebase-tools
-Although we provide instructions here, a more details installation guide can be found here:
-https://firebase.google.com/docs/functions/get-started
-
-## Cloning the Repo
+## Webserver Hosting
 From your **build computer** linux terminal
 ```bash
 $ git clone https://github.com/Wind-River/boundless.git && cd boundless
@@ -108,9 +106,8 @@ make init
 **NOTE:** If dependencies are not done properly, make will error with error message. Also, by default, 'make' will call 'make help' which lists the possible options of the './makefile'.
 
 
-### Webserver Hosting
-From the firebase project credentials fill in Firebase configuration inside system.yml inside config folder as 
-instructed.
+Using the firebase project credentials fill in configuration data found in file system.yml (inside config folder) as 
+instructed:
 
 ```yml
 # Please make sure to REOMVE ALL THE COMMAS.
@@ -139,8 +136,7 @@ databaseConfig:
   
 ```
 
-Once the Firebase credentials are set inside 'system.yml' please proceed with 
-the following:
+Once the Firebase credentials are stored in 'system.yml' proceed with the following:
 
 ```bash
 make build
@@ -169,7 +165,7 @@ $ sudo cp -r ./spa/. /var/www/html/
 This should allow the user to visit port 80 of the **server computer** and enjoy the
 application.
 
-### Container Hosting
+## Container Hosting
 
 **Note:** Docker compose is required and must support version 3.7+
 <br />
