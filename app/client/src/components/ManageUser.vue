@@ -384,10 +384,8 @@ export default {
                 await this.db.collection('users').doc(entry).delete()
 
                 this.$q.notify({
-                  icon: 'done',
-                  color: 'positive',
-                  message: 'Deleted sucessfully!',
-                  closeBtn: 'OK'
+                  type: 'positive',
+                  message: 'Deleted sucessfully!'
                 })
 
                 await this.db.collection('users').doc('ToC').set({

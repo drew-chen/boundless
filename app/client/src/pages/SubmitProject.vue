@@ -846,21 +846,11 @@ export default {
       this.chipType = ''
       this.chosenKeywords = []
 
-      for (let ref in this.$refs) {
-        if (!ref.includes('member')) {
-          this.$refs[ref].resetValidation()
-        }
-      }
-      this.$refs.memberEmail0[0].resetValidation()
-      this.$refs.memberName0[0].resetValidation()
-
       this.loading = false
 
       this.$q.notify({
-        icon: 'done',
-        color: 'positive',
-        message: 'Submitted sucessfully!',
-        closeBtn: 'Okay!'
+        type: 'positive',
+        message: 'Submitted sucessfully!'
       })
 
       this.$emit('added')
@@ -934,8 +924,7 @@ export default {
         this.$q.notify({
           color: 'negative',
           message: 'Only [' + this.allowedDomain.join(', ') + '] are allowed!',
-          icon: 'warning',
-          closeBtn: 'Close'
+          icon: 'warning'
         })
 
         this.projectMembers[index].email = ''
@@ -947,8 +936,9 @@ export default {
         this.projectMembers[index].name = this.emailToNameMap[indexEmail]
 
         this.$q.notify({
-          message: 'Since the user already exists in the database, the name of the user is loaded from the database.',
-          color: 'positive'
+          message: 'Existing user data was pulled from database',
+          timeout: 500,
+          type: 'positive'
         })
       } else {
         if (indexEmail !== '') {

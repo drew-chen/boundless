@@ -2843,10 +2843,8 @@ export default {
       }, { merge: true })
 
       this.$q.notify({
-        icon: 'done',
-        color: 'positive',
-        message: 'Submitted sucessfully!',
-        closeBtn: 'Okay!'
+        type: 'positive',
+        message: 'Submitted sucessfully!'
       })
 
       this.emitAdded()
@@ -3428,8 +3426,7 @@ export default {
       this.$q.notify({
         color: 'negative',
         message: 'Field is required!',
-        icon: 'warning',
-        closeBtn: 'Close'
+        icon: 'warning'
       })
 
       return ''

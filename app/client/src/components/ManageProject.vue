@@ -430,10 +430,8 @@ export default {
                 await this.db.collection('projects').doc(entry).delete()
 
                 this.$q.notify({
-                  icon: 'done',
-                  color: 'positive',
-                  message: 'Deleted sucessfully!',
-                  closeBtn: 'OK'
+                  type: 'positive',
+                  message: 'Deleted sucessfully!'
                 })
 
                 let updates = {}

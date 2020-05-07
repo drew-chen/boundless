@@ -201,10 +201,8 @@ export default {
       this.webpage = {}
 
       this.$q.notify({
-        icon: 'done',
-        color: 'positive',
-        message: 'Submitted sucessfully!',
-        closeBtn: 'Okay!'
+        type: 'positive',
+        message: 'Submitted sucessfully!'
       })
 
       this.loading = false
@@ -249,8 +247,7 @@ export default {
         this.$q.notify({
           color: 'negative',
           message: `Only [${this.allowedDomain.join(', ')}] are allowed!`,
-          icon: 'warning',
-          closeBtn: 'Close'
+          icon: 'warning'
         })
 
         this.user.email = ''

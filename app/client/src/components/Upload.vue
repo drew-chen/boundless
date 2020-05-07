@@ -289,10 +289,8 @@ export default {
         this.showLoading()
 
         this.$q.notify({
-          icon: 'done',
-          color: 'positive',
-          message: 'Uploaded sucessfully!',
-          closeBtn: 'Okay!'
+          type: 'positive',
+          message: 'Uploaded sucessfully!'
         })
         this.$emit('close', this.curData)
 

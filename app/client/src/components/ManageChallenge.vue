@@ -437,10 +437,8 @@ export default {
                 await this.db.collection('challenges').doc(entry).delete()
 
                 this.$q.notify({
-                  icon: 'done',
-                  color: 'positive',
-                  message: 'Deleted sucessfully!',
-                  closeBtn: 'OK'
+                  type: 'positive',
+                  message: 'Deleted sucessfully!'
                 })
 
                 let updates = {}
