@@ -90,7 +90,7 @@ $ npm install -g firebase-tools
 # this could take several mins since this will be installing dependencies
 $ cd app/server/firebase/functions 
 $ npm i 
-$ cd ..
+$ cd ../../..
 
 # 'firebase login' should prompt broswer, please select proper google account since
 # this command will be grabbing credentials from the browser
@@ -103,6 +103,7 @@ If the user has make installed, you may just run make from the root as shown bel
 ```bash
 make init
 ```
+
 **NOTE:** If dependencies are not done properly, make will error with error message. Also, by default, 'make' will call 'make help' which lists the possible options of the './makefile'.
 
 
