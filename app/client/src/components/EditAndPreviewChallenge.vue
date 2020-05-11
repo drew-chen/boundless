@@ -2441,7 +2441,6 @@ export default {
       if (file) {
         this.mainImage.cur = URL.createObjectURL(file)
         this.mainImage.file = file
-
         this.updated = true
       } else {
         this.mainImage.cur = this.mainImage.prev

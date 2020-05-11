@@ -2113,7 +2113,6 @@ export default {
       this.addMemberDialog.use.forEach(member => {
         members.push(member.value || member)
       })
-
       this.curData.members = members
       this.updated = true
     },
