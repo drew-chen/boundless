@@ -459,7 +459,7 @@ export default {
           this.storage = testingStorage
         } else {
           this.db = productionDb
-          this.db = productionStorage
+          this.storage = productionStorage
         }
 
         return true
