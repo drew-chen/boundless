@@ -58,7 +58,11 @@ export default {
         // while (start >= 0 && d.lastIndexOf('src', start) >= 0) {
         while (start >= 0) {
           end = d.indexOf(')', start)
+          if (end < 0) end = d.indexOf('\'', start)
+          if (end < 0) end = d.indexOf('"', start)
+
           let storagePath = d.substring(start + delim.length, end)
+
           if (storagePath && storagePath.includes('.')) {
             let url = await this.storage.ref().child(
               storagePath
