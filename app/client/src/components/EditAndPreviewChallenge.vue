@@ -2321,7 +2321,7 @@ export default {
        * @return {void}
        */
 
-      let url = `![](./${type}/${pathToFile})`
+      let url = `local://${type}/${pathToFile}`
 
       this.copyTextToClipboard(url)
 

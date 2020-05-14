@@ -50,23 +50,23 @@ export default {
       }
 
       try {
+        let delim = 'local://'
         let d = this.data
-        let start = d.indexOf('](./')
+        let start = d.indexOf(delim)
         let end
 
-        while (start >= 0 && d.lastIndexOf('![', start) >= 0) {
+        // while (start >= 0 && d.lastIndexOf('src', start) >= 0) {
+        while (start >= 0) {
           end = d.indexOf(')', start)
-          let storagePath = d.substring(start + 4, end)
-
+          let storagePath = d.substring(start + delim.length, end)
           if (storagePath && storagePath.includes('.')) {
             let url = await this.storage.ref().child(
               storagePath
             ).getDownloadURL()
-
-            d = d.replace(`./${storagePath}`, url)
+            d = d.replace(`${delim}${storagePath}`, url)
           }
 
-          start = d.indexOf('](./', start + 1)
+          start = d.indexOf(delim, start + 1)
         }
         this.source = d
 
