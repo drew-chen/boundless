@@ -124,7 +124,11 @@ Methods:
         <q-separator color="secondary" />
       </div>
 
+      <!-- If there is at least one keyword - then list them w/check box -->
       <div v-if="Object.keys(keywordOptions).length">
+        <dir class="text-italic text-grey">
+          You can select up to 6 keywords to diplay under the banner.
+        </dir>
         <q-option-group
           v-if="data.keywords"
           dense inline
@@ -135,16 +139,15 @@ Methods:
           @input="checkMax"
         />
       </div>
-
+      <!-- No keywords yet -->
       <div v-else class="q-ml-sm">
         Keywords must be added in <b>General Settings</b>.
       </div>
 
       <p v-if="data.keywords" class="q-px-lg q-py-md">
-        Selected keywords: {{ data.keywords }} <br >
+        <b> Selected Keyword Ordering:</b> {{ data.keywords }} <br >
         <dir class="text-italic text-grey">
-          You can select up to 6 keywords to diplay in the banner.
-          This is also the order in which they will appear.
+          This is the order in which they will appear.
         </dir>
       </p>
     </div>
