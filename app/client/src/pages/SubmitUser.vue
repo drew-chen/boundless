@@ -153,40 +153,45 @@ export default {
        * @return {Promise<Boolean>}
        */
 
-      this.loading = true
+      this.checkEmail(this.user.email)
 
-      let timeOfSubmit = new Date(Date.now()).toISOString()
-      let firestore = this.db.collection('users').doc()
-      let key = firestore.id
+      if (this.user.email) {
+        this.loading = true
 
-      this.user = {
-        ...this.user,
-        timestamp: timeOfSubmit,
-        created: timeOfSubmit,
-        uuid: key,
-        imgURL: '',
-        title: ''
+        let timeOfSubmit = new Date(Date.now()).toISOString()
+        let firestore = this.db.collection('users').doc()
+        let key = firestore.id
+
+        this.user = {
+          ...this.user,
+          timestamp: timeOfSubmit,
+          created: timeOfSubmit,
+          uuid: key,
+          imgURL: '',
+          title: ''
+        }
+
+        this.webpage = {
+          ...this.webpage,
+          socialNetwork: {},
+          projects: [],
+          achievements: {}
+        }
+
+        try {
+          await firestore.set(this.webpage)
+          await this.db.collection('users').doc('ToC').set({
+            [key]: this.user
+          }, { merge: true })
+
+          this.onReset()
+
+          return true
+        } catch (error) {
+          return false
+        }
       }
-
-      this.webpage = {
-        ...this.webpage,
-        socialNetwork: {},
-        projects: [],
-        achievements: {}
-      }
-
-      try {
-        await firestore.set(this.webpage)
-        await this.db.collection('users').doc('ToC').set({
-          [key]: this.user
-        }, { merge: true })
-
-        this.onReset()
-
-        return true
-      } catch (error) {
-        return false
-      }
+      return false
     },
     onReset: function () {
       /**
@@ -218,6 +223,13 @@ export default {
 
       if (!this.emailList.includes(entry) && entry.includes('@')) {
         this.emailDomainCheck(entry)
+      } else if (this.emailList.includes(entry)) {
+        this.user.email = ''
+        this.$q.notify({
+          type: 'negative',
+          message: 'The email is already in use!',
+          timeout: 500
+        })
       } else {
         this.user.email = ''
       }
