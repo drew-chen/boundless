@@ -34,20 +34,16 @@ Methods:
         <div class="q-px-md q-gutter-md">
           <q-btn outline label="Background Color">
             <q-popup-proxy transition-show="scale" transition-hide="scale">
-              <q-color
-                flat no-header no-footer
-                v-model="generalConfig.bgColor"
-              />
+              <q-color flat v-model="generalConfig.bgColor" />
+
               <q-btn class="float-right" flat v-close-popup >Done</q-btn>
             </q-popup-proxy>
           </q-btn>
 
           <q-btn outline label="Text Color">
             <q-popup-proxy transition-show="scale" transition-hide="scale">
-              <q-color
-                flat no-header no-footer
-                v-model="generalConfig.txtColor"
-              />
+              <q-color flat v-model="generalConfig.txtColor" />
+
               <q-btn class="float-right" flat v-close-popup >Done</q-btn>
             </q-popup-proxy>
           </q-btn>
