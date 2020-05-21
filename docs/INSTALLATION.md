@@ -11,6 +11,7 @@ The current system utilizes google's firebase database, storage and serverless f
 From your **build computer** linux terminal
 ```bash
 $ git clone https://github.com/Wind-River/boundless.git && cd boundless
+$ echo "" > init.js
 ```
 
 
@@ -101,62 +102,48 @@ https://firebase.google.com/docs/functions/get-started
   1. Select [**Continue to console**]
 <br />
 
-## Webserver Hosting
+## Copy db creditals into init.js
+From the root directory
+Back to the build computer terminal go into editor for init.js and paste the firebase credentials into ./init.js. For example:
+```js
+  var firebaseConfig = {
+    apiKey: "...",
+    authDomain: "...",
+    databaseURL: "...",
+    projectId: "...",
+    storageBucket: "...",
+    messagingSenderId: "...",
+    appId: "...",
+    measurementId: "..."
+  };
+```
 
-## Application
-
-### Building with 'make' (Recommended)
+Install firebase functions
 If the user has make installed, you may just run make from the root as shown below:
 ```bash
-make init
+make fb_init
+make fb_functions_deploy
 ```
 
-**NOTE:** If dependencies are not done properly, make will error with error message. Also, by default, 'make' will call 'make help' which lists the possible options of the './makefile'.
+## Webserver Hosting (Apache server example)
 
-
-Using the firebase project credentials fill in configuration data found in file system.yml (inside config folder) as 
-instructed:
-
-```yml
-# Please make sure to REOMVE ALL THE COMMAS.
-databaseConfig:
-  production:
-    apiKey: "------------------------------------"
-    authDomain: "------------------------------------"
-    databaseURL: "------------------------------------"
-    projectId: "------------------------------------"
-    storageBucket: "------------------------------------"
-    appId: "------------------------------------"
-    messagingSenderId: "------------------------------------"
-
-## If you set up an additional test database (recommended for testing)
-## Again, please REOMVE ALL THE COMMAS.
-  testing:
-    apiKey: "------------------------------------"
-    authDomain: "------------------------------------"
-    databaseURL: "------------------------------------"
-    projectId: "------------------------------------"
-    storageBucket: "------------------------------------"
-    appId: "------------------------------------"
-    messagingSenderId: "------------------------------------"
-    
-  dev:
-  
-```
-
+From the root directory
 Once the Firebase credentials are stored in 'system.yml' proceed with the following:
 
 ```bash
 make build
+```
 
+To run locally (ex. localhost:8080), call
+```bash
 # if running locally (ex. localhost:8080), call
 $ make run
-
 ```
 
 After running 'make build' above the application is ready to be hosted on webserver.
 The following example will be showing on how to host it on an Apache web server:
 
+### Apache server example
 On the **server computer**: 
 ```bash
 # check the status of apache2
