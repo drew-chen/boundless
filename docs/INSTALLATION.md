@@ -7,6 +7,26 @@ The current system utilizes google's firebase database, storage and serverless f
   * a computer to build the the boundless application (**build computer**)
     * will need access to a bash terminal with GNU make installed. 
   * a computer server to serve up the application (**server computer**) - could use also firebase hosting, the build computer or another dedicated server (e.g., running Apache server)
+  
+From your **build computer** linux terminal
+```bash
+$ git clone https://github.com/Wind-River/boundless.git && cd boundless
+```
+
+
+```bash
+# inside boundless root directory
+$ npm install -g firebase-tools
+
+# this could take several mins since this will be installing dependencies
+$ cd app/server/firebase/functions 
+$ npm i 
+$ cd ../../..
+
+# 'firebase login' should prompt broswer, please select proper google account since
+# this command will be grabbing credentials from the browser
+$ firebase login --interactive ## log into the google account which holds the firebase project
+```
 
 ## Firebase Project Creation and Credentials
 Log into firebase console via the following link: https://firebase.google.com/
@@ -58,13 +78,18 @@ https://firebase.google.com/docs/functions/get-started
   1. Select "**Functions**" tab on left menu under "**Develop**"
   1. Choose [**Get started**] and complete
   1. you will be asked to install on your server: $ npm install -g firebase-tools
-  1. On left menu near top (**Project Ovdrview**) select the "**Settings Cog**" icon on the upper left corner
+  1. You can ignore the following (just click [Finsh]):
+   ```bash
+    $ firebase init
+    $ firebase deploy
+    ```
+  1. On left menu near top (**Project Overview**) select the "**Settings Cog**" icon on the upper left corner
   1. Select "**Project settings**"
   1. Scroll down and select "**</>**" icon
   1. Enter app nickname 
   1. (Firebase Hosting not required)
   1. Select [**Register app**]
-  1. Copy the following for a later step from var firebaseConfigs = { ... }
+  1. Copy the following for a later step from var firebaseConfigs = { ... };
       ```js
         apiKey: ...,
           .
@@ -77,24 +102,6 @@ https://firebase.google.com/docs/functions/get-started
 <br />
 
 ## Webserver Hosting
-From your **build computer** linux terminal
-```bash
-$ git clone https://github.com/Wind-River/boundless.git && cd boundless
-```
-
-
-```bash
-# inside boundless root directory
-$ npm install -g firebase-tools
-
-# this could take several mins since this will be installing dependencies
-$ cd app/server/firebase/functions 
-$ npm i 
-$ cd ../../..
-
-# 'firebase login' should prompt broswer, please select proper google account since
-# this command will be grabbing credentials from the browser
-$ firebase login --interactive ## log into the google account which holds the firebase project
 
 ## Application
 
