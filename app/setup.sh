@@ -18,6 +18,7 @@ if [ -r ../init.js ]; then
   echo "Proceeding to caching..."
 else
   echo "init.js is missing..."
+  exit 1
 fi
 
 if [ -r config/system.yml ]; then
