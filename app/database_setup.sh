@@ -37,6 +37,7 @@ if [ -r config/system.yml ]; then
 
     if [ ${#cmpBaseResult} -gt 0 ] && [ ${#cmpResult} -gt 0 ]; then
       echo "Changes detected, proceeding to generate dependencies before building."
+      cp config/system.yml ../setup.o/system.yml
     elif ! [ ${#cmpBaseResult} -gt 0 ]; then
       echo "Please update 'system.yml' with firebase database credientials."
       exit 1

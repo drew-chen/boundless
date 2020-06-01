@@ -14,6 +14,13 @@
 # Purpose: To instruct CLI related installation processes to the user
 ################################################################################
 
+if [ -r ../init.js ]; then
+  echo "Proceeding to caching..."
+else
+  echo "init.js is missing..."
+  exit 1
+fi
+
 if [ -r config/system.yml ]; then
   exit 0
 elif [ -f config/system.yml ]; then

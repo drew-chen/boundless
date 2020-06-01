@@ -21,8 +21,9 @@ root_dir:=$(shell pwd)
 
 default: help
 
-fb_init:
-	@cd app && \
+fb_init: init.js
+	@node app/config/system_init.js && \
+	cd app && \
 	./setup.sh && \
 	./database_setup.sh
 

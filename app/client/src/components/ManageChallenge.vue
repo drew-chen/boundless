@@ -407,6 +407,8 @@ export default {
           return true
         }, 300)
       } catch (error) {
+        this.loading = false
+
         return false
       }
     },

@@ -76,6 +76,7 @@ for (let i in docData) {
     let value = lineComp[2].split(' ')
     value[1] = value[1].replace(/\"/g, '')
     value[1] = value[1].replace(/\'/g, '')
+    value[1] = value[1].replace(/\,/g, '')
 
     if (!isValidProp(value[0])) {
       continue

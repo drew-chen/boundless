@@ -593,6 +593,8 @@ export default {
 
         return true
       } catch (error) {
+        this.loading = false
+
         return false
       }
     },
