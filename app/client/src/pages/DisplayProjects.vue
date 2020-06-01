@@ -223,7 +223,7 @@ Methods:
                     class="text-blue cursor-pointer"
                     @click="popDialog(props.row.description)"
                   >
-                    &nbsp;&nbsp;[more ...]
+                    &nbsp;&nbsp;[more]
                   </div>
                 </div>
               </div>
@@ -261,7 +261,7 @@ Methods:
                 @click="displayProjectPage(props.row.alias || props.row.uuid)"
                 color="info"
                 text-color="white"
-                label="more..."
+                label="more"
               />
             </q-td>
 

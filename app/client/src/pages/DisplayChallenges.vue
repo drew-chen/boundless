@@ -227,7 +227,7 @@ Methods:
                     class="text-blue cursor-pointer"
                     @click="popDialog(props.row.description)"
                   >
-                    &nbsp;&nbsp;[more ...]
+                    &nbsp;&nbsp;[more]
                   </div>
                 </div>
               </div>
@@ -273,7 +273,7 @@ Methods:
               <q-chip
                 dense clickable
                 color="info" text-color="white"
-                label="more..."
+                label="more"
                 @click="displayChallengePage(props.row.alias || props.row.uuid)"
               />
             </q-td>
