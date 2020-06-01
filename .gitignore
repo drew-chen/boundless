@@ -22,6 +22,7 @@ yarn-error.log*
 
 # make related ignore
 setup.o
+init.js
 
 # Editor directories and files
 .idea
