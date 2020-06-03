@@ -9,8 +9,8 @@ Here are the require prerequisites:
   * Create a dedeciate Google gmail account (we will enable Google's Firebase database and storage)
   * Use google chrome to maange access to Firebase (will inherit browser credentials during the installation)
   * A computer to build and configure the the portal (**build computer**)
-    * will need access to a bash terminal with GNU make installed. Make is important.
-  * a computer server to serve up the application (**server computer**) - could use also firebase hosting, the build computer or another dedicated server (e.g., running Apache server)
+    * will need access to a **unix/bash terminal** with **GNU make**. [Git Bash](https://gitforwindows.org/) is often used on Windows with a Windows version of make [here](https://gist.github.com/evanwill/0207876c3243bbb6863e65ec5dc3f058).
+  * a **server computer** to host the web portal in production. For the server computer you could also use firebase hosting, the build computer or another dedicated server (e.g., running Apache server)
   
 From your **build computer** linux terminal window:
 ```bash
