@@ -22,6 +22,7 @@ Methods:
   <div class="q-pa-sm full-width">
     <q-card class="q-pa-md dbCard">
 
+      <!-- <input type="file"> -->
       <q-uploader
         bordered hide-upload-btn
         ref="file"

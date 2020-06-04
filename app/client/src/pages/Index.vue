@@ -423,6 +423,7 @@ export default {
        * load firebase database reference
        * load firebase storage reference (if applicable)
        * load firebase cloud functions reference (if applicable)
+       * @param {void}
        * @return {Promise<Boolean>}
        */
 
