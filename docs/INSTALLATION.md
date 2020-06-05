@@ -9,7 +9,7 @@ Here are the require prerequisites:
   * Create a dedeciate Google gmail account (we will enable Google's Firebase database and storage)
   * Use google chrome to maange access to Firebase (will inherit browser credentials during the installation)
   * A computer to build and configure the the portal (**build computer**)
-    * will need access to a **unix/bash terminal** with **GNU make**. [Git Bash](https://gitforwindows.org/) is often used on Windows with a Windows version of make [here](https://gist.github.com/evanwill/0207876c3243bbb6863e65ec5dc3f058).
+    * will need access to a **unix/bash terminal** with **GNU make**. [Git Bash](https://gitforwindows.org/) is often used on Windows with a Windows version of make [here](https://gist.github.com/evanwill/0207876c3243bbb6863e65ec5dc3f058#make).
   * a **server computer** to host the web portal in production. For the server computer you could also use firebase hosting, the build computer or another dedicated server (e.g., running Apache server)
   
 From your **build computer** linux terminal window:
@@ -17,17 +17,19 @@ From your **build computer** linux terminal window:
 $ git clone https://github.com/Wind-River/boundless.git && cd boundless
 $ echo "" > init.js   ## We need to create file init.js for a later step.
 ```
-
+Next we want to install the firebase cli and tools. 
 
 ```bash
-### inside portal **root** directory
+### inside portal root directory: .../boundless
 $ npm install -g firebase-tools
 
 ### this could take several minutes since this will be installing dozens of dependencies
 $ cd app/server/firebase/functions 
 $ npm i 
 $ cd ../../..  ## go to the root/app directory to execute the next command
-
+```
+We want to log into firebase via the command line. It may pop up the chrome browser for additional input. 
+```bash
 ### 'firebase login' should prompt broswer, please select proper google account since
 ### this command will be grabbing credentials from the browser
 $ firebase login --interactive ## log into the google account which holds the firebase project
@@ -117,7 +119,7 @@ Select [**Continue to console**]
 
 ## Copy db creditals into init.js
 From the root directory
-Back to the build computer terminal go into editor for init.js and paste the firebase credentials into ./init.js. For example:
+Back to the build computer terminal go into editor for init.js and paste the firebase credentials into ./init.js. That is:
 ```js
   var firebaseConfig = {
     apiKey: "...",
