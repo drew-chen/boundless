@@ -90,10 +90,7 @@ https://firebase.google.com/docs/functions/get-started
   1. Choose [**Get started**] and complete
   1. you will be asked to install on your server: $ npm install -g firebase-tools - you did this already above - click **Continue**
   1. You can also ignore the following (just click [Finsh]):
-   ```bash
-    $ firebase init
-    $ firebase deploy
-    ```
+  
 * **Ready to grab the database credentials:**
   1. On left menu near top (**Project Overview**) select the "**Settings Cog**" icon on the upper left corner
   1. Select "**Project settings**"
