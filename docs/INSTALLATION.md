@@ -36,107 +36,19 @@ $ firebase login --interactive ## log into the google account which holds the fi
 ```
 
 ## I.2) Firebase Project Creation and Credentials
-In this section we need to create the firebase database, storage and server side functions. At the end you will need to make a copy of the database credentials to securely configure the web portal in **Part II**. This should take about 30 minutes. Log into firebase console via the following link: https://firebase.google.com/
+In this section we need to create the firebase database, storage and server side functions. At the end you will need to make a copy of the database credentials to securely configure the web portal in **Part II**. This should take about 30 minutes. 
 
-* On upper right corner, please select <**Go to console**>
-* **Create Firebase Project:**
-  1. Click on [**Create a project**] (You may reuse your old projects).
-  1. Enter project name 
-  1. Configure Google Analytics (not required)
-    1. select Default Account for Firebase
-  1. select "_Create a project_"
-  1. Once done, press "**Continue**"
-* **Create Database:**
-  1. Select "**Develop**" tab on left menu
-  1. Select "**Database**" 
-  1. Click on [**Create database**]
-  1. Select "**Start in production mode**"
-  1. Select region
-  1. Click on [**Done**]
-  1. Choose "Rules" menu tab (below "**Database**") and change it to the following:
-  ```js
-  // rules_version = '2';
-  service cloud.firestore {
-    match /databases/{database}/documents {
-      match /{document=**} {
-        allow read, write: if true;
-      }
-    }
-  }
-  ```
-* **Set Up the Firebase Storage:**
-  1. Select "**Storage**" tab on left menu under "**Develop**"
-  1. Choose [**Get started**]
-  1. You will see message about edit another rule - click **Next**
-  1. Select region, click **Done**
-  1. 
-  1. Choose "Rules" menu tab (below "**Storage**") and change it to the following:
-      ```js
-      // rules_version = '2';
-      service firebase.storage {
-        match /b/{bucket}/o {
-          match /{allPaths=**} {
-            allow read, write: if true;
-          }
-        }
-      }
-      ```
-We need to set the server side functions. In order to config Firebase functions you will need to install firebase-tools
-Although we provide instructions here, a more details installation guide can be found here:
-https://firebase.google.com/docs/functions/get-started
+Because there are a number of steps we created document dedicated to setting up Firebase where you can find here: [Firebase Installation](FirebaseInstall.md)
 
-* **Set Up the Firebase Server Side Functions:**
-  1. Select "**Functions**" tab on left menu under "**Develop**"
-  1. Choose [**Get started**] and complete
-  1. you will be asked to install on your server: $ npm install -g firebase-tools - you did this already above - click **Continue**
-  1. You can also ignore the following (just click [Finsh]):
-  
-* **Ready to grab the database credentials:**
-  1. On left menu near top (**Project Overview**) select the "**Settings Cog**" icon on the upper left corner
-  1. Select "**Project settings**"
-  1. Scroll down and select "**</>**" icon
-  1. Enter app nickname 
-  1. (Firebase Hosting not required)
-  1. Select [**Register app**]
-  1. Copy the following for a later step from var firebaseConfigs = { ... };
-```js
-  var firebaseConfig = {
-    apiKey: "...",
-    authDomain: "...",
-    databaseURL: "...",
-    projectId: "...",
-    storageBucket: "...",
-    messagingSenderId: "...",
-    appId: "...",
-    measurementId: "..."
-  };
-```
-Select [**Continue to console**]
-<br />
+Once you completed the Firebase Installation instructions which concludes with the copiing of your database credentials into **init.js** proceed to the next section.
 
-## Copy db creditals into init.js
-From the root directory
-Back to the build computer terminal go into editor for init.js and paste the firebase credentials into ./init.js. That is:
-```js
-  var firebaseConfig = {
-    apiKey: "...",
-    authDomain: "...",
-    databaseURL: "...",
-    projectId: "...",
-    storageBucket: "...",
-    messagingSenderId: "...",
-    appId: "...",
-    measurementId: "..."
-  };
-```
-ok - we are done configuring the database and server side storage
-
+## I.3) Firebase Initialize and Function Loading
 From the **terminal** run the following to install firebase functions (you must have make installed):
 ```bash
 $ make fb_init
 $ make fb_functions_deploy
 ```
-** Congratulations ! ** - you have successfully configured firebase database, storage and server side fucntions..
+** Congratulations ! ** - you have successfully configured firebase database, storage and server side fucntions. 
 
 YOU ARE READY TO RUN THE SERVER!
 
@@ -164,7 +76,11 @@ $ make run
 ```
 This could take ~ 5 minutes the first time while it performs a complete build. 
 Your portal is now reafdy (at least on your local computer) - go to local browser and enter:
-   http://localhost:8080/ 
+   http://localhost:8080/
+   
+You should log in as admin and change the admin password. The default settings are:
+    user: admin
+    password: nimda
 
 
 ## II.2) Web Server Hosting (Apache server example)
@@ -198,6 +114,11 @@ $ sudo systemctl start apache2
 # copy the files inside spa folder into var/www/html
 $ sudo cp -r ./spa/. /var/www/html/
 ```
+
+You should log in as admin and change the admin password. The default settings are:
+    user: admin
+    password: nimda
+
 
 This should allow the user to visit port 80 of the **server computer** and enjoy the
 application.
@@ -246,6 +167,11 @@ browser and explore the software.
 **Note:** Currently, Firebase-functions are not automated.
 
 Now, the application is fully ready to be used.
+
+You should log in as admin and change the admin password. The default settings are:
+    user: admin
+    password: nimda
+
 
 ## II.4) Firebase Hosting 
   TBD - see Firebase Web Hosting (part of your firebase account)
