@@ -36,14 +36,12 @@ $ firebase login --interactive ## log into the google account which holds the fi
 ```
 
 ## I.2) Firebase Project Creation and Credentials
-In this section we need to create the firebase database, storage and server side functions. At the end you will need to make a copy of the database credentials to securely configure the web portal in **Part II**. This should take about 30 minutes. 
+In this section we need to create the firebase database, storage and server side functions. At the end you will need to make a copy of the database credentials to securely configure the web portal in **Part II**. This should take about 30 minutes. Because there are a number of steps - we created a document dedicated to setting up Firebase which can be found here: [Firebase Installation](docs/Installation/FirebaseInstall.md).
 
-Because there are a number of steps we created document dedicated to setting up Firebase where you can find here: [Firebase Installation](FirebaseInstall.md)
-
-Once you completed the Firebase Installation instructions which concludes with the copiing of your database credentials into **init.js** proceed to the next section.
+Once you completed the Firebase Installation instructions, which concludes with the coping of your database credentials into **init.js**, proceed to the next section.
 
 ## I.3) Firebase Initialize and Function Loading
-From the **terminal** run the following to install firebase functions (you must have make installed):
+From the **terminal** run the following to install firebase functions (you must have **make** installed):
 ```bash
 $ make fb_init
 $ make fb_functions_deploy
@@ -54,21 +52,11 @@ YOU ARE READY TO RUN THE SERVER!
 
 # Part II Running (Hosting) The Web Portal 
 You have four options on how you can run the web portal:
-  1. Run on your local (development) computer
-  1. Web Server Hosting (e.g., Apache server)
-  1. Container hosting (e.g., docker)
-  1. Firebase Hosting (free with your firebase account)
+  1. **Run on your local (development) computer** - this option is what contributors (project developers) will need to use to develop and test. If you are an admin installing firebase for the first time try starting there to test it out. Even though it is on your local host the data you enter will reside in the production database and will be available to the other three hosting methods.
+  1. **Web Server Hosting** (e.g., Apache server) - This is a common way to host the web portal internally behind an organization firewall.
+  1. **Container Hosting** (e.g., docker) - This is an easy way if you are comforable working with docker and container images. You will need to take a few steps to add the database credentials but the actual build is automated. 
+  1. **Firebase Hosting** - available with your firebase account. More details will be provide at a later date.
   
-**Run on your development computer** - The first option is what contributors (project developers) will need to use to develop and test. If you are an admin installing firebase for the first time try starting there to test it out. Even though it is on your local host the data you enter will reside in the production database and will be available to the other three hosting methods.
-
-**Web Server Hosting (e.g., Apache server)** - This is a common way to host the web portal internally behind an organization firewall.
-
-**Container hosting** - This is an easy way if you are comforable working with docker and container images. You will need to take a few steps to add the database credentials but the actual build is automated. 
-
-**Firebase Hosting** 
-
-
-
 ## II.1) Run on your development computer
 To run locally (e.g. from localhost:8080), call the make command from the root directory:
 ```bash
@@ -174,5 +162,5 @@ You should log in as admin and change the admin password. The default settings a
 
 
 ## II.4) Firebase Hosting 
-  TBD - see Firebase Web Hosting (part of your firebase account)
+  TBD - see Firebase Web Hosting (part of your firebase account). We will provide more details about this option at a later date. 
   

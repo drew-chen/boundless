@@ -19,7 +19,7 @@ The approach is simple:
 
 # Installation Guide
 
-[The Installation Guide can be found here:](./docs/INSTALLATION.md)
+[The Installation Guide can be found here:](./docs/Installation/INSTALLATION.md)
 
 # Project License
 
