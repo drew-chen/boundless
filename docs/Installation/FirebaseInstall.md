@@ -94,4 +94,4 @@ Back to the build computer terminal go into editor for init.js and paste the fir
     measurementId: "..."
   };
 ```
-Great! - we are done configuring the database and server side storage. You can return to the main [Installation Guide](INSTALLATION.md#part-i---setting-up-firebase-database-and-storage) and proceed with **Part II** - web hosting. 
+Great! - we are done configuring the database and server side storage. You can return to the main [Installation Guide](INSTALLATION.md#part-ii-running-hosting-the-web-portal) and proceed with **Part II** - web hosting. 
