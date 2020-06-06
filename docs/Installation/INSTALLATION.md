@@ -36,7 +36,7 @@ $ firebase login --interactive ## log into the google account which holds the fi
 ```
 
 ## I.2) Firebase Project Creation and Credentials
-In this section we need to create the firebase database, storage and server side functions. At the end you will need to make a copy of the database credentials to securely configure the web portal in **Part II**. This should take about 30 minutes. Because there are a number of steps - we created a document dedicated to setting up Firebase which can be found here: [Firebase Installation](docs/Installation/FirebaseInstall.md).
+In this section we need to create the firebase database, storage and server side functions. At the end you will need to make a copy of the database credentials to securely configure the web portal in **Part II**. This should take about 30 minutes. Because there are a number of steps - we created a document dedicated to setting up Firebase which can be found here: [Firebase Installation](FirebaseInstall.md).
 
 Once you completed the Firebase Installation instructions, which concludes with the coping of your database credentials into **init.js**, proceed to the next section.
 
