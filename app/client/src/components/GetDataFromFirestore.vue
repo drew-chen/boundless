@@ -165,9 +165,6 @@ export default {
         await Promise.all(promises)
 
         setTimeout(() => {
-          this.$refs.file.files.splice(0, 1)
-          this.attachedFile = false
-
           this.$q.sessionStorage.remove('boundless_config')
           this.$q.sessionStorage.remove('boundless_timeout')
 
