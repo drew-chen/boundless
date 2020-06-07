@@ -132,7 +132,7 @@ def do_import(args):
 
   print("initiating import...")
   os.system(
-    "cd {} && ".format("./tmpFile/{}/{}/.".format(source[:-4], target[5:])) +
+    "cd {} && ".format("./tmpFile/{}/*/".format(source[:-4]) +
     "gsutil.cmd -m cp -R . {} && ".format(target) +
     "cd .. && cd .. && cd .. && rm -rf tmpFile/"
   )
