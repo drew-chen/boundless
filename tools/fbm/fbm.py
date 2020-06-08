@@ -91,7 +91,10 @@ def create_parser(prog_name):
 ################################################################################
 def do_export(args):
   source = args.SOURCE
-  target = args.target if args.target != None else 'boundless'
+  if args.target != None:
+    target = args.target
+  else:
+    target = 'storage_{}'.format(source[5:])
 
   time = datetime.datetime.now()
   time = time.strftime("%m.%d.%Y_%H_%M_%S")
@@ -132,7 +135,7 @@ def do_import(args):
 
   print("initiating import...")
   os.system(
-    "cd {} && ".format("./tmpFile/{}/*/".format(source[:-4]) +
+    "cd {} && ".format("./tmpFile/{}/*.com".format(source[:-4])) +
     "gsutil.cmd -m cp -R . {} && ".format(target) +
     "cd .. && cd .. && cd .. && rm -rf tmpFile/"
   )
