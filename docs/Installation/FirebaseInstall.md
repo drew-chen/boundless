@@ -81,7 +81,7 @@ Select [**Continue to console**]
 
 ## Copy db creditals into init.js
 From the root directory
-Back to the build computer terminal go into editor for init.js and paste the firebase credentials into ./init.js. That is:
+Back to the build computer terminal - open <root>/initi.js in an editor and paste the following firebase credentials into the file. That is:
 ```js
   var firebaseConfig = {
     apiKey: "...",
@@ -94,4 +94,12 @@ Back to the build computer terminal go into editor for init.js and paste the fir
     measurementId: "..."
   };
 ```
-Great! - we are done configuring the database and server side storage. You can return to the main [Installation Guide](INSTALLATION.md#part-ii-running-hosting-the-web-portal) and proceed with **Part II** - web hosting. 
+### Done
+**Woohoo!** - we are done configuring the database and server side storage.
+
+STORE THE **init.js** FILE IN A SECURE PLACE. This is your login credentials. Do not share these credentials with other untrusted parties.  You will need it to obtain access to your firebase database and storage.
+
+STORE GOOGLE ACCOUNT **LOG IN CREDENTIALS (email, passsword)** IN A SECURE PLACE. This is your Firebnase login credentials you will need to manage the database and storage (poosibly the .  Do not share these credentials with other untrusted parties. 
+
+Return to the main [Installation Guide](INSTALLATION.md#part-ii-running-hosting-the-web-portal) and proceed with **Part II: Web Hosting** to launch the web portal. 
+

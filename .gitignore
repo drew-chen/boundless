@@ -17,8 +17,10 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 
-# Cloud functions related ignore
+### Cloud functions related ignore
 .firebaserc
+# log file created by tools/fbm/fbm.py
+/app/firebase-debug.log 
 
 # make related ignore
 setup.o
