@@ -150,8 +150,13 @@ Methods:
                           <div class="col q-ml-md">
                             <q-img
                               contain
-                              class="project-img bg-black"
+                              class="project-img"
                               :src="mainImage.cur"
+                              :style="
+                                `background: ${
+                                  mainImage.color ? mainImage.color : 'black'
+                                }`
+                              "
                               :ratio="4/3"
                             />
                           </div>
@@ -449,37 +454,63 @@ Methods:
                           </div>
 
                           <!-- ---------------- Main Image ---------------- -->
-                          <div
-                            class="col q-ml-md cursor-pointer" @click="invokeFilePicker"
-                          >
-                            <q-img
-                              contain
-                              class="project-img bg-black"
-                              :src="mainImage.cur"
-                              :ratio="4/3"
-                            />
+                          <div class="q-ml-md col">
+                            <div align="center">
+                              <q-btn
+                                outline
+                                label="Image Background Color"
+                                @click="updated = true"
+                              >
+                                <q-popup-proxy
+                                  transition-show="scale"
+                                  transition-hide="scale"
+                                >
+                                  <q-color flat v-model="mainImage.color" />
 
-                            <q-icon
-                              dense flat
-                              class="full-width"
-                              size="xs" color="accent"
-                              name="collections"
-                            />
+                                  <q-btn flat v-close-popup>
+                                    Done
+                                  </q-btn>
+                                </q-popup-proxy>
+                              </q-btn>
+                            </div>
 
-                            <input
-                              hidden
-                              type="file" ref="imageInput"
-                              accept="image/*"
-                              @change="filePickerOnChange"
-                            />
-
-                            <q-tooltip
-                              anchor="bottom middle"
-                              self="top middle"
-                              :offset="[10, 10]"
+                            <div
+                              class="cursor-pointer" @click="invokeFilePicker"
                             >
-                              Choose your image file...
-                            </q-tooltip>
+                              <q-img
+                                contain
+                                class="project-img"
+                                :src="mainImage.cur"
+                                :style="
+                                  `background: ${
+                                    mainImage.color ? mainImage.color : 'black'
+                                  }`
+                                "
+                                :ratio="4/3"
+                              />
+
+                              <q-icon
+                                dense flat
+                                class="full-width"
+                                size="xs" color="accent"
+                                name="collections"
+                              />
+
+                              <input
+                                hidden
+                                type="file" ref="imageInput"
+                                accept="image/*"
+                                @change="filePickerOnChange"
+                              />
+
+                              <q-tooltip
+                                anchor="bottom middle"
+                                self="top middle"
+                                :offset="[10, 10]"
+                              >
+                                Choose your image file...
+                              </q-tooltip>
+                            </div>
                           </div>
                         </div>
 
@@ -2070,6 +2101,7 @@ export default {
       //                      ['Edit', 'Preview', 'DB']
       submitMode: '',
       mainImage: { // <Object>: record of main image
+        color: 'black', // <String>: background color of main image
         prev: '', // <String>: url of the previous image
         cur: '', // <String>: blob url of the current file
         file: '' // <File>: file data of the current file
@@ -2516,6 +2548,8 @@ export default {
               this.curData.webpage.imgURL
             ).put(this.mainImage.file)
           }
+          // adding color for main image
+          this.curData.webpage.imgBgColor = this.mainImage.color
 
           await this.db.collection('challenges').doc(this.curData.uuid).set({
             webpage: this.curData.webpage || {}, // obj
@@ -2762,6 +2796,10 @@ export default {
             this.mainImage.cur = this.getMainPhoto()
             this.mainImage.prev = this.mainImage.cur
           }
+        }
+
+        if (this.curData.webpage.imgBgColor) {
+          this.mainImage.color = this.curData.webpage.imgBgColor
         }
 
         this.aliasMap = res[1].data().alias || {}

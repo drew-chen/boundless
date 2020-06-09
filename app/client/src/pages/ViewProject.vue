@@ -124,10 +124,15 @@ Methods:
                           <div class="col-5 q-mt-sm">
                             <!-- --------------- Main Image ---------------- -->
                             <q-img
-                              class="project-img bg-black"
-                              :src="projectImagePath"
-                              :ratio="4/3"
                               contain
+                              class="project-img"
+                              :src="projectImagePath"
+                              :style="
+                                `background: ${
+                                  mainImgBgColor ? mainImgBgColor : 'black'
+                                }`
+                              "
+                              :ratio="4/3"
                             />
                           </div>
 
@@ -555,6 +560,7 @@ export default {
         category: 'projects' // <String>: category of the banner
       },
       projectImagePath: '', // <String>: url of the main image
+      mainImgBgColor: 'black', // <String>: background color of main image
       fixedDialog: false, // <Boolean>: trigger for chip pop-up dialog
       dialogJSON: { // <Object>: information to display inside chip pop-up
         title: '', // <String>: label of the chip
@@ -871,6 +877,10 @@ export default {
             } catch (error) {
               this.projectImagePath = await this.getMainPhoto()
             }
+          }
+
+          if (this.data.webpage.imgBgColor) {
+            this.mainImgBgColor = this.data.webpage.imgBgColor
           }
         } else {
           errMsg = 'Webpage information are corrupted!'

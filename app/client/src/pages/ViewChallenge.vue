@@ -120,8 +120,13 @@ Methods:
                       <div class="col q-ml-md">
                         <q-img
                           contain
-                          class="project-img bg-black"
+                          class="project-img"
                           :src="challengeImagePath"
+                          :style="
+                            `background: ${
+                              mainImgBgColor ? mainImgBgColor : 'black'
+                            }`
+                          "
                           :ratio="4/3"
                         />
                       </div>
@@ -606,6 +611,7 @@ export default {
         category: 'challenges' // <String>: category of the banner
       },
       challengeImagePath: '', // <String>: url of the main image
+      mainImgBgColor: 'black', // <String>: background color of main image
       fixedDialog: false, // <Boolean>: trigger for chip pop-up dialog
       dialogJSON: { // <Object>: information to display inside chip pop-up
         title: '', // <String>: label of the chip
@@ -921,6 +927,10 @@ export default {
             } catch (error) {
               this.challengeImagePath = await this.getMainPhoto()
             }
+          }
+
+          if (this.data.webpage.imgBgColor) {
+            this.mainImgBgColor = this.data.webpage.imgBgColor
           }
         } else {
           errMsg = 'Webpage information are corrupted!'
