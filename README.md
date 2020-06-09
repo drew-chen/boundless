@@ -24,7 +24,7 @@ The approach is simple:
 # Project Documentation
   * [Contributor Guide](docs/Contribute/Contribute-main.md)
   * [Installation Guide](docs/Installation/Install-main.md)
-  * [Maintenance Guide](docs/Maintenance/Maintain-main.md)
+  * [Maintenance Guide](docs/Maintain/Maintain-main.md)
 
 # Project License
 
