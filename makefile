@@ -22,10 +22,12 @@ root_dir:=$(shell pwd)
 default: help
 
 fb_init: init.js
-	@node app/config/system_init.js && \
-	cd app && \
-	./setup.sh && \
-	./database_setup.sh
+	@node app/config/system_init.js && cd app && \
+	chmod 777 setup.sh && ./setup.sh && \
+	chmod 777 database_setup.sh && ./database_setup.sh && \
+	chmod 777 demo.sh && chmod 777 build.sh && \
+	cd server/firebase && chmod 777 deploy.sh && \
+	chmod 777 export.sh
 
 run:
 	@cd app && \
