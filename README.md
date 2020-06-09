@@ -19,7 +19,12 @@ The approach is simple:
 
 # Installation Guide
 
-[The Installation Guide can be found here:](./docs/Installation/INSTALLATION.md)
+[The Installation Guide can be found here:](docs/Installation/Install-main.md)
+
+# Project Documentation
+  * [Contributor Guide](docs/Contribute/Contribute-main.md)
+  * [Installation Guide](docs/Installation/Install-main.md)
+  * [Maintenance Guide](docs/Maintenance/Maintain-main.md)
 
 # Project License
 

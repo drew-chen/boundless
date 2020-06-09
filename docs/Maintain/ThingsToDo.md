@@ -7,5 +7,5 @@
 
 ## Test List
   * Test storage export
-  * Can we export aout the test db?
-  * Is there a seperate test Storage & if there is can it be exported?
+  * Can we export out the test db?
+  * Is there a separate test Storage & if there is can it be exported?
