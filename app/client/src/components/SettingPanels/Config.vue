@@ -604,6 +604,9 @@ export default {
         })
       }
 
+      this.data.keywords = this.data.keywords.filter(
+        v => v in this.keywords
+      )
       // this.data.listingTable.bannerImg.url
       // this.data.webpage.bannerImg.url
       // this.data.webpage.mainImg.url

@@ -320,6 +320,10 @@ export default {
       await this.loadProjectList()
 
       this.loadProgressBarConf()
+
+      this.keywordsInUse = this.keywordsInUse.filter(
+        v => v in this.keywordsValToKeyMap
+      )
     } catch (error) {
       throw new Error(error)
     }

@@ -27,7 +27,7 @@ fb_init: init.js
 	chmod 777 database_setup.sh && ./database_setup.sh && \
 	chmod 777 demo.sh && chmod 777 build.sh && \
 	cd server/firebase && chmod 777 deploy.sh && \
-	chmod 777 export.sh
+	chmod 777 export.sh && cd functions && npm i
 
 run:
 	@cd app && \
@@ -42,7 +42,7 @@ build:
 	./build.sh
 
 fb_functions_deploy:
-	@cd app/server/firebase && \
+	@cd app/server/firebase/functions && npm i && cd .. && \
 	./deploy.sh
 
 fb_export_storage:

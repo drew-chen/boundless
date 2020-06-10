@@ -94,12 +94,12 @@ def do_export(args):
   if args.target != None:
     target = args.target
   else:
-    target = 'storage_{}'.format(source[5:])
-
+    target = '{}.storage'.format(source[5:-12])
+  
   time = datetime.datetime.now()
   time = time.strftime("%m.%d.%Y_%H_%M_%S")
 
-  target = "{}_{}".format(target, time)
+  target = "{}.{}".format(target, time)
 
   print("intiating export...")
   print("generating: {}".format(target))

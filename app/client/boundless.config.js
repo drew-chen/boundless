@@ -38,6 +38,7 @@ export const layoutConfig = {
   homeURL: '',
   companyName: '',
   defaultImg: '',
+  switchDatabase: false,
   // hairCut: false, // feature for later
   challenges: false
 }

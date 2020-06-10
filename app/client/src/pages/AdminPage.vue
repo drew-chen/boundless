@@ -161,13 +161,24 @@ Methods:
                 <q-tab-panels v-model="optionTab">
                   <!-- ---------- Managing Data from Database ---------- -->
                   <q-tab-panel name="database">
-                    <div class="text-h4 q-mb-md">
+                    <div class="text-h4">
                       Database
                       <q-separator color="secondary" />
                     </div>
+                    <div class="q-mb-sm q-ml-md">
+                      ({{ dbId }})
+                    </div>
 
                     <q-page>
-                      <div class="q-px-sm">
+                      <ManageDatabase
+                        @importingToDB="consoleLoading"
+                        @databaseId="loadDatabaseId"
+                      />
+
+                      <div
+                        class="q-px-sm q-mt-lg"
+                        :hidden="!layoutConfig.switchDatabase"
+                      >
                         <div class="q-pb-sm">
                           <b class="text-h6">Switch Database</b>
                           <q-separator color="secondary" />
@@ -184,10 +195,6 @@ Methods:
                           @input="switchDatabase"
                         />
                       </div>
-
-                      <ManageDatabase
-                        @importingToDB="consoleLoading"
-                      />
                     </q-page>
                   </q-tab-panel>
 
@@ -352,6 +359,7 @@ export default {
       optionTab: 'general', // <String>: name of the option tab
       splitterModel: 15, // <Number>: % of vw that left splitter is located
       db: null, // <String>: name of the database
+      dbId: null, // <String>: project id of the firebase cred
       parentOption: 'projects', // <String>: name of the parent tab
       previewRatio: '5', // <String>: ratio for preview of imges in child
       configs: { // <Object<Object>>: configuration records of all collections
@@ -387,6 +395,15 @@ export default {
           this.layoutConfig.homeURL = storedConfig.wikiInfo.url || ''
         }
       }
+    },
+    loadDatabaseId: function (databaseId) {
+      /**
+       * handle page loading via child event
+       * @param {Boolean} loadVal: event emitter value to render loading
+       * @return {void}
+       */
+
+      this.dbId = databaseId
     },
     loadKeywords: function (val) {
       /**

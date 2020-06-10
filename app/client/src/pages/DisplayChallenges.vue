@@ -348,6 +348,10 @@ export default {
         this.$router.push('/err')
       }
       // TODO: remove the code above after route handler
+
+      this.keywordsInUse = this.keywordsInUse.filter(
+        v => v in this.keywordsValToKeyMap
+      )
     } catch (error) {
       throw new Error(error)
     }

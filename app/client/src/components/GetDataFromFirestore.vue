@@ -19,10 +19,10 @@ Methods:
 ## -->
 
 <template>
-  <div class="q-pa-sm full-width">
+  <div class="q-px-sm full-width">
     <q-card flat class="">
       <!-- IMPORT DATABASE -->
-      <div class="q-mt-md">
+      <div class="">
         <div>
           <b class="text-h6">Import Database</b>
           <q-separator color="secondary" />
@@ -36,14 +36,12 @@ Methods:
 
         <q-form @submit="onSubmit">
           <div class="">
-            <div class="col">
-              <q-btn
-                no-caps label="Import" type="submit"
-                style="width: 145px;"
-                :disable="!attachedFile"
-                :color="attachedFile ? 'secondary' : 'grey'"
-              />
-            </div>
+            <q-btn
+              no-caps label="Import" type="submit"
+              style="width: 145px;"
+              :disable="!attachedFile"
+              :color="attachedFile ? 'secondary' : 'grey'"
+            />
           </div>
         </q-form>
       </div>
@@ -60,7 +58,7 @@ Methods:
             no-caps
             style="width: 145px;"
             class="col" color="secondary" label="Download"
-            @click="download('boundless_data', data)"
+            @click="download(`${dbId}.data`, data)"
           />
         </div>
       </div>
@@ -79,6 +77,9 @@ export default {
     try {
       await this.loadFireRefs()
       await this.loadData()
+
+      this.dbId = this.db.XT.bT.ci.projectId
+      this.$emit('databaseId', this.dbId)
     } catch (error) {
       throw new Error(error)
     }
@@ -86,6 +87,7 @@ export default {
   data () {
     return {
       db: null, // <Object>: firebase object referencing the database
+      dbId: null, // <String>: project id of the firebase cred
       loading: false, // <Boolean>: flag for page loading
       attachedFile: false, // <Boolean>: flag to check import file is attached
       // meta <Object>: meta data of the database to be exported or imported
@@ -149,34 +151,41 @@ export default {
        * @return {Promise<Boolean>}
        */
 
-      let promises = []
+      this.$q.dialog({
+        title: 'Confirmation to Import',
+        message: 'The old data will be overwritten!',
+        cancel: true,
+        persistent: true
+      }).onOk(async () => {
+        let promises = []
 
-      try {
-        this.$emit('importingToDB', true)
+        try {
+          this.$emit('importingToDB', true)
 
-        this.importDataField.forEach(colObj => {
-          let dbCollection = this.db.collection(colObj.name)
+          this.importDataField.forEach(colObj => {
+            let dbCollection = this.db.collection(colObj.name)
 
-          colObj.data.forEach(colData => {
-            promises.push(dbCollection.doc(colData.doc_id).set(colData.data))
+            colObj.data.forEach(colData => {
+              promises.push(dbCollection.doc(colData.doc_id).set(colData.data))
+            })
           })
-        })
 
-        await Promise.all(promises)
+          await Promise.all(promises)
 
-        setTimeout(() => {
-          this.$q.sessionStorage.remove('boundless_config')
-          this.$q.sessionStorage.remove('boundless_timeout')
+          setTimeout(() => {
+            this.$q.sessionStorage.remove('boundless_config')
+            this.$q.sessionStorage.remove('boundless_timeout')
 
-          this.$emit('importingToDB', false)
+            this.$emit('importingToDB', false)
 
-          location.reload()
+            location.reload()
 
-          return true
-        }, 100)
-      } catch (error) {
-        return false
-      }
+            return true
+          }, 100)
+        } catch (error) {
+          return false
+        }
+      })
     },
     download: function (filename, text) {
       /**
