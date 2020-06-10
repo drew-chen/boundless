@@ -7,40 +7,22 @@ The current system utilizes google's firebase database, storage and serverless f
 ## I.1) Prerequisites
 Here are the require prerequisites: 
   * Create a dedeciate Google gmail account (we will enable Google's Firebase database and storage)
-  * Use google chrome to maange access to Firebase (will inherit browser credentials during the installation)
+  * Use google chrome to manage access to Firebase (will inherit browser credentials during the installation)
   * A computer to build and configure the the portal (**build computer**)
     * will need access to a **unix/bash terminal** with **GNU make**. [Git Bash](https://gitforwindows.org/) is often used on Windows with a Windows version of make [here](https://gist.github.com/evanwill/0207876c3243bbb6863e65ec5dc3f058#make).
   * a **server computer** to host the web portal in production. For the server computer you could also use firebase hosting, the build computer or another dedicated server (e.g., running Apache server)
   
-From your **build computer** linux terminal window:
-```bash
-$ git clone https://github.com/Wind-River/boundless.git && cd boundless
-$ echo "" > init.js   ## We need to create file init.js for a later step.
-```
-Next we want to install the firebase cli and tools. 
-
-```bash
-### inside portal root directory: .../boundless
-$ npm install -g firebase-tools
-
-### this could take several minutes since this will be installing dozens of dependencies
-$ cd app/server/firebase/functions 
-$ npm i 
-$ cd ../../..  ## go to the root/app directory to execute the next command
-```
-We want to log into firebase via the command line. It may pop up the chrome browser for additional input. 
-```bash
-### 'firebase login' should prompt broswer, please select proper google account since
-### this command will be grabbing credentials from the browser
-$ firebase login --interactive ## log into the google account which holds the firebase project
-```
-
 ## I.2) Firebase Project Creation and Credentials
-In this section we need to create the firebase database, storage and server side functions. At the end you will need to make a copy of the database credentials to securely configure the web portal in **Part II**. This should take about 30 minutes. Because there are a number of steps - we created a document dedicated to setting up Firebase which can be found here: [Firebase Installation](FirebaseInstall.md).
+In this section we need to create the firebase database, storage and server side functions. At the end you will need to make a copy of the database credentials to securely configure the web portal in **Part II**. This should take about 30 minutes. Because there are a number of steps - we created a document dedicated to setting up Firebase which can be found here: [Firebase Installation](Install-Firebase.md).
+
+## I.3) System Build 
+Instructions for the following platforms:
+  * Windows Server and Windins 10: [Instructions](Install-Windows.md)
+  * Linux Server (tested on Ubuntu 18): [Instructions](Install-Ubuntu.md)
 
 Once you completed the Firebase Installation instructions, which concludes with the coping of your database credentials into **init.js**, proceed to the next section.
 
-## I.3) Firebase Initialize and Function Loading
+## I.4) Database Build and Server Side Function Loading
 From the **terminal** run the following to install firebase functions (you must have **make** installed):
 ```bash
 $ make fb_init
