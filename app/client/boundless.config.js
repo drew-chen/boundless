@@ -53,6 +53,8 @@ export const dbMeta = {
   }
 }
 
+// core data that gets loaded the very first time the software runs
+//
 export const configSkeleton = {
   allowedDomain: [],
   bodyContentType: [

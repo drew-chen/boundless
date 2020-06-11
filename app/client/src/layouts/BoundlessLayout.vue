@@ -321,7 +321,7 @@ export default {
     },
     loadConfig: async function () {
       /**
-       * load the config from the db
+       * load the config from the db to session
        * TODO: this should be replaced since config/project is cached in session
        * @param {void}
        * @return {Promise<Boolean>}
@@ -332,6 +332,7 @@ export default {
 
         if (doc.exists) {
           this.$q.sessionStorage.set('boundless_config', doc.data())
+          // count down to refetch config from db
           this.$q.sessionStorage.set(
             'boundless_timeout', Date.now() + 5 * 60 * 1000
           )
@@ -397,6 +398,7 @@ export default {
        * @return {void}
        */
 
+      // if logged in, clean cookies and session token
       if (this.$q.sessionStorage.has('admin_token')) {
         this.$q.sessionStorage.remove('admin_token')
         this.$q.cookies.remove('userToken')
@@ -405,6 +407,7 @@ export default {
           if (err) {
           }
         })
+      // otherwise, admin is not logged in, and wants to log in
       } else {
         this.logInDialog()
       }
@@ -413,7 +416,7 @@ export default {
     },
     logInDialog: async function () {
       /**
-       * helper function for admin login
+       * this function processes the admin log in
        * @param {void}
        * @return {void}
        */
@@ -429,6 +432,7 @@ export default {
         cancel: true,
         persistent: true
       }).onOk(data => {
+        // passed in data is 'admin', then prompt password
         if (data === dbMeta.admin.username) {
           this.$q.dialog({
             title: 'Admin Log In',
@@ -442,9 +446,11 @@ export default {
             persistent: true
           }).onOk(async (data) => {
             try {
+              // grab the db meta data
               let metaCol = this.db.collection('--db_meta--').doc('data')
               let doc = await metaCol.get()
 
+              // if db_meta collection exists, proceed to log in
               if (doc.exists) {
                 let docData = doc.data()
                 let correctPass = false
@@ -475,6 +481,7 @@ export default {
                   }, 300)
                 }
               } else {
+                // does not exist, construct/initialize the db
                 let dbConfigRef = this.db.collection('config').doc('project')
 
                 await this.db.collection('--db_meta--').doc('data').set(dbMeta)
