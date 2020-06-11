@@ -19,75 +19,141 @@ Methods:
 
 <template>
   <div class="q-pa-md">
+    <q-card class="q-pa-md">
 
-    <q-splitter class="q-gutter-sm" v-model="splitterModel" :limits="[30, 70]" >
+      <div class="q-px-md q-gutter-md q-mb-sm">
+        <q-btn outline label="Background Color">
+          <q-popup-proxy transition-show="scale" transition-hide="scale">
+            <q-color flat v-model="generalConfig.bgColor" />
 
-      <template v-slot:before>
-        <div class="q-pa-md">
-          <q-input
-            autogrow outlined dense
-            debounce="300" type="textarea"
-            v-model="generalConfig.data"
-          />
-        </div>
+            <q-btn class="float-right" flat v-close-popup >Done</q-btn>
+          </q-popup-proxy>
+        </q-btn>
 
-        <div class="q-px-md q-gutter-md">
-          <q-btn outline label="Background Color">
-            <q-popup-proxy transition-show="scale" transition-hide="scale">
-              <q-color flat v-model="generalConfig.bgColor" />
+        <q-btn outline label="Text Color">
+          <q-popup-proxy transition-show="scale" transition-hide="scale">
+            <q-color flat v-model="generalConfig.txtColor" />
 
-              <q-btn class="float-right" flat v-close-popup >Done</q-btn>
-            </q-popup-proxy>
-          </q-btn>
+            <q-btn class="float-right" flat v-close-popup >Done</q-btn>
+          </q-popup-proxy>
+        </q-btn>
 
-          <q-btn outline label="Text Color">
-            <q-popup-proxy transition-show="scale" transition-hide="scale">
-              <q-color flat v-model="generalConfig.txtColor" />
-
-              <q-btn class="float-right" flat v-close-popup >Done</q-btn>
-            </q-popup-proxy>
-          </q-btn>
-
-          <q-btn
-            outline v-close-popup
-            class="float-right" color="green"
-            @click="submitMarkdown"
-          >
-            Submit
-          </q-btn>
-
-          <q-btn flat v-close-popup class="float-right" >
-            Cancel
-          </q-btn>
-
-        </div>
-      </template>
-
-      <template v-slot:separator>
-        <q-avatar
-          color="info"
-          text-color="white"
-          size="40px" icon="drag_indicator"
-        />
-      </template>
-
-      <template v-slot:after>
-        <div
-          class="q-pa-md"
-          :style="{
-            backgroundColor: generalConfig.bgColor,
-            color: generalConfig.txtColor
-          }"
+        <q-btn
+          outline v-close-popup
+          class="float-right" color="green"
+          @click="submitMarkdown"
         >
-          <MarkdownTranslator
-            :storage="storage"
-            :data="generalConfig.data"
+          Submit
+        </q-btn>
+
+        <q-btn flat v-close-popup class="float-right" >
+          Cancel
+        </q-btn>
+
+      </div>
+
+      <q-tabs
+        dense
+        class="text-grey" align="left"
+        active-color="secondary"
+        indicator-color="primary"
+        v-model="generalConfig.view"
+      >
+        <q-tab name="edit" label="Edit" />
+
+        <q-separator vertical />
+
+        <q-tab name="preview" label="Preview" />
+
+        <q-space />
+
+        <!-- <q-btn-dropdown
+          v-if="
+            curData.files &&
+            Object.entries(curData.files).length
+          "
+          stretch flat
+          label="Attachments"
+        >
+          <q-list>
+            <q-item
+              v-for="(val, key, ind) in curData.files"
+              :key="ind"
+              dense
+            >
+              <q-item-section>
+                {{ key }}
+              </q-item-section>
+
+              <q-item-section side avatar>
+                <q-btn
+                  round flat dense
+                  icon="far fa-clipboard"
+                  @click="
+                    fetchAttachmentURL(
+                      val, 'projects'
+                    )
+                  "
+                />
+              </q-item-section>
+            </q-item>
+          </q-list>
+        </q-btn-dropdown> -->
+      </q-tabs>
+
+      <q-separator />
+
+      <q-tab-panels
+        animated
+        v-model="generalConfig.view"
+      >
+        <q-tab-panel name="edit">
+          <div class="row" align="left">
+            <strong>Markdown/HTML</strong>
+            <hr class="col q-ml-sm">
+          </div>
+
+          <q-input
+            filled autogrow
+            class="q-mt-sm"
+            label="Body/Text Description"
+            placeholder="Please enter the body for the respective label."
+            v-model="generalConfig.data"
+            :rules="
+              [val => !!val || 'Field is required']
+            "
+            @focus="updated = true"
           />
-        </div>
-      </template>
+        </q-tab-panel>
 
-    </q-splitter>
+        <q-tab-panel name="preview">
+          <div
+            v-if="!generalConfig.data"
+            class="q-pa-md"
+            style="background-color: black; color: white;"
+          >
+            <MarkdownTranslator
+              :storage="storage"
+              :data="defaultText"
+            />
+          </div>
 
+          <div
+            v-else
+            class="q-pa-md"
+            :style="{
+              backgroundColor: generalConfig.bgColor,
+              color: generalConfig.txtColor
+            }"
+          >
+            <MarkdownTranslator
+              :storage="storage"
+              :data="generalConfig.data"
+            />
+          </div>
+        </q-tab-panel>
+      </q-tab-panels>
+    </q-card>
   </div>
 </template>
 
@@ -120,16 +186,18 @@ export default {
   },
   data () {
     return {
+      // defaultText <String>: placeholder text for empty input
+      defaultText: ':::\nPut your markdown here\n\nClassic markup: :wink: :joy: :cry: :angel: :heart: :beers: :laughing: :yum:\n\nShortcuts (emoticons): :-) :-( 8-) ;)\n:::\nMax fixed size image: 200x200; responsive\n![Minion](https://octodex.github.com/images/minion.png =200x200)\n\n# Best of all, the box autogrows!\n',
       // generalConfig <Object>: record of the general config object associated
       //                         to the right panel of about page
       generalConfig: {
+        view: 'edit', // <String>: specify which tab to shows for tab panels
         // data <String>: string to be displayed on the right about panel
         data: ':::\nPut your markdown here\n\nClassic markup: :wink: :joy: :cry: :angel: :heart: :beers: :laughing: :yum:\n\nShortcuts (emoticons): :-) :-( 8-) ;)\n:::\nMax fixed size image: 200x200; responsive\n![Minion](https://octodex.github.com/images/minion.png =200x200)\n\n# Best of all, the box autogrows!\n',
         // bgColor <String>: hex string encoding color of the background
         bgColor: '#000000',
         txtColor: '#ffffff' // <String>: hex string encoding color of the text
-      },
-      splitterModel: 50 // <Integer>: page splitter
+      }
     }
   },
   methods: {

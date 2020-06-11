@@ -213,6 +213,10 @@ export default {
 
         this.loadChallengeFlag(cachedConfig)
       }
+
+      if (!this.layoutConfig.switchDatabase) {
+        this.$q.localStorage.set('boundless_db', 'production')
+      }
     } catch (error) {
       throw new Error(error)
     }
