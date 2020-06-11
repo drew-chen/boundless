@@ -1,14 +1,16 @@
+# auto gen from quasar framework
 .quasar
 .DS_Store
 .thumbs.db
 node_modules
 dist
 
+# local config info not to be stored in github
 /app/config/system.yml
 /app/config/system.js
-
 /app/client/database.cred.js
 
+# auto gen from quasar framework
 /app/src-cordova/node_modules
 /app/src-cordova/platforms
 /app/src-cordova/plugins
