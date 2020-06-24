@@ -5,11 +5,12 @@ Once the user has finished with the installation, follow the following cmd to ex
 
 ```sh
 # gs://<bucket_name> can be retrieved from firebase storage or
-# google cloud platform
-$ gsutil -m cp -R gs://<bucket_name> .
-
-# in gitbash for windows run the following:
 $ gsutil.cmd -m cp -R gs://<bucket_name> .
+
+$ cd <root>/app/server/firebase/storage
+
+$ gsutil.cmd cors set cors.json gs://<bucket>
+
 ```
 
 For a built-in util tools, please 'cd' into './tools/fbm' and follow the these [instructions.](../tools/fbm/README.md)
