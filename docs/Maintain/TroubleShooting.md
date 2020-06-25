@@ -77,7 +77,69 @@ $ firebase login -- interacrtive
 +  Success! Logged in as boundless.inv@gmail.com
 ```
 
+## Firebase Storage
 
+### When you see an error similar to:
 
+```bash
+boundless $ make fb_export_storage
+This make take several minutes to complete...
+Exporting production
+AccessDeniedException: 403 avitechx360@gmail.com does not have storage.objects.list access to the GCloud Storage bucket.
+CommandException: 1 file/object could not be transferred.
+intiating export...
+generating: boundless-d7c8e.storage.06.24.2020_22_28_48
+starting the zipping process...
+deleting the content...
+
+Export completed sucessfully
+The zipped file is available inside ~/tools/fbm folder!
+```
+
+**Solution 1**: You have go to the glcould SDK and initialize or re-initialize. In the SDK Try:
+
+```bash
+C:\Users\mgisi\AppData\Local\Google\Cloud SDK>gcloud init
+Welcome! This command will take you through the configuration of gcloud.
+
+Settings from your current configuration [default] are:
+core:
+  account: avitechx360@gmail.com
+  disable_usage_reporting: 'True'
+  project: avitech4-a7739
+
+Pick configuration to use:
+ [1] Re-initialize this configuration [default] with new settings
+ [2] Create a new configuration
+Please enter your numeric choice:  1
+
+Your current configuration has been set to: [default]
+
+You can skip diagnostics next time by using the following flag:
+  gcloud init --skip-diagnostics
+
+Network diagnostic detects and fixes local network connection issues.
+Checking network connection...done.
+Reachability Check passed.
+Network diagnostic passed (1/1 checks passed).
+
+Choose the account you would like to use to perform operations for
+this configuration:
+ [1] avitechx360@gmail.com
+ [2] boundless.inv@gmail.com
+ [3] Log in with a new account
+Please enter your numeric choice:  2
+
+You are logged in as: [boundless.inv@gmail.com].
+
+Pick cloud project to use:
+ [1] boundless-d7c8e
+ [2] boundless1-c52f8
+ [3] Create a new project
+Please enter numeric choice or text value (must exactly match list
+item):  1
+
+Your current project has been set to: [boundless-d7c8e].
+```
 
 
