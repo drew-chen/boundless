@@ -59,7 +59,11 @@ Methods:
           placeholder="Please enter the name of the challenge..."
           label="Challenge Name"
           lazy-rules
-          :rules="[val => !!val || 'Field is required']"
+          :rules="[
+            val => $v.challengeName.required || 'Field is required',
+            val => $v.challengeName.maxLength || 'Max length is 60 characters'
+          ]"
+          @input="$v.challengeName.$touch()"
           @keydown.ctrl.shift.65="activateAdmin"
         >
           <template v-slot:prepend>
@@ -78,7 +82,8 @@ Methods:
           label="Description/Overview"
           type="textarea"
           lazy-rules
-          :rules="[val => !!val || 'Field is required']"
+          @input="$v.challengeDescription.$touch()"
+          :rules="[val => $v.challengeDescription.required || 'Field is required']"
         >
           <template v-slot:prepend>
             <q-icon name="far fa-comment-alt" />
@@ -145,7 +150,8 @@ Methods:
               v-model="sponsors[index].email"
               :ref="`memberEmail${index}`"
               :autofocus="index > 0"
-              :rules="[val => !!val || 'Field is required']"
+              :rules="[val => $v.sponsors.$each[index].email.required || 'Field is required']"
+              @input="$v.sponsors.$each[index].email.$touch()"
               @blur="emailDomainCheck(sponsors[index].email, index)"
             >
               <template v-slot:prepend>
@@ -160,7 +166,8 @@ Methods:
               placeholder="ie. John Doe" label="Contributor's Full Name"
               v-model="sponsors[index].name"
               :ref="`memberName${index}`"
-              :rules="[val => !!val || 'Field is required']"
+              :rules="[val => $v.sponsors.$each[index].name.required || 'Field is required']"
+              @input="$v.sponsors.$each[index].name.$touch()"
               @blur="capitalizeFirstChar(index)"
             >
               <template v-slot:prepend>
@@ -647,6 +654,8 @@ import testingDb from '../firebase/init_testing'
 
 import { layoutConfig } from '../../boundless.config'
 
+import { required, maxLength } from 'vuelidate/lib/validators'
+
 export default {
   async created () {
     try {
@@ -708,6 +717,25 @@ export default {
       addedContent: false,
       loading: false, // <Boolean>: flag for loading animation
       adminMode: false // <Boolean>: flag for activating admin mode
+    }
+  },
+  validations: {
+    challengeName: {
+      required,
+      maxLength: maxLength(60)
+    },
+    challengeDescription: {
+      required
+    },
+    sponsors: {
+      $each: {
+        name: {
+          required
+        },
+        email: {
+          required
+        }
+      }
     }
   },
   methods: {
