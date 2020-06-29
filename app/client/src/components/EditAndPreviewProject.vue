@@ -364,7 +364,7 @@ Methods:
                             buttons
                             title="Edit Project Name"
                             v-model="editedName"
-                            :validate="() => !$v.editedName.$invalid"
+                            :validate="validateName"
                             @save="saveEditedName"
                           >
                             <q-input
@@ -2342,6 +2342,14 @@ export default {
         this.mainImage.file = ''
         // this.updated = false // removed for persistance
       }
+    },
+    validateName (val) {
+      /**
+       * Validation for the challenge name: editedName.
+       * @param {String} val Dummy, unused variable for the QPopupEdit API
+       * @return {Promise<Boolean>}
+       */
+      return !this.$v.editedName.$invalid
     },
     onSubmit: function () {
       /**

@@ -411,12 +411,11 @@ Methods:
                                 <q-icon
                                   size=".8em" color="accent" name="edit"
                                 />
-
                                 <q-popup-edit
                                   buttons
                                   title="Edit Challenge Name"
                                   v-model="editedName"
-                                  :validate="() => !$v.editedName.$invalid"
+                                  :validate="validateName"
                                   @save="saveEditedName"
                                 >
                                   <q-input
@@ -2503,6 +2502,14 @@ export default {
         this.mainImage.cur = this.mainImage.prev
         this.mainImage.file = ''
       }
+    },
+    validateName (val) {
+      /**
+       * Validation for the challenge name: editedName.
+       * @param {String} val Dummy, unused variable for the QPopupEdit API
+       * @return {Promise<Boolean>}
+       */
+      return !this.$v.editedName.$invalid
     },
     onSubmit: async function () {
       /**
