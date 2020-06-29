@@ -2959,10 +2959,9 @@ export default {
         // nothing goes here
       })
     },
-    projectNameValidation: function (val) {
+    projectNameValidation: function () {
       /**
        * helper function to validate the name of the project
-       * @param {String} val: the new title of the project
        * @return {Boolean}
        */
 

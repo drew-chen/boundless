@@ -416,12 +416,18 @@ Methods:
                                   buttons
                                   title="Edit Challenge Name"
                                   v-model="curData.challenge"
+                                  :validate="challengeNameValidation"
                                   @save="updated = true"
                                 >
                                   <q-input
                                     dense autofocus
                                     class="full-width"
-                                    v-model="curData.challenge"
+                                    :value="curData.challenge"
+                                    @input="updateEditedName($event.target.value)"
+                                    :rules="[
+                                      val => $v.curData.challenge.required || 'Field is required',
+                                      val => $v.curData.challenge.maxLength || 'Max length is 60 characters'
+                                    ]"
                                   />
                                 </q-popup-edit>
                               </div>
@@ -2034,6 +2040,8 @@ import 'firebase/firestore'
 import productionDb, { productionStorage } from '../firebase/init_production'
 import testingDb, { testingStorage } from '../firebase/init_testing'
 
+import { required, maxLength } from 'vuelidate/lib/validators'
+
 import UploadGUI from '../components/Upload'
 import ProjectTable from '../components/Tables/ProjectTable'
 import AddUser from '../components/SubmitUserAdminConsole'
@@ -2115,6 +2123,7 @@ export default {
       loading: false, // <Boolean>: flag for loading
       data: {}, // <Object>: static data of the component from db
       curData: {}, // <Object>: mutable copy of data
+      editedName: '', // <String>: Temporary name until submission
       pageTab: 'main', // <String>: tab value
       splitterModel: 15, // <Integer>: % of width the splitter will occupy
       priorityGague: { // <Object>: data for knob animation
@@ -2135,6 +2144,12 @@ export default {
       extraSponsorInfo: {
         img: {} // <Object>: dictionary of sponsor uid to avater image
       }
+    }
+  },
+  validations: {
+    editedName: {
+      required,
+      maxLength: maxLength(60)
     }
   },
   methods: {
@@ -2270,6 +2285,11 @@ export default {
 
       this.userEmailToObjMap[newUser.email] = newUser
       this.addMemberDialog.use.push(newUser)
+    },
+    updateEditedName (inputValue) {
+      debugger
+      this.editedName = inputValue
+      this.$v.editedName.$touch()
     },
     submitAddMembers: function () {
       /**
@@ -3111,17 +3131,17 @@ export default {
       }).onDismiss(() => {
       })
     },
-    projectNameValidation: function (val) {
+    challengeNameValidation: function () {
       /**
        * helper function to validate project name
-       * @param {String} val: string value to be validated
        * @return {Boolean}
        */
 
-      if (val === '') {
-        return false
+      if (this.$v.curData.challenge.maxLength && this.$v.curData.challenge.required) {
+        console.log(this.$v)
+        return true
       }
-      return true
+      return false
     },
     addCustomField: function () {
       /**
