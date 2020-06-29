@@ -415,18 +415,19 @@ Methods:
                                 <q-popup-edit
                                   buttons
                                   title="Edit Challenge Name"
-                                  v-model="curData.challenge"
-                                  :validate="challengeNameValidation"
-                                  @save="updated = true"
+                                  v-model="editedName"
+                                  :validate="() => !$v.editedName.$invalid"
+                                  @save="updated = true; curData.challenge = editedName"
                                 >
                                   <q-input
                                     dense autofocus
                                     class="full-width"
-                                    :value="curData.challenge"
-                                    @input="updateEditedName($event.target.value)"
+                                    :value="editedName"
+                                    @focus="editedName = curData.challenge"
+                                    @input="updateEditedName($event)"
                                     :rules="[
-                                      val => $v.curData.challenge.required || 'Field is required',
-                                      val => $v.curData.challenge.maxLength || 'Max length is 60 characters'
+                                      val => $v.editedName.required || 'Field is required',
+                                      val => $v.editedName.maxLength || 'Max length is 60 characters'
                                     ]"
                                   />
                                 </q-popup-edit>
@@ -2287,7 +2288,6 @@ export default {
       this.addMemberDialog.use.push(newUser)
     },
     updateEditedName (inputValue) {
-      debugger
       this.editedName = inputValue
       this.$v.editedName.$touch()
     },
@@ -3130,18 +3130,6 @@ export default {
       }).onCancel(() => {
       }).onDismiss(() => {
       })
-    },
-    challengeNameValidation: function () {
-      /**
-       * helper function to validate project name
-       * @return {Boolean}
-       */
-
-      if (this.$v.curData.challenge.maxLength && this.$v.curData.challenge.required) {
-        console.log(this.$v)
-        return true
-      }
-      return false
     },
     addCustomField: function () {
       /**
