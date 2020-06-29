@@ -360,20 +360,21 @@ Methods:
                             class="cursor-pointer"
                             name="edit" size=".8em" color="accent"
                           />
-
                           <q-popup-edit
                             buttons
-                            title="Edit the Project Name"
-                            v-model="curData.project"
-                            :validate="projectNameValidation"
-                            @save="updated = true; $v.curData.project.$touch()"
+                            title="Edit Project Name"
+                            v-model="editedName"
+                            :validate="() => !$v.editedName.$invalid"
+                            @save="saveEditedName"
                           >
                             <q-input
                               dense autofocus filled hide-bottom-space
-                              v-model="curData.project"
+                              :value="editedName"
+                              @focus="editedName = curData.project"
+                              @input="updateEditedName($event)"
                               :rules="[
-                                val => $v.curData.project.required || 'Field is required',
-                                val => $v.curData.project.maxLength || 'Max length is 60 characters'
+                                val => $v.editedName.required || 'Field is required',
+                                val => $v.editedName.maxLength || 'Max length is 60 characters'
                               ]"
                             />
                           </q-popup-edit>
@@ -1991,6 +1992,7 @@ export default {
       loading: false, // <Boolean>: flag for loading
       data: {}, // <Object>: static data of the component from db
       curData: {}, // <Object>: mutable copy of data
+      editedName: '', // <String>: Temporary name for submission
       pageTab: 'main', // <String>: tab value
       splitterModel: 15, // <Integer>: % of width the splitter will occupy
       progressBar: { // <Object>: default object of the progress bar
@@ -2001,11 +2003,9 @@ export default {
     }
   },
   validations: {
-    curData: {
-      project: {
-        required,
-        maxLength: maxLength(60)
-      }
+    editedName: {
+      required,
+      maxLength: maxLength(60)
     }
   },
   methods: {
@@ -2145,6 +2145,14 @@ export default {
       this.userEmailToObjMap[newUser.email] = newUser
       newUser.role = 'member'
       this.addMemberDialog.use.push(newUser)
+    },
+    updateEditedName (inputValue) {
+      this.editedName = inputValue
+      this.$v.editedName.$touch()
+    },
+    saveEditedName () {
+      this.updated = true
+      this.curData.project = this.editedName
     },
     submitAddMembers: function () {
       /**

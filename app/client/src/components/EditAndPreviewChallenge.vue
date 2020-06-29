@@ -417,7 +417,7 @@ Methods:
                                   title="Edit Challenge Name"
                                   v-model="editedName"
                                   :validate="() => !$v.editedName.$invalid"
-                                  @save="updated = true; curData.challenge = editedName"
+                                  @save="saveEditedName"
                                 >
                                   <q-input
                                     dense autofocus
@@ -2124,7 +2124,7 @@ export default {
       loading: false, // <Boolean>: flag for loading
       data: {}, // <Object>: static data of the component from db
       curData: {}, // <Object>: mutable copy of data
-      editedName: '', // <String>: Temporary name until submission
+      editedName: '', // <String>: Temporary name for submission
       pageTab: 'main', // <String>: tab value
       splitterModel: 15, // <Integer>: % of width the splitter will occupy
       priorityGague: { // <Object>: data for knob animation
@@ -2290,6 +2290,10 @@ export default {
     updateEditedName (inputValue) {
       this.editedName = inputValue
       this.$v.editedName.$touch()
+    },
+    saveEditedName () {
+      this.updated = true
+      this.curData.challenge = this.editedName
     },
     submitAddMembers: function () {
       /**
