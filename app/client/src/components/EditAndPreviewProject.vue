@@ -304,13 +304,13 @@ Methods:
                                       :key="ulIndex"
                                     >
                                       <div
-                                        v-if="
+                                        v-if="(
                                           bodyContent.content.type ===
                                           'EVENT_LIST'
-                                        "
+                                        )"
                                         style="
-                                          display: inline; padding-left: 12px;
-                                        "
+                                            display: inline; padding-left: 12px;
+                                          "
                                       >
                                         {{ link.subject }}
                                         <hr>
@@ -366,12 +366,15 @@ Methods:
                             title="Edit the Project Name"
                             v-model="curData.project"
                             :validate="projectNameValidation"
-                            @save="updated = true"
+                            @save="updated = true; $v.curData.project.$touch()"
                           >
                             <q-input
                               dense autofocus filled hide-bottom-space
                               v-model="curData.project"
-                              :rules="[val => !!val || 'Field is required']"
+                              :rules="[
+                                val => $v.curData.project.required || 'Field is required',
+                                val => $v.curData.project.maxLength || 'Max length is 60 characters'
+                              ]"
                             />
                           </q-popup-edit>
 
@@ -1901,6 +1904,8 @@ import 'firebase/firestore'
 import productionDb, { productionStorage } from '../firebase/init_production'
 import testingDb, { testingStorage } from '../firebase/init_testing'
 
+import { required, maxLength } from 'vuelidate/lib/validators'
+
 import UploadGUI from '../components/Upload'
 import ProgressBar from '../components/ProgressBar'
 import AddUser from '../components/SubmitUserAdminConsole'
@@ -1992,6 +1997,14 @@ export default {
         // tags <Array<String>>: list of default values for the progress bar
         tags: ['Idea', 'PoC', 'Value'],
         half: true // <Boolean>: flag for half step
+      }
+    }
+  },
+  validations: {
+    curData: {
+      project: {
+        required,
+        maxLength: maxLength(60)
       }
     }
   },
@@ -2953,10 +2966,11 @@ export default {
        * @return {Boolean}
        */
 
-      if (val === '') {
-        return false
+      if (this.$v.curData.project.maxLength && this.$v.curData.project.required) {
+        console.log(this.$v)
+        return true
       }
-      return true
+      return false
     },
     addCustomField: function () {
       /**
