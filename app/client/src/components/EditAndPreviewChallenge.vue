@@ -411,25 +411,12 @@ Methods:
                                 <q-icon
                                   size=".8em" color="accent" name="edit"
                                 />
-                                <q-popup-edit
-                                  buttons
+                                  <limited-len-input-popup
                                   title="Edit Challenge Name"
-                                  v-model="editedName"
-                                  :validate="validateName"
-                                  @save="saveEditedName"
-                                >
-                                  <q-input
-                                    dense autofocus
-                                    class="full-width"
-                                    :value="editedName"
-                                    @focus="editedName = curData.challenge"
-                                    @input="updateEditedName($event)"
-                                    :rules="[
-                                      val => $v.editedName.required || 'Field is required',
-                                      val => $v.editedName.maxLength || 'Max length is 60 characters'
-                                    ]"
-                                  />
-                                </q-popup-edit>
+                                  :lenLimit="60"
+                                  :initialValue="curData.challenge"
+                                  @save="saveEditedName($event)"
+                                />
                               </div>
                               <q-separator color="secondary" />
                             </div>
@@ -2040,11 +2027,11 @@ import 'firebase/firestore'
 import productionDb, { productionStorage } from '../firebase/init_production'
 import testingDb, { testingStorage } from '../firebase/init_testing'
 
-import { required, maxLength } from 'vuelidate/lib/validators'
-
 import UploadGUI from '../components/Upload'
 import ProjectTable from '../components/Tables/ProjectTable'
 import AddUser from '../components/SubmitUserAdminConsole'
+import LimitedLenInputPopup from '../components/LimitedLenInputPopup.vue'
+
 import MarkdownTranslator from './MarkdownTranslator'
 
 export default {
@@ -2052,7 +2039,8 @@ export default {
     UploadGUI,
     ProjectTable,
     AddUser,
-    MarkdownTranslator
+    MarkdownTranslator,
+    LimitedLenInputPopup
   },
   props: {
     challengeId: String,
@@ -2123,7 +2111,6 @@ export default {
       loading: false, // <Boolean>: flag for loading
       data: {}, // <Object>: static data of the component from db
       curData: {}, // <Object>: mutable copy of data
-      editedName: '', // <String>: Temporary name for submission
       pageTab: 'main', // <String>: tab value
       splitterModel: 15, // <Integer>: % of width the splitter will occupy
       priorityGague: { // <Object>: data for knob animation
@@ -2144,12 +2131,6 @@ export default {
       extraSponsorInfo: {
         img: {} // <Object>: dictionary of sponsor uid to avater image
       }
-    }
-  },
-  validations: {
-    editedName: {
-      required,
-      maxLength: maxLength(60)
     }
   },
   methods: {
@@ -2286,13 +2267,9 @@ export default {
       this.userEmailToObjMap[newUser.email] = newUser
       this.addMemberDialog.use.push(newUser)
     },
-    updateEditedName (inputValue) {
-      this.editedName = inputValue
-      this.$v.editedName.$touch()
-    },
-    saveEditedName () {
+    saveEditedName (editedName) {
       this.updated = true
-      this.curData.challenge = this.editedName
+      this.curData.challenge = editedName
     },
     submitAddMembers: function () {
       /**
@@ -2502,14 +2479,6 @@ export default {
         this.mainImage.cur = this.mainImage.prev
         this.mainImage.file = ''
       }
-    },
-    validateName (val) {
-      /**
-       * Validation for the challenge name: editedName.
-       * @param {String} val Dummy, unused variable for the QPopupEdit API
-       * @return {Promise<Boolean>}
-       */
-      return !this.$v.editedName.$invalid
     },
     onSubmit: async function () {
       /**

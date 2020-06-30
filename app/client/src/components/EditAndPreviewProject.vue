@@ -360,24 +360,13 @@ Methods:
                             class="cursor-pointer"
                             name="edit" size=".8em" color="accent"
                           />
-                          <q-popup-edit
-                            buttons
+
+                          <limited-len-input-popup
                             title="Edit Project Name"
-                            v-model="editedName"
-                            :validate="validateName"
-                            @save="saveEditedName"
-                          >
-                            <q-input
-                              dense autofocus filled hide-bottom-space
-                              :value="editedName"
-                              @focus="editedName = curData.project"
-                              @input="updateEditedName($event)"
-                              :rules="[
-                                val => $v.editedName.required || 'Field is required',
-                                val => $v.editedName.maxLength || 'Max length is 60 characters'
-                              ]"
-                            />
-                          </q-popup-edit>
+                            :lenLimit="60"
+                            :initialValue="curData.project"
+                            @save="saveEditedName($event)"
+                          />
 
                           <q-separator />
                         </div>
@@ -1905,11 +1894,10 @@ import 'firebase/firestore'
 import productionDb, { productionStorage } from '../firebase/init_production'
 import testingDb, { testingStorage } from '../firebase/init_testing'
 
-import { required, maxLength } from 'vuelidate/lib/validators'
-
 import UploadGUI from '../components/Upload'
 import ProgressBar from '../components/ProgressBar'
 import AddUser from '../components/SubmitUserAdminConsole'
+import LimitedLenInputPopup from '../components/LimitedLenInputPopup'
 import MarkdownTranslator from './MarkdownTranslator'
 
 export default {
@@ -1917,7 +1905,8 @@ export default {
     UploadGUI,
     ProgressBar,
     AddUser,
-    MarkdownTranslator
+    MarkdownTranslator,
+    LimitedLenInputPopup
   },
   props: {
     projectId: String,
@@ -1992,7 +1981,6 @@ export default {
       loading: false, // <Boolean>: flag for loading
       data: {}, // <Object>: static data of the component from db
       curData: {}, // <Object>: mutable copy of data
-      editedName: '', // <String>: Temporary name for submission
       pageTab: 'main', // <String>: tab value
       splitterModel: 15, // <Integer>: % of width the splitter will occupy
       progressBar: { // <Object>: default object of the progress bar
@@ -2002,12 +1990,7 @@ export default {
       }
     }
   },
-  validations: {
-    editedName: {
-      required,
-      maxLength: maxLength(60)
-    }
-  },
+
   methods: {
     deleteAttachment: async function (key, pathToFile, type) {
       /**
@@ -2146,13 +2129,9 @@ export default {
       newUser.role = 'member'
       this.addMemberDialog.use.push(newUser)
     },
-    updateEditedName (inputValue) {
-      this.editedName = inputValue
-      this.$v.editedName.$touch()
-    },
-    saveEditedName () {
+    saveEditedName (editedName) {
       this.updated = true
-      this.curData.project = this.editedName
+      this.curData.project = editedName
     },
     submitAddMembers: function () {
       /**
@@ -2342,14 +2321,6 @@ export default {
         this.mainImage.file = ''
         // this.updated = false // removed for persistance
       }
-    },
-    validateName (val) {
-      /**
-       * Validation for the challenge name: editedName.
-       * @param {String} val Dummy, unused variable for the QPopupEdit API
-       * @return {Promise<Boolean>}
-       */
-      return !this.$v.editedName.$invalid
     },
     onSubmit: function () {
       /**
