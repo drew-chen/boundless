@@ -28,12 +28,13 @@ Methods:
   >
     <q-input
       dense autofocus filled hide-bottom-space
+      clearable
       :label="label"
       :value="editedName"
       @input="updateEditedName($event)"
       :rules="[
         val => $v.editedName.required || 'Field is required',
-        val => $v.editedName.maxLength || 'Max length is 60 characters'
+        val => $v.editedName.maxLength || `Max length is ${lenLimit} characters`
       ]"
     />
   </q-popup-edit>
