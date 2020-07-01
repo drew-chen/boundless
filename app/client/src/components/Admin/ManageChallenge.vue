@@ -9,7 +9,7 @@
 ## under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES
 ## OR CONDITIONS OF ANY KIND, either express or implied.
 
-Name:     components/ManageChallenge.vue
+Name:     components/Admin/ManageChallenge.vue
 Purpose:  Dispaly, edit, add, and delete challenge from the admin console
 Methods:
   * Allows the challenge to be added
@@ -116,8 +116,8 @@ Methods:
 
           <q-td
             key="name"
-            :props="props"
             style="width: 300px;"
+            :props="props"
           >
             <div align="left">
               {{ props.row.challenge }}
@@ -144,8 +144,8 @@ Methods:
 
           <q-td
             key="icons"
-            :props="props"
             style="width: 100px;"
+            :props="props"
           >
             <q-btn
               dense round flat
@@ -181,9 +181,7 @@ Methods:
           />
         </q-card-section>
 
-        <q-card-section
-          v-if="dialogOption === 'edit'"
-        >
+        <q-card-section v-if="dialogOption === 'edit'">
           <br>
           <popUpChallenge
             :challengeId="uuid"
@@ -203,11 +201,11 @@ Methods:
 import firebase from 'firebase/app'
 import 'firebase/firestore'
 
-import productionDb, { proAppCall } from '../firebase/init_production'
-import testingDb, { testAppCall } from '../firebase/init_testing'
+import productionDb, { proAppCall } from '../../firebase/init_production'
+import testingDb, { testAppCall } from '../../firebase/init_testing'
 
-import addChallenge from '../components/SubmitChallengeAdminConsole'
-import popUpChallenge from '../components/EditAndPreviewChallenge'
+import addChallenge from '../../components/SubmitChallengeAdminConsole'
+import popUpChallenge from '../../components/EditAndPreviewChallenge'
 
 export default {
   components: {

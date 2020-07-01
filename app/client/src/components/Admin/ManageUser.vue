@@ -9,7 +9,7 @@
 ## under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES
 ## OR CONDITIONS OF ANY KIND, either express or implied.
 
-Name:     components/ManageUser.vue
+Name:     components/Admin/ManageUser.vue
 Purpose:  Display, edit, add, and delete user from the admin console
 Methods:
   * Allows the user to be added
@@ -176,11 +176,11 @@ Methods:
 import firebase from 'firebase/app'
 import 'firebase/firestore'
 
-import productionDb from '../firebase/init_production'
-import testingDb from '../firebase/init_testing'
+import productionDb from '../../firebase/init_production'
+import testingDb from '../../firebase/init_testing'
 
-import AddUser from '../components/SubmitUserAdminConsole'
-import EditUser from '../components/EditUser'
+import AddUser from '../../components/SubmitUserAdminConsole'
+import EditUser from '../../components/EditUser'
 
 export default {
   components: {

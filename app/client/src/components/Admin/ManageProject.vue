@@ -9,7 +9,7 @@
 ## under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES
 ## OR CONDITIONS OF ANY KIND, either express or implied.
 
-Name:     components/ManageProject.vue
+Name:     components/Admin/ManageProject.vue
 Purpose:  Display, edit, add, and delete project from the admin console
 Methods:
   * Allows the project to be added
@@ -175,7 +175,7 @@ Methods:
           />
         </q-card-section>
 
-        <q-card-section v-if="dialogOption === 'edit'" >
+        <q-card-section v-if="dialogOption === 'edit'">
           <br>
           <popUpProject
             :projectId="uuid"
@@ -195,11 +195,11 @@ Methods:
 import firebase from 'firebase/app'
 import 'firebase/firestore'
 
-import productionDb, { proAppCall } from '../firebase/init_production'
-import testingDb, { testAppCall } from '../firebase/init_testing'
+import productionDb, { proAppCall } from '../../firebase/init_production'
+import testingDb, { testAppCall } from '../../firebase/init_testing'
 
-import addProject from '../components/SubmitProjectAdminConsole'
-import popUpProject from '../components/EditAndPreviewProject'
+import addProject from '../../components/SubmitProjectAdminConsole'
+import popUpProject from '../../components/EditAndPreviewProject'
 
 export default {
   components: {
@@ -365,7 +365,7 @@ export default {
 
           return true
         } else {
-          throw new Error('config/project not found!')
+          throw new Error('"config/project" not found!')
         }
       } catch (error) {
         return false

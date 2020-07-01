@@ -300,9 +300,9 @@ Methods:
 <script>
 import { layoutConfig } from '../../boundless.config'
 
-import ManageProjects from '../components/ManageProject'
-import ManageChallenges from '../components/ManageChallenge'
-import ManageUsers from '../components/ManageUser'
+import ManageProjects from '../components/Admin/ManageProject'
+import ManageChallenges from '../components/Admin/ManageChallenge'
+import ManageUsers from '../components/Admin/ManageUser'
 
 import SystemSettings from '../components/SystemSettings'
 import ManageDatabase from '../components/GetDataFromFirestore'
