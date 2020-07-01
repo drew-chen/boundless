@@ -144,7 +144,10 @@ Methods:
               label="Contributor's Full Name"
               v-model="projectMembers[index].name"
               :ref="`memberName${index}`"
-              :rules="[val => $v.projectMembers.$each[index].name.required || 'Field is required']"
+              :rules="[
+                val => $v.projectMembers.$each[index].name.required || 'Field is required',
+                val => $v.projectMembers.$each[index].name.maxLength || 'Max length is 60 characters'
+              ]"
               @input="$v.projectMembers.$each[index].name.$touch()"
               @blur="capitalizeFirstChar(index)"
             >
@@ -678,7 +681,8 @@ export default {
     projectMembers: {
       $each: {
         name: {
-          required
+          required,
+          maxLength: maxLength(60)
         },
         email: {
           required

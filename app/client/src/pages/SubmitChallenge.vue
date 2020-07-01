@@ -166,7 +166,10 @@ Methods:
               placeholder="ie. John Doe" label="Contributor's Full Name"
               v-model="sponsors[index].name"
               :ref="`memberName${index}`"
-              :rules="[val => $v.sponsors.$each[index].name.required || 'Field is required']"
+              :rules="[
+                val => $v.sponsors.$each[index].name.required || 'Field is required',
+                val => $v.sponsors.$each[index].name.maxLength || 'Max length is 60 characters'
+              ]"
               @input="$v.sponsors.$each[index].name.$touch()"
               @blur="capitalizeFirstChar(index)"
             >
@@ -730,7 +733,8 @@ export default {
     sponsors: {
       $each: {
         name: {
-          required
+          required,
+          maxLength: maxLength(60)
         },
         email: {
           required
