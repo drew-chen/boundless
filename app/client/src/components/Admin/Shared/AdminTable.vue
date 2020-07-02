@@ -20,7 +20,7 @@ Methods:
 ## -->
 
 <template>
-  <q-page flat class="">
+  <q-page flat>
     <!-- -------------------- Main Content -------------------- -->
     <q-table
       flat wrap-cells binary-state-sort
@@ -31,6 +31,8 @@ Methods:
       :filter="filter"
       :loading="loading"
       :pagination.sync="pagination"
+      selection="multiple"
+      :selected.sync="selected"
     >
       <template v-slot:top-left>
         <q-btn
@@ -42,11 +44,14 @@ Methods:
 
       <template v-slot:header="props">
         <q-tr :props="props">
+          <q-th auto-width>
+            <q-checkbox v-model="props.selected"/>
+          </q-th>
           <q-th
             v-for="col in props.cols"
             :key="col.name"
             :props="props"
-            style="font-size: 18px; font-weight: normal;"
+            class="table-header"
           >
             {{ col.label }}
           </q-th>
@@ -64,7 +69,7 @@ Methods:
               <q-list
                 v-for="(keyword, index) in popkeywords"
                 :key="index"
-                style="min-width: 100px"
+                class="keyword-dropdown"
               >
                 <q-item clickable v-close-popup dense>
                   <q-item-section @click="filter = keyword.value">
@@ -101,6 +106,9 @@ Methods:
 
       <template v-slot:body="props">
         <q-tr :props="props">
+          <q-td auto-width>
+            <q-checkbox v-model="props.selected"/>
+          </q-td>
 
           <q-td
             key="keywords"
@@ -116,7 +124,7 @@ Methods:
 
           <q-td
             key="name"
-            style="width: 300px;"
+            class="row-name"
             :props="props"
           >
             <div align="left">
@@ -144,7 +152,6 @@ Methods:
 
           <q-td
             key="icons"
-            style="width: 100px;"
             :props="props"
           >
             <q-btn
@@ -164,7 +171,6 @@ Methods:
       </template>
 
     </q-table>
-
     <q-dialog
       persistent maximized
       transition-show="slide-up" transition-hide="slide-down"
@@ -175,7 +181,7 @@ Methods:
         <q-card-section
           v-if="dialogOption === 'add'"
         >
-          <addChallenge
+          <add-data
             @added="updateProjectsAndClose"
             @close="dialog = false"
           />
@@ -204,7 +210,7 @@ import 'firebase/firestore'
 import productionDb, { proAppCall } from '../../../firebase/init_production'
 import testingDb, { testAppCall } from '../../../firebase/init_testing'
 
-import addChallenge from '../../../components/SubmitChallengeAdminConsole'
+import addData from '../../../components/SubmitChallengeAdminConsole'
 import popUpChallenge from '../../../components/EditAndPreviewChallenge'
 
 export default {
@@ -220,7 +226,7 @@ export default {
     }
   },
   components: {
-    addChallenge,
+    addData,
     popUpChallenge
   },
   async created () {
@@ -251,13 +257,9 @@ export default {
         sortBy: 'name', // <String>: name of the column to be sorted
         rowsPerPage: 50 // <Integer>: number of items to be listed per page
       },
+      selected: [],
       // columns <Array<Object>>: column layout of the display table
       columns: [
-        {
-          name: 'keywords',
-          label: '',
-          field: row => row.keywords
-        },
         {
           name: 'name',
           required: true,
@@ -426,6 +428,7 @@ export default {
 
           return true
         }, 300)
+        console.log(this.projectList)
       } catch (error) {
         this.loading = false
 
@@ -548,6 +551,16 @@ export default {
 }
 </script>
 
-<style lang="stylus">
+<style lang="stylus" scoped>
+
+.row-name
+  width: 400px
+
+.table-header
+  font-size: 18px
+  font-weight: normal
+
+.keyword-dropdown
+  min-width: 100px
 
 </style>
