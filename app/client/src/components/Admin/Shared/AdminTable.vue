@@ -79,6 +79,9 @@ Methods:
 
       <template v-slot:header="props">
         <q-tr :props="props">
+          <q-th auto-width>
+            <q-checkbox v-model="props.selected"/>
+          </q-th>
           <q-th
             auto-width
             class="table-header">
@@ -338,11 +341,6 @@ export default {
       // columns <Array<Object>>: column layout of the display table
       columns: [
         {
-          name: 'keywords',
-          label: '',
-          field: row => row.keywords
-        },
-        {
           name: 'name',
           required: true,
           align: 'center',
@@ -505,6 +503,7 @@ export default {
 
           return true
         }, 300)
+        console.log(this.projectList)
       } catch (error) {
         this.loading = false
 
