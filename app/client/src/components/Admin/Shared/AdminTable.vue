@@ -510,7 +510,6 @@ export default {
 
           return true
         }, 300)
-        console.log(this.projectList)
       } catch (error) {
         this.loading = false
 
