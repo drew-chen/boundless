@@ -22,6 +22,8 @@ Methods:
 <template>
   <q-page flat>
     <!-- -------------------- Main Content -------------------- -->
+      Selected: {{ JSON.stringify(selected) }}
+
     <q-table
       flat wrap-cells binary-state-sort
       color="secondary"
@@ -39,6 +41,11 @@ Methods:
           round
           icon="add" color="accent"
           @click="dialog = true; dialogOption = 'add'"
+        />
+        <q-btn
+          dense round flat
+          color="secondary" icon="delete"
+          @click="deleteSelected()"
         />
       </template>
 
@@ -110,17 +117,13 @@ Methods:
             <q-checkbox v-model="props.selected"/>
           </q-td>
 
+          <!-- Invisible column for keyword searching. -->
           <q-td
             key="keywords"
             :props="props"
-          >
-            <div
-              hidden
-              align="left"
-            >
-              {{ props.row.keywords }}
-            </div>
-          </q-td>
+            invisible
+            auto-width
+          />
 
           <q-td
             key="name"
@@ -261,6 +264,11 @@ export default {
       // columns <Array<Object>>: column layout of the display table
       columns: [
         {
+          name: 'keywords',
+          label: '',
+          field: row => row.keywords
+        },
+        {
           name: 'name',
           required: true,
           align: 'center',
@@ -314,6 +322,12 @@ export default {
        */
       if (typeof str !== 'string') return ''
       return str.charAt(0).toUpperCase() + str.slice(1)
+    },
+    deleteSelected () {
+      this.selected.forEach(row => {
+        this.deleteChallenge(row.uuid, row.alias)
+      })
+      this.selected = []
     },
     loadFireRefs: async function () {
       /**
