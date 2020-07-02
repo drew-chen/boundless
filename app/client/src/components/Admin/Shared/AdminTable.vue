@@ -184,7 +184,7 @@ Methods:
         <q-card-section
           v-if="dialogOption === 'add'"
         >
-          <component :is="addRowComponentName"
+          <component :is="getAddRowComponent"
             @added="updateAllRowsAndClose"
             @close="dialog = false"
           />
@@ -192,8 +192,8 @@ Methods:
 
         <q-card-section v-if="dialogOption === 'edit'">
           <br>
-          <component :is="editRowComponentName"
-            :challengeId="uuid"
+          <component :is="getEditRowComponent"
+            :uuid="uuid"
             :mode="dialogOption"
             @added="updateAllRows"
             @close="dialog = false"
@@ -212,6 +212,8 @@ import 'firebase/firestore'
 
 import addChallenge from '../../../components/SubmitChallengeAdminConsole'
 import editChallenge from '../../../components/EditAndPreviewChallenge'
+import addProject from '../../../components/SubmitProjectAdminConsole'
+import editProject from '../../../components/EditAndPreviewProject'
 
 import productionDb, { proAppCall } from '../../../firebase/init_production'
 import testingDb, { testAppCall } from '../../../firebase/init_testing'
@@ -230,13 +232,23 @@ export default {
   },
   components: {
     addChallenge,
-    editChallenge
+    editChallenge,
+    addProject,
+    editProject
   },
   computed: {
-    addRowComponentName () {
+    getAddRowComponent () {
+      /**
+       * Gets the name of the imported component which adds a row to the admin table.
+       * @return {String} The component name
+       */
       return `add${this.capitalizeFirst(this.rowType)}`
     },
-    editRowComponentName () {
+    getEditRowComponent () {
+      /**
+       * Gets the name of the imported component which edits a row of the admin table.
+       * @return {String} The component name
+       */
       return `edit${this.capitalizeFirst(this.rowType)}`
     }
   },

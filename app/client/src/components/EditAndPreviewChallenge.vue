@@ -2047,7 +2047,7 @@ export default {
     MarkdownTranslator
   },
   props: {
-    challengeId: String,
+    uuid: String,
     mode: String
   },
   async created () {
@@ -2699,7 +2699,7 @@ export default {
       this.loading = true
 
       let promises = []
-      promises.push(this.db.collection('challenges').doc(this.challengeId).get())
+      promises.push(this.db.collection('challenges').doc(this.uuid).get())
       promises.push(this.db.collection('challenges').doc('ToC').get())
       promises.push(this.db.collection('projects').doc('ToC').get())
       promises.push(this.db.collection('users').doc('ToC').get())
@@ -2711,8 +2711,8 @@ export default {
           this.data[objField] = res[0].data()[objField]
         }
 
-        for (let objField in res[1].data()[this.challengeId]) {
-          this.data[objField] = res[1].data()[this.challengeId][objField]
+        for (let objField in res[1].data()[this.uuid]) {
+          this.data[objField] = res[1].data()[this.uuid][objField]
         }
 
         for (let objField in res[3].data()) {

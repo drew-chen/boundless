@@ -1914,7 +1914,7 @@ export default {
     MarkdownTranslator
   },
   props: {
-    projectId: String,
+    uuid: String,
     mode: String
   },
   async created () {
@@ -2550,7 +2550,7 @@ export default {
       this.loading = true
 
       let promises = []
-      promises.push(this.db.collection('projects').doc(this.projectId).get())
+      promises.push(this.db.collection('projects').doc(this.uuid).get())
       promises.push(this.db.collection('projects').doc('ToC').get())
       promises.push(this.db.collection('users').doc('ToC').get())
 
@@ -2561,8 +2561,8 @@ export default {
           this.data[objField] = res[0].data()[objField]
         }
 
-        for (let objField in res[1].data()[this.projectId]) {
-          this.data[objField] = res[1].data()[this.projectId][objField]
+        for (let objField in res[1].data()[this.uuid]) {
+          this.data[objField] = res[1].data()[this.uuid][objField]
         }
 
         for (let objField in res[2].data()) {
