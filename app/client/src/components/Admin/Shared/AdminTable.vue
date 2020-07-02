@@ -22,7 +22,7 @@ Methods:
 <template>
   <q-page flat>
     <!-- -------------------- Main Content -------------------- -->
-      Selected: {{ JSON.stringify(selected) }}
+      <!-- Selected: {{ JSON.stringify(selected) }} -->
 
     <q-table
       flat wrap-cells binary-state-sort
@@ -323,11 +323,50 @@ export default {
       if (typeof str !== 'string') return ''
       return str.charAt(0).toUpperCase() + str.slice(1)
     },
+    formatAlias (row) {
+      /**
+       * Returns the alias for display if there is one.
+       * @param row {Object} The project, challenge, or user with a potential alias.
+       * @return {String} The alias.
+       */
+      if (row) {
+        return row.alias ? ` (alias: ${row.alias})` : ''
+      }
+    },
     deleteSelected () {
-      this.selected.forEach(row => {
-        this.deleteChallenge(row.uuid, row.alias)
-      })
-      this.selected = []
+      if (this.selected.length === 0) {
+        this.$q.dialog({
+          title: 'Error',
+          message: 'Nothing to remove!'
+        })
+      } else if (this.selected.length === 1) {
+        let deletedRow = this.selected[0]
+        let entry = deletedRow.uuid
+        let removedAlias = deletedRow.alias
+
+        this.$q.dialog({
+          title: 'Confirmation to Delete',
+          message: `Delete ${entry}${this.formatAlias(deletedRow)}?`,
+          ok: true,
+          cancel: true
+        })
+          .onOk(async () => {
+            this.deleteChallenge(entry, removedAlias)
+            this.selected = []
+          })
+      } else {
+        this.$q.dialog({
+          title: 'Confirmation to Delete Row Selection',
+          message: `Delete all ${this.selected.length} entries selected?`,
+          ok: true,
+          cancel: true
+        }).onOk(async () => {
+          this.selected.forEach(row => {
+            this.deleteChallenge(row.uuid, row.alias)
+          })
+          this.selected = []
+        })
+      }
     },
     loadFireRefs: async function () {
       /**
