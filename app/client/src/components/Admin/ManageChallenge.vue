@@ -20,7 +20,7 @@ Methods:
 ## -->
 
 <template>
-  <admin-table dataType="challenge"></admin-table>
+  <admin-table rowType="challenge" />
 </template>
 
 <script>

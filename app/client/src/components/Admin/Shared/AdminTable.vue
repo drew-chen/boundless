@@ -1,6 +1,6 @@
 
 <!-- ##
-## Copyright (c) 2019 Wind River Systems, Inc.
+## Copyright (c) 2020 Wind River Systems, Inc.
 ##
 ## Licensed under the Apache License, Version 2.0 (the "License");
 ## you may not use this file except in compliance with the License.
@@ -10,7 +10,7 @@
 ## under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES
 ## OR CONDITIONS OF ANY KIND, either express or implied.
 
-Name:     components/Admin/ManageChallenge.vue
+Name:     components/Admin/Shared/AdminTable.vue
 Purpose:  Display, edit, add, and delete challenge from the admin console
 Methods:
 
@@ -28,7 +28,7 @@ Methods:
       flat wrap-cells binary-state-sort
       color="secondary"
       row-key="uuid"
-      :data="projectList"
+      :data="rowList"
       :columns="columns"
       :filter="filter"
       :loading="loading"
@@ -131,7 +131,7 @@ Methods:
             :props="props"
           >
             <div align="left">
-              {{ props.row[dataType] }}
+              {{ props.row[rowType] }}
             </div>
           </q-td>
 
@@ -160,13 +160,13 @@ Methods:
             <q-btn
               dense round flat
               color="secondary" icon="edit"
-              @click="editProject(props.row.uuid)"
+              @click="editRow(props.row.uuid)"
             />
 
             <q-btn
               dense round flat
               color="secondary" icon="delete"
-              @click="deleteChallenge(props.row.uuid, props.row.alias)"
+              @click="deleteRow(props.row.uuid, props.row.alias)"
             />
           </q-td>
 
@@ -184,18 +184,18 @@ Methods:
         <q-card-section
           v-if="dialogOption === 'add'"
         >
-          <add-data
-            @added="updateProjectsAndClose"
+          <component :is="addRowComponentName"
+            @added="updateAllRowsAndClose"
             @close="dialog = false"
           />
         </q-card-section>
 
         <q-card-section v-if="dialogOption === 'edit'">
           <br>
-          <popUpChallenge
+          <component :is="editRowComponentName"
             :challengeId="uuid"
             :mode="dialogOption"
-            @added="updateProjects"
+            @added="updateAllRows"
             @close="dialog = false"
           />
         </q-card-section>
@@ -210,15 +210,15 @@ Methods:
 import firebase from 'firebase/app'
 import 'firebase/firestore'
 
+import addChallenge from '../../../components/SubmitChallengeAdminConsole'
+import editChallenge from '../../../components/EditAndPreviewChallenge'
+
 import productionDb, { proAppCall } from '../../../firebase/init_production'
 import testingDb, { testAppCall } from '../../../firebase/init_testing'
 
-import addData from '../../../components/SubmitChallengeAdminConsole'
-import popUpChallenge from '../../../components/EditAndPreviewChallenge'
-
 export default {
   props: {
-    dataType: { // <String>: Whether this component displays challenges, projecs, or users
+    rowType: { // <String>: Whether this component displays proj
       type: String,
       required: true,
       validator: prop => [
@@ -229,14 +229,22 @@ export default {
     }
   },
   components: {
-    addData,
-    popUpChallenge
+    addChallenge,
+    editChallenge
+  },
+  computed: {
+    addRowComponentName () {
+      return `add${this.capitalizeFirst(this.rowType)}`
+    },
+    editRowComponentName () {
+      return `edit${this.capitalizeFirst(this.rowType)}`
+    }
   },
   async created () {
     try {
-      // fetching dataType, i.e., project, challenges, or users, and config from db
+      // fetching row of rowType (project, challenges, or users) and config from db
       await this.loadFireRefs()
-      await this.loadChallenges()
+      await this.loadAllRows()
       await this.loadConfig()
     } catch (error) {
       throw new Error(error)
@@ -246,13 +254,13 @@ export default {
     return {
       db: null, // <Object>: firebase object referencing the database
       cloudFunctions: null, // <Object>: firebase ref to cloud functions
-      uuid: '', // <String>: uid of dataType, i.e., project, challenges, or users, to be edited
+      uuid: '', // <String>: uid of rowType, i.e., project, challenges, or users, to be edited
       // popkeywords <Array<Object>>: list of keywords converted to object
       //                              with label and value
       popkeywords: [],
       dialog: false, // <Boolean>: flag to invoke dialog
       dialogOption: '', // <String>: mode of the dialog
-      projectList: [], // <Array<Object>>: list of dataType, i.e., project, challenges, or users, from ToC
+      rowList: [], // <Array<Object>>: list of rows of the same rowType (project, challenges, or users) from ToC
       uuidList: [], // <Array<String>>: list of uid from ToC
       filter: '', // <String>: value of the search
       loading: true, // <Boolean>: flag for page loading
@@ -272,8 +280,8 @@ export default {
           name: 'name',
           required: true,
           align: 'center',
-          label: `${this.capitalizeFirst(this.dataType)} Name`,
-          field: row => row[this.dataType],
+          label: `${this.capitalizeFirst(this.rowType)} Name`,
+          field: row => row[this.rowType],
           format: val => `${val}`,
           sort: (a, b) => {
             if (a.trim() < b.trim()) {
@@ -316,7 +324,7 @@ export default {
     capitalizeFirst (str) {
       /**
        * Capitlizes the first character of a string.
-       * Used for dataType for certain imports or labels.
+       * Used for rowType for certain imports or labels.
        * @param {String} str The string to be capitlized.
        * @return {String} The captilized string
        */
@@ -331,41 +339,6 @@ export default {
        */
       if (row) {
         return row.alias ? ` (alias: ${row.alias})` : ''
-      }
-    },
-    deleteSelected () {
-      if (this.selected.length === 0) {
-        this.$q.dialog({
-          title: 'Error',
-          message: 'Nothing to remove!'
-        })
-      } else if (this.selected.length === 1) {
-        let deletedRow = this.selected[0]
-        let entry = deletedRow.uuid
-        let removedAlias = deletedRow.alias
-
-        this.$q.dialog({
-          title: 'Confirmation to Delete',
-          message: `Delete ${entry}${this.formatAlias(deletedRow)}?`,
-          ok: true,
-          cancel: true
-        })
-          .onOk(async () => {
-            this.deleteChallenge(entry, removedAlias)
-            this.selected = []
-          })
-      } else {
-        this.$q.dialog({
-          title: 'Confirmation to Delete Row Selection',
-          message: `Delete all ${this.selected.length} entries selected?`,
-          ok: true,
-          cancel: true
-        }).onOk(async () => {
-          this.selected.forEach(row => {
-            this.deleteChallenge(row.uuid, row.alias)
-          })
-          this.selected = []
-        })
       }
     },
     loadFireRefs: async function () {
@@ -453,23 +426,23 @@ export default {
         return false
       }
     },
-    loadChallenges: async function () {
+    loadAllRows: async function () {
       /**
-       * load all the challenges from the ToC for the admin console
+       * load all the projects, challenges, or users from the ToC for the admin console
        * @param {void}
        * @return {Promise<Boolean>}
        */
 
       try {
-        let doc = await this.db.collection(`${this.dataType}s`).doc('ToC').get()
+        let doc = await this.db.collection(`${this.rowType}s`).doc('ToC').get()
 
         if (doc.exists) {
-          let tocProjectData = doc.data()
+          let tocAllRowData = doc.data()
 
-          for (let project in tocProjectData) {
-            if (project !== 'alias') {
-              this.projectList.push(tocProjectData[project])
-              this.uuidList.push(project)
+          for (let rowContent in tocAllRowData) {
+            if (rowContent !== 'alias') {
+              this.rowList.push(tocAllRowData[rowContent])
+              this.uuidList.push(rowContent)
             }
           }
         } else {
@@ -481,115 +454,131 @@ export default {
 
           return true
         }, 300)
-        console.log(this.projectList)
       } catch (error) {
         this.loading = false
 
         return false
       }
     },
-    deleteChallenge: async function (entry, removedAlias) {
+    deleteSelected () {
+      if (this.selected.length === 0) {
+        this.$q.dialog({
+          title: 'Error',
+          message: 'Nothing to remove!'
+        })
+      } else if (this.selected.length === 1) {
+        let deletedRow = this.selected[0]
+        let entry = deletedRow.uuid
+        let removedAlias = deletedRow.alias
+
+        this.$q.dialog({
+          title: 'Confirmation to Delete',
+          message: `Delete ${entry}${this.formatAlias(deletedRow)}?`,
+          ok: true,
+          cancel: true
+        })
+          .onOk(async () => {
+            this.deleteRow(entry, removedAlias)
+            this.selected = []
+          })
+      } else {
+        this.$q.dialog({
+          title: 'Confirmation to Delete Row Selection',
+          message: `Delete all ${this.selected.length} entries selected?`,
+          ok: true,
+          cancel: true
+        }).onOk(async () => {
+          this.selected.forEach(row => {
+            this.deleteRow(row.uuid, row.alias)
+          })
+          this.selected = []
+        })
+      }
+    },
+    deleteRow: async function (entry, removedAlias) {
       /**
-       * deletes project from the database and stroage;
+       * Deletes projects, challenges, or users from the database and stroage;
        * notifies the user of the status when compeleted
-       * @param{String} entry: uid of the project to be removed
-       * @param {String} removedAlias: alias of the project to be removed
+       * @param{String} entry: uid of the projects, challenges, or users to be removed
+       * @param {String} removedAlias: alias of the projects, challenges, or users to be removed
        * @return {void}
        */
+      if (this.rowList.length < 1) {
+        this.$q.dialog({
+          title: 'Error',
+          message: 'Nothing to remove!'
+        })
+      } else {
+        if (this.uuidList.includes(entry)) {
+          try {
+            await this.db.collection(`${this.rowType}s`).doc(entry).delete()
 
-      this.$q.dialog({
-        title: 'Confirmation to Delete',
-        message: `Delete ${entry}?`,
-        ok: true,
-        cancel: true
-      })
-        .onOk(async () => {
-          if (this.projectList.length < 1) {
-            this.$q.dialog({
-              title: 'Error',
-              message: 'Nothing to remove!'
+            this.$q.notify({
+              type: 'positive',
+              message: 'Deleted sucessfully!'
             })
-          } else {
-            if (this.uuidList.includes(entry)) {
-              try {
-                await this.db.collection(`${this.dataType}s`).doc(entry).delete()
 
-                this.$q.notify({
-                  type: 'positive',
-                  message: 'Deleted sucessfully!'
-                })
+            let updates = {}
+            updates[entry] = firebase.firestore.FieldValue.delete()
 
-                let updates = {}
-                updates[entry] = firebase.firestore.FieldValue.delete()
-
-                if (typeof removedAlias !== 'undefined') {
-                  if (removedAlias !== '') {
-                    updates[`alias.${removedAlias}`] = firebase.firestore.FieldValue.delete()
-                  }
-                }
-
-                await this.db.collection(`${this.dataType}s`).doc('ToC')
-                  .update(updates)
-
-                let tmpProjectList = []
-
-                this.projectList.forEach(project => {
-                  if (project.uuid !== entry) {
-                    tmpProjectList.push(project)
-                  }
-                })
-
-                this.projectList = tmpProjectList
-
-                // delete the storage dir from the storage
-                await this.cloudFunctions({ folder: `${this.dataType}s/${entry}` })
-              } catch (error) {
+            if (typeof removedAlias !== 'undefined') {
+              if (removedAlias !== '') {
+                updates[`alias.${removedAlias}`] = firebase.firestore.FieldValue.delete()
               }
-            } else {
-              this.$q.dialog({
-                title: 'Error',
-                message: 'UUID does not exist in the database.'
-              })
             }
+
+            await this.db.collection(`${this.rowType}s`).doc('ToC')
+              .update(updates)
+
+            let tmpRowList = []
+
+            this.rowList.forEach(row => {
+              if (row.uuid !== entry) {
+                tmpRowList.push(row)
+              }
+            })
+
+            this.rowList = tmpRowList
+
+            // delete the storage dir from the storage
+            await this.cloudFunctions({ folder: `${this.rowType}s/${entry}` })
+          } catch (error) {
           }
-        })
-        .onCancel(() => {
-        })
+        } else {
+          this.$q.dialog({
+            title: 'Error',
+            message: 'UUID does not exist in the database.'
+          })
+        }
+      }
     },
-    updateProjectsAndClose: function () {
+    updateAllRowsAndClose: function () {
       /**
        * helper function to update the list of projects and close the dialog
        * @param {void}
        * @return {void}
        */
-
-      this.loading = true
-
-      this.projectList = []
-      this.uuidList = []
-
-      this.loadChallenges()
-
+      this.updateAllRows()
       this.dialog = false
     },
-    updateProjects: function () {
+    updateAllRows: function () {
       /**
-       * helper function to refetch project list
+       * helper function to refetch row (challenges, projects, or users) list
        * @param {void}
        * @return {void}
        */
 
       this.loading = true
 
-      this.projectList = []
+      this.rowList = []
       this.uuidList = []
 
-      this.loadChallenges()
+      this.loadAllRows()
     },
-    editProject: function (entry) {
+    editRow: function (entry) {
       /**
        * helper function to dialog to invoke 'edit'
-       * @param {String} entry: uid of the project
+       * @param {String} entry: uid of the row (challenges, projects, or users)
        * @returns {void}
        */
 
