@@ -22,6 +22,8 @@ Methods:
 <template>
   <q-page flat>
     <!-- -------------------- Main Content -------------------- -->
+      Selected: {{ JSON.stringify(selected) }}
+
     <q-table
       flat wrap-cells binary-state-sort virtual-scroll
       color="secondary"
@@ -340,6 +342,11 @@ export default {
       selected: [],
       // columns <Array<Object>>: column layout of the display table
       columns: [
+        {
+          name: 'keywords',
+          label: '',
+          field: row => row.keywords
+        },
         {
           name: 'name',
           required: true,
