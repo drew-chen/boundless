@@ -22,7 +22,6 @@ Methods:
 <template>
   <q-page flat>
     <!-- -------------------- Main Content -------------------- -->
-      <!-- Selected: {{ JSON.stringify(selected) }} -->
 
     <q-table
       flat wrap-cells binary-state-sort virtual-scroll
@@ -178,7 +177,11 @@ Methods:
             :key="middleColumn"
             :props="props"
           >
+<<<<<<< HEAD
             <div align="center">
+=======
+            <div align="left">
+>>>>>>> e03928e... Make second column of adminTable dynamic prepare for support for users
               {{ props.row[middleColumn] }}
             </div>
           </q-td>
@@ -199,7 +202,17 @@ Methods:
             <q-btn
               dense round flat
               color="secondary" icon="edit"
+<<<<<<< HEAD
               @click.stop="editRow(props.row.uuid || props.row[rowKey])"
+=======
+              @click="editRow(props.row.uuid)"
+            />
+
+            <q-btn
+              dense round flat
+              color="secondary" icon="delete"
+              @click="deleteRow(props.row.uuid, props.row[middleColumn])"
+>>>>>>> e03928e... Make second column of adminTable dynamic prepare for support for users
             />
           </q-td>
 
@@ -255,8 +268,12 @@ import testingDb, { testAppCall } from '../../../firebase/init_testing'
 
 export default {
   props: {
+<<<<<<< HEAD
     // <String>: Whether this component displays projects, challenges, or users
     rowType: {
+=======
+    rowType: { // <String>: Whether this component displays projects, challenges, or users
+>>>>>>> e03928e... Make second column of adminTable dynamic prepare for support for users
       type: String,
       required: true,
       validator: prop => [
@@ -270,6 +287,7 @@ export default {
     middleColumn: {
       required: true,
       type: String
+<<<<<<< HEAD
     },
     // <Boolean> Whether keywords are used. Keywords are currently only used for projects and challenges, not users.
     useLoadConfig: {
@@ -280,6 +298,8 @@ export default {
     rowKey: {
       type: String,
       default: 'uuid'
+=======
+>>>>>>> e03928e... Make second column of adminTable dynamic prepare for support for users
     }
   },
   components: {
@@ -322,12 +342,20 @@ export default {
     return {
       db: null, // <Object>: firebase object referencing the database
       cloudFunctions: null, // <Object>: firebase ref to cloud functions
+<<<<<<< HEAD
       uuid: '', // <String>: uid of rowType, i.e., project, challenges, or users, to be edited. Used in conjunction with
       //                     rowKey prop since some user data doesn't have a uuid, but does have a rowKey like 'email'.
       // popkeywords <Array<Object>>: list of keywords for projects and challenges converted to object
       //                              with label and value (not for users)
       popkeywords: [],
       emailSet: new Set(), // <Set<String>>: set of user email (not for projects or challenges)
+=======
+      uuid: '', // <String>: uid of rowType, i.e., project, challenges, or users, to be edited
+      // popkeywords <Array<Object>>: list of keywords for projects and challenges converted to object
+      //                              with label and value (not for users)
+      popkeywords: [],
+      emailList: [], // <Array<String>>: list of user email (not for projects or challenges)
+>>>>>>> e03928e... Make second column of adminTable dynamic prepare for support for users
 
       dialog: false, // <Boolean>: flag to invoke dialog
       dialogOption: '', // <String>: mode of the dialog
@@ -351,8 +379,13 @@ export default {
           name: 'name',
           required: true,
           align: 'center',
+<<<<<<< HEAD
           label: this.capitalizeFirst(this.rowType),
           field: row => row[this.rowType] || row.name || '',
+=======
+          label: `${this.capitalizeFirst(this.rowType)} Name`,
+          field: row => row[this.rowType] || '',
+>>>>>>> e03928e... Make second column of adminTable dynamic prepare for support for users
           format: val => `${val}`,
           sort: this.stringCompare,
           sortable: true,
@@ -392,6 +425,29 @@ export default {
     }
   },
   methods: {
+<<<<<<< HEAD
+=======
+    capitalizeFirst (str) {
+      /**
+       * Capitlizes the first character of a string.
+       * Used for rowType for certain imports or labels.
+       * @param {String} str The string to be capitlized.
+       * @return {String} The captilized string
+       */
+      if (typeof str !== 'string') return ''
+      return str.charAt(0).toUpperCase() + str.slice(1)
+    },
+    formatProperty (row, propertyName) {
+      /**
+       * Returns the row.propertyName for display if there is one.
+       * @param row {Object} The project, challenge, or user with a potential property of propertyName.
+       * @return {String} The property value.
+       */
+      if (row && propertyName && row.hasOwnProperty(propertyName)) {
+        return row[propertyName] ? ` (${propertyName}: ${row[propertyName]})` : ''
+      }
+    },
+>>>>>>> e03928e... Make second column of adminTable dynamic prepare for support for users
     loadFireRefs: async function () {
       /**
        * load firebase database reference
@@ -497,7 +553,11 @@ export default {
               this.rowList.push(row)
               this.uuidList.push(rowUuid)
               if (row.hasOwnProperty('email')) { // this row describes a user
+<<<<<<< HEAD
                 this.emailSet.add(row.email)
+=======
+                this.emailList.push(tocAllRowData[row].email)
+>>>>>>> e03928e... Make second column of adminTable dynamic prepare for support for users
               }
             }
           }
@@ -524,7 +584,11 @@ export default {
         })
       } else if (this.selected.length === 1) {
         let deletedRow = this.selected[0]
+<<<<<<< HEAD
         let rowId = deletedRow.uuid || deletedRow[this.rowKey]
+=======
+        let rowId = deletedRow.uuid
+>>>>>>> e03928e... Make second column of adminTable dynamic prepare for support for users
         this.$q.dialog({
           title: 'Confirmation to Delete',
           message: `Delete ${rowId}${this.formatProperty(deletedRow, this.middleColumn)}?`,
@@ -543,7 +607,11 @@ export default {
           cancel: true
         }).onOk(async () => {
           this.selected.forEach(row => {
+<<<<<<< HEAD
             this.deleteRow(row.uuid || row[this.rowKey], row[this.middleColumn])
+=======
+            this.deleteRow(row.uuid, row[this.middleColumn])
+>>>>>>> e03928e... Make second column of adminTable dynamic prepare for support for users
           })
           this.selected = []
         })
@@ -578,7 +646,11 @@ export default {
 
             if (typeof removedMiddleEntry !== 'undefined') {
               if (removedMiddleEntry !== '') {
+<<<<<<< HEAD
                 updates[`${this.middleColumn}.${removedMiddleEntry}`] = firebase.firestore.FieldValue.delete()
+=======
+                updates[`alias.${removedMiddleEntry}`] = firebase.firestore.FieldValue.delete()
+>>>>>>> e03928e... Make second column of adminTable dynamic prepare for support for users
               }
             }
             await this.db.collection(`${this.rowType}s`).doc('ToC')
@@ -626,7 +698,11 @@ export default {
 
       this.rowList = []
       this.uuidList = []
+<<<<<<< HEAD
       this.emailSet = new Set()
+=======
+      this.emailList = []
+>>>>>>> e03928e... Make second column of adminTable dynamic prepare for support for users
 
       this.loadAllRows()
     },
