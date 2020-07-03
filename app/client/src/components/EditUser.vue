@@ -316,7 +316,7 @@ Methods:
                     @deleted="projectDeleteByChild"
                   /> -->
                   <ProjectTable
-                    :userId="curTocData.uuid"
+                    :uuid="curTocData.uuid"
                     :childDb="db"
                     :projectList="curData.projects || []"
                   />
@@ -389,7 +389,7 @@ import ProjectTable from '../components/Tables/ProjectTable'
 
 export default {
   props: {
-    userId: String,
+    uuid: String,
     emailList: Array
   },
   components: {
@@ -640,14 +640,14 @@ export default {
         }
 
         await this.db.collection('users').doc('ToC').set({
-          [this.userId]: this.curTocData
+          [this.uuid]: this.curTocData
         }, { merge: true })
 
         this.curData.socialNetwork = this.curData.socialNetwork || {}
         this.curData.projects = this.curData.projects || []
         this.curData.achievements = this.curData.achievements || {}
 
-        await this.db.collection('users').doc(this.userId).set(this.curData)
+        await this.db.collection('users').doc(this.uuid).set(this.curData)
 
         this.emitClose()
         this.$emit('added')
@@ -721,7 +721,7 @@ export default {
       this.loading = true
       // this.projectImagePath = this.getMainPhoto()
       let promises = []
-      promises.push(this.db.collection('users').doc(this.userId).get())
+      promises.push(this.db.collection('users').doc(this.uuid).get())
       promises.push(this.db.collection('users').doc('ToC').get())
 
       try {
@@ -739,8 +739,8 @@ export default {
           // this.data[objField] = res[0].data()[objField]
         }
 
-        for (let objField in res[1].data()[this.userId]) {
-          this.tocData[objField] = res[1].data()[this.userId][objField]
+        for (let objField in res[1].data()[this.uuid]) {
+          this.tocData[objField] = res[1].data()[this.uuid][objField]
         }
 
         this.curData = this.deepObjCopy(this.data)

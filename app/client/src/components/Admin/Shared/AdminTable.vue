@@ -22,7 +22,6 @@ Methods:
 <template>
   <q-page flat>
     <!-- -------------------- Main Content -------------------- -->
-      <!-- Selected: {{ JSON.stringify(selected) }} -->
 
     <q-table
       flat wrap-cells binary-state-sort
@@ -136,11 +135,11 @@ Methods:
           </q-td>
 
           <q-td
-            key="alias"
+            :key="middleColumn"
             :props="props"
           >
             <div align="left">
-              {{ props.row.alias }}
+              {{ props.row[middleColumn] }}
             </div>
           </q-td>
 
@@ -166,7 +165,7 @@ Methods:
             <q-btn
               dense round flat
               color="secondary" icon="delete"
-              @click="deleteRow(props.row.uuid, props.row.alias)"
+              @click="deleteRow(props.row.uuid, props.row[middleColumn])"
             />
           </q-td>
 
@@ -214,13 +213,15 @@ import addChallenge from '../../../components/SubmitChallengeAdminConsole'
 import editChallenge from '../../../components/EditAndPreviewChallenge'
 import addProject from '../../../components/SubmitProjectAdminConsole'
 import editProject from '../../../components/EditAndPreviewProject'
+import addUser from '../../../components/SubmitUserAdminConsole'
+import editUser from '../../../components/EditUser'
 
 import productionDb, { proAppCall } from '../../../firebase/init_production'
 import testingDb, { testAppCall } from '../../../firebase/init_testing'
 
 export default {
   props: {
-    rowType: { // <String>: Whether this component displays proj
+    rowType: { // <String>: Whether this component displays projects, challenges, or users
       type: String,
       required: true,
       validator: prop => [
@@ -228,13 +229,21 @@ export default {
         'project',
         'user'
       ].includes(prop)
+    },
+    // <String>: Label name and row property name of the middle column.
+    // see ManageChallenge.vue and this.columns for examples.
+    middleColumn: {
+      required: true,
+      type: String
     }
   },
   components: {
     addChallenge,
-    editChallenge,
     addProject,
-    editProject
+    addUser,
+    editChallenge,
+    editProject,
+    editUser
   },
   computed: {
     getAddRowComponent () {
@@ -267,9 +276,11 @@ export default {
       db: null, // <Object>: firebase object referencing the database
       cloudFunctions: null, // <Object>: firebase ref to cloud functions
       uuid: '', // <String>: uid of rowType, i.e., project, challenges, or users, to be edited
-      // popkeywords <Array<Object>>: list of keywords converted to object
-      //                              with label and value
+      // popkeywords <Array<Object>>: list of keywords for projects and challenges converted to object
+      //                              with label and value (not for users)
       popkeywords: [],
+      emailList: [], // <Array<String>>: list of user email (not for projects or challenges)
+
       dialog: false, // <Boolean>: flag to invoke dialog
       dialogOption: '', // <String>: mode of the dialog
       rowList: [], // <Array<Object>>: list of rows of the same rowType (project, challenges, or users) from ToC
@@ -293,7 +304,7 @@ export default {
           required: true,
           align: 'center',
           label: `${this.capitalizeFirst(this.rowType)} Name`,
-          field: row => row[this.rowType],
+          field: row => row[this.rowType] || '',
           format: val => `${val}`,
           sort: (a, b) => {
             if (a.trim() < b.trim()) {
@@ -307,11 +318,11 @@ export default {
           sortable: true
         },
         {
-          name: 'alias',
+          name: this.middleColumn,
           required: true,
           align: 'center',
-          label: 'Alias',
-          field: row => row.alias || '',
+          label: this.capitalizeFirst(this.middleColumn),
+          field: row => row[this.middleColumn] || '',
           format: val => `${val}`,
           sortable: true
         },
@@ -343,14 +354,14 @@ export default {
       if (typeof str !== 'string') return ''
       return str.charAt(0).toUpperCase() + str.slice(1)
     },
-    formatAlias (row) {
+    formatProperty (row, propertyName) {
       /**
-       * Returns the alias for display if there is one.
-       * @param row {Object} The project, challenge, or user with a potential alias.
-       * @return {String} The alias.
+       * Returns the row.propertyName for display if there is one.
+       * @param row {Object} The project, challenge, or user with a potential property of propertyName.
+       * @return {String} The property value.
        */
-      if (row) {
-        return row.alias ? ` (alias: ${row.alias})` : ''
+      if (row && propertyName && row.hasOwnProperty(propertyName)) {
+        return row[propertyName] ? ` (${propertyName}: ${row[propertyName]})` : ''
       }
     },
     loadFireRefs: async function () {
@@ -416,26 +427,27 @@ export default {
 
         this.pagination.rowsPerPage = cachedConfig.pagination
       }
+      if (this.rowType !== 'user') {
+        try {
+          let doc = await this.db.collection('config').doc('project').get()
 
-      try {
-        let doc = await this.db.collection('config').doc('project').get()
+          if (doc.exists) {
+            let data = doc.data()
 
-        if (doc.exists) {
-          let data = doc.data()
+            for (let key in data['keywords']) {
+              this.popkeywords.push({
+                label: key,
+                value: data['keywords'][key]
+              })
+            }
 
-          for (let key in data['keywords']) {
-            this.popkeywords.push({
-              label: key,
-              value: data['keywords'][key]
-            })
+            return true
+          } else {
+            throw new Error('"config/project" not found!')
           }
-
-          return true
-        } else {
-          throw new Error('"config/project" not found!')
+        } catch (error) {
+          return false
         }
-      } catch (error) {
-        return false
       }
     },
     loadAllRows: async function () {
@@ -450,11 +462,15 @@ export default {
 
         if (doc.exists) {
           let tocAllRowData = doc.data()
-
-          for (let rowContent in tocAllRowData) {
-            if (rowContent !== 'alias') {
-              this.rowList.push(tocAllRowData[rowContent])
-              this.uuidList.push(rowContent)
+          let row = null
+          for (let rowUuid in tocAllRowData) {
+            if (rowUuid !== 'alias') {
+              row = tocAllRowData[rowUuid]
+              this.rowList.push(row)
+              this.uuidList.push(rowUuid)
+              if (row.hasOwnProperty('email')) { // this row describes a user
+                this.emailList.push(tocAllRowData[row].email)
+              }
             }
           }
         } else {
@@ -480,17 +496,15 @@ export default {
         })
       } else if (this.selected.length === 1) {
         let deletedRow = this.selected[0]
-        let entry = deletedRow.uuid
-        let removedAlias = deletedRow.alias
-
+        let rowId = deletedRow.uuid
         this.$q.dialog({
           title: 'Confirmation to Delete',
-          message: `Delete ${entry}${this.formatAlias(deletedRow)}?`,
+          message: `Delete ${rowId}${this.formatProperty(deletedRow, this.middleColumn)}?`,
           ok: true,
           cancel: true
         })
           .onOk(async () => {
-            this.deleteRow(entry, removedAlias)
+            this.deleteRow(rowId, deletedRow[this.middleColumn])
             this.selected = []
           })
       } else {
@@ -501,18 +515,18 @@ export default {
           cancel: true
         }).onOk(async () => {
           this.selected.forEach(row => {
-            this.deleteRow(row.uuid, row.alias)
+            this.deleteRow(row.uuid, row[this.middleColumn])
           })
           this.selected = []
         })
       }
     },
-    deleteRow: async function (entry, removedAlias) {
+    deleteRow: async function (entry, removedMiddleEntry) {
       /**
        * Deletes projects, challenges, or users from the database and stroage;
        * notifies the user of the status when compeleted
        * @param{String} entry: uid of the projects, challenges, or users to be removed
-       * @param {String} removedAlias: alias of the projects, challenges, or users to be removed
+       * @param {String} removedMiddleEntry: The alias or email of the projects, challenges, or users to be removed
        * @return {void}
        */
       if (this.rowList.length < 1) {
@@ -527,15 +541,15 @@ export default {
 
             this.$q.notify({
               type: 'positive',
-              message: 'Deleted sucessfully!'
+              message: `Deleted sucessfully!`
             })
 
             let updates = {}
             updates[entry] = firebase.firestore.FieldValue.delete()
 
-            if (typeof removedAlias !== 'undefined') {
-              if (removedAlias !== '') {
-                updates[`alias.${removedAlias}`] = firebase.firestore.FieldValue.delete()
+            if (typeof removedMiddleEntry !== 'undefined') {
+              if (removedMiddleEntry !== '') {
+                updates[`alias.${removedMiddleEntry}`] = firebase.firestore.FieldValue.delete()
               }
             }
 
@@ -584,6 +598,7 @@ export default {
 
       this.rowList = []
       this.uuidList = []
+      this.emailList = []
 
       this.loadAllRows()
     },
