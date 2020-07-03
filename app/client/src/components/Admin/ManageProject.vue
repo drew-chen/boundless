@@ -20,7 +20,10 @@ Methods:
 ## -->
 
 <template>
-  <admin-table rowType="project" />
+  <admin-table
+    rowType="project"
+    middleColumn="alias"
+ />
 </template>
 
 <script>
