@@ -1,5 +1,5 @@
 <!-- ##
-## Copyright (c) 2019 Wind River Systems, Inc.
+## Copyright (c) 2020 Wind River Systems, Inc.
 ##
 ## Licensed under the Apache License, Version 2.0 (the "License");
 ## you may not use this file except in compliance with the License.
@@ -9,12 +9,12 @@
 ## under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES
 ## OR CONDITIONS OF ANY KIND, either express or implied.
 
-Name:     components/Admin/ManageChallenge.vue
-Purpose:  Dispaly, edit, add, and delete challenge from the admin console
+Name:     components/Admin/ManageProject.vue
+Purpose:  Display, edit, add, and delete project from the admin console
 Methods:
-  * Allows the challenge to be added
-  * Allows the challenge to be deleted
-  * Allows the challenge to be eited
+  * Allows the project to be added
+  * Allows the project to be deleted
+  * Allows the project to be edited
   * Display the list of chanllenges in a table
 
 ## -->

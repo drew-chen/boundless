@@ -10,11 +10,11 @@
 ## OR CONDITIONS OF ANY KIND, either express or implied.
 
 Name:     components/Admin/ManageChallenge.vue
-Purpose:  Dispaly, edit, add, and delete challenge from the admin console
+Purpose:  Display, edit, add, and delete challenge from the admin console
 Methods:
   * Allows the challenge to be added
   * Allows the challenge to be deleted
-  * Allows the challenge to be eited
+  * Allows the challenge to be edited
   * Display the list of chanllenges in a table
 
 ## -->
