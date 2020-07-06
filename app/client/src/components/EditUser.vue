@@ -390,7 +390,7 @@ import ProjectTable from '../components/Tables/ProjectTable'
 export default {
   props: {
     uuid: String,
-    emailList: Array
+    emailSet: Set
   },
   components: {
     // uploadGUI
@@ -485,7 +485,7 @@ export default {
         this.errorObj.error = true
         this.errorObj.message = 'Not a valid email format!'
         return false
-      } else if (this.emailList.includes(String(val).toLowerCase())) {
+      } else if (this.emailSet.has(String(val).toLowerCase())) {
         this.errorObj.error = true
         this.errorObj.message = 'This email is already taken!'
         return false

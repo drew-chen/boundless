@@ -1829,7 +1829,7 @@ Methods:
                 @input="addMemberDialog.edited = true"
               />
 
-              <!-- ---------- Member Dispaly ---------- -->
+              <!-- ---------- Member Display ---------- -->
               <div>
                 <div class="q-mt-sm">
                   <b>Current Members</b>
@@ -1915,7 +1915,10 @@ export default {
   },
   props: {
     uuid: String,
-    mode: String
+    mode: {
+      type: String,
+      default: 'edit'
+    }
   },
   async created () {
     try {

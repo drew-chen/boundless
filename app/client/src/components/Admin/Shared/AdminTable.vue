@@ -22,7 +22,6 @@ Methods:
 <template>
   <q-page flat>
     <!-- -------------------- Main Content -------------------- -->
-
     <q-table
       flat wrap-cells binary-state-sort
       color="secondary"
@@ -67,6 +66,7 @@ Methods:
       <template v-slot:top-right>
         <q-toolbar>
           <q-btn
+            v-if="popkeywords.length > 0"
             dense flat round
             icon="menu"
             class="q-mr-xs"
@@ -130,7 +130,7 @@ Methods:
             :props="props"
           >
             <div align="left">
-              {{ props.row[rowType] }}
+              {{ props.row[rowType] || props.row.name }}
             </div>
           </q-td>
 
@@ -138,7 +138,7 @@ Methods:
             :key="middleColumn"
             :props="props"
           >
-            <div align="left">
+            <div align="center">
               {{ props.row[middleColumn] }}
             </div>
           </q-td>
@@ -193,7 +193,7 @@ Methods:
           <br>
           <component :is="getEditRowComponent"
             :uuid="uuid"
-            :mode="dialogOption"
+            :emailSet="emailSet"
             @added="updateAllRows"
             @close="dialog = false"
           />
@@ -221,7 +221,8 @@ import testingDb, { testAppCall } from '../../../firebase/init_testing'
 
 export default {
   props: {
-    rowType: { // <String>: Whether this component displays projects, challenges, or users
+    // <String>: Whether this component displays projects, challenges, or users
+    rowType: {
       type: String,
       required: true,
       validator: prop => [
@@ -235,6 +236,11 @@ export default {
     middleColumn: {
       required: true,
       type: String
+    },
+    // <Boolean> Whether keywords are used. Keywords are currently only used for projects and challenges, not users.
+    useLoadConfig: {
+      type: Boolean,
+      default: true
     }
   },
   components: {
@@ -266,7 +272,9 @@ export default {
       // fetching row of rowType (project, challenges, or users) and config from db
       await this.loadFireRefs()
       await this.loadAllRows()
-      await this.loadConfig()
+      if (this.useLoadConfig) {
+        await this.loadConfig()
+      }
     } catch (error) {
       throw new Error(error)
     }
@@ -279,7 +287,7 @@ export default {
       // popkeywords <Array<Object>>: list of keywords for projects and challenges converted to object
       //                              with label and value (not for users)
       popkeywords: [],
-      emailList: [], // <Array<String>>: list of user email (not for projects or challenges)
+      emailSet: new Set(), // <Set<String>>: set of user email (not for projects or challenges)
 
       dialog: false, // <Boolean>: flag to invoke dialog
       dialogOption: '', // <String>: mode of the dialog
@@ -304,17 +312,9 @@ export default {
           required: true,
           align: 'center',
           label: `${this.capitalizeFirst(this.rowType)} Name`,
-          field: row => row[this.rowType] || '',
+          field: row => row[this.rowType] || row.name || '',
           format: val => `${val}`,
-          sort: (a, b) => {
-            if (a.trim() < b.trim()) {
-              return -1
-            } else if (a.trim() > b.trim()) {
-              return 1
-            } else {
-              return 0
-            }
-          },
+          sort: this.stringCompare,
           sortable: true
         },
         {
@@ -324,6 +324,7 @@ export default {
           label: this.capitalizeFirst(this.middleColumn),
           field: row => row[this.middleColumn] || '',
           format: val => `${val}`,
+          sort: this.stringCompare,
           sortable: true
         },
         {
@@ -333,6 +334,7 @@ export default {
           align: 'center',
           field: row => row.uuid,
           format: val => `${val}`,
+          sort: this.stringCompare,
           sortable: true
         },
         {
@@ -344,6 +346,28 @@ export default {
     }
   },
   methods: {
+    stringCompare (a, b) {
+      /**
+       * Used to sort columns
+       * @param {String} a Left string
+       * @param {String} b Right string
+       * @return {String} If the return value:
+       * is less than 0 then sort a to an index lower than b, i.e. a comes first
+       * is 0 then leave a and b unchanged with respect to each other, but sorted with respect to all different elements
+       * is greater than 0 then sort b to an index lower than a, i.e. b comes first
+       */
+      a = a.trim()
+      a = a.toLowerCase()
+      b = b.trim()
+      b = b.toLowerCase()
+      if (a < b) {
+        return -1
+      } else if (a > b) {
+        return 1
+      } else {
+        return 0
+      }
+    },
     capitalizeFirst (str) {
       /**
        * Capitlizes the first character of a string.
@@ -469,7 +493,7 @@ export default {
               this.rowList.push(row)
               this.uuidList.push(rowUuid)
               if (row.hasOwnProperty('email')) { // this row describes a user
-                this.emailList.push(tocAllRowData[row].email)
+                this.emailSet.add(row.email)
               }
             }
           }
@@ -524,7 +548,8 @@ export default {
     deleteRow: async function (entry, removedMiddleEntry) {
       /**
        * Deletes projects, challenges, or users from the database and stroage;
-       * notifies the user of the status when compeleted
+       * notifies the user of the status when compeleted. Works by getting a reference
+       * to the field being deleted then removes (by updating) the field in the document.
        * @param{String} entry: uid of the projects, challenges, or users to be removed
        * @param {String} removedMiddleEntry: The alias or email of the projects, challenges, or users to be removed
        * @return {void}
@@ -549,10 +574,9 @@ export default {
 
             if (typeof removedMiddleEntry !== 'undefined') {
               if (removedMiddleEntry !== '') {
-                updates[`alias.${removedMiddleEntry}`] = firebase.firestore.FieldValue.delete()
+                updates[`${this.middleColumn}.${removedMiddleEntry}`] = firebase.firestore.FieldValue.delete()
               }
             }
-
             await this.db.collection(`${this.rowType}s`).doc('ToC')
               .update(updates)
 
@@ -573,7 +597,7 @@ export default {
         } else {
           this.$q.dialog({
             title: 'Error',
-            message: 'UUID does not exist in the database.'
+            message: `${this.capitalizeFirst(this.rowType)} does not exist in the database.`
           })
         }
       }
@@ -598,7 +622,7 @@ export default {
 
       this.rowList = []
       this.uuidList = []
-      this.emailList = []
+      this.emailSet = new Set()
 
       this.loadAllRows()
     },
