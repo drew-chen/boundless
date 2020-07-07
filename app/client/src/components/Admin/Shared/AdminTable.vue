@@ -80,7 +80,9 @@ Methods:
 
       <template v-slot:header="props">
         <q-tr :props="props">
-          <q-th auto-width>
+          <q-th
+            auto-width
+            class="table-header">
             <q-checkbox v-model="props.selected"/>
           </q-th>
           <q-th
