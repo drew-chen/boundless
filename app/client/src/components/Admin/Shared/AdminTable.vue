@@ -23,7 +23,7 @@ Methods:
   <q-page flat>
     <!-- -------------------- Main Content -------------------- -->
     <q-table
-      flat wrap-cells binary-state-sort
+      flat wrap-cells binary-state-sort virtual-scroll
       color="secondary"
       row-key="uuid"
       :data="rowList"
@@ -33,23 +33,55 @@ Methods:
       :pagination.sync="pagination"
       selection="multiple"
       :selected.sync="selected"
+      :virtual-scroll-item-size="48"
+      :virtual-scroll-sticky-size-start="90"
+      class="table"
     >
       <template v-slot:top-left>
-        <q-btn
-          round
-          icon="add" color="accent"
-          @click="dialog = true; dialogOption = 'add'"
-        />
-        <q-btn
-          dense round flat
-          color="secondary" icon="delete"
-          @click="deleteSelected()"
-        />
+
+        <div class="row">
+          <q-btn
+            rounded
+            color="accent"
+            icon="add"
+            :label="`Add ${capitalizeFirst(rowType)}`"
+            @click="dialog = true; dialogOption = 'add'"
+          />
+          <transition name="fade">
+            <q-btn
+              flat rounded
+              class="q-ml-sm"
+              color="accent"
+              icon="delete"
+              key="delete"
+              v-if="selected.length !== 0"
+              @click="deleteSelected()">
+              <q-tooltip>
+                delete selection
+              </q-tooltip>
+            </q-btn>
+          </transition>
+
+          <transition name="fade">
+            <q-btn
+              flat rounded
+              color="accent" icon="edit"
+              v-if="selected.length === 1"
+              @click="editRow()">
+              <q-tooltip>
+                edit a row
+              </q-tooltip>
+            </q-btn>
+          </transition>
+
+        </div>
       </template>
 
       <template v-slot:header="props">
         <q-tr :props="props">
-          <q-th auto-width>
+          <q-th
+            auto-width
+            class="table-header">
             <q-checkbox v-model="props.selected"/>
           </q-th>
           <q-th
@@ -111,7 +143,11 @@ Methods:
       </template>
 
       <template v-slot:body="props">
-        <q-tr :props="props">
+        <q-tr
+          :props="props"
+          @click="selectRow(props.row)"
+          class="body-table-row"
+        >
           <q-td auto-width>
             <q-checkbox v-model="props.selected"/>
           </q-td>
@@ -159,13 +195,7 @@ Methods:
             <q-btn
               dense round flat
               color="secondary" icon="edit"
-              @click="editRow(props.row.uuid)"
-            />
-
-            <q-btn
-              dense round flat
-              color="secondary" icon="delete"
-              @click="deleteRow(props.row.uuid, props.row[middleColumn])"
+              @click.stop="editRow(props.row.uuid)"
             />
           </q-td>
 
@@ -346,9 +376,30 @@ export default {
     }
   },
   methods: {
+    selectRow (row) {
+      /**
+       * Adds the row clicked to the list of selected rows.
+       * @param {Object} event JS event object
+       * @param {Object} row The row clicked
+       */
+      if (this.selected.length > 0) {
+        let i = 0
+        const matched = this.selected.find((item, index) => {
+          i = index
+          return item.uuid === row.uuid
+        })
+        if (matched) {
+          this.selected.splice(i, 1)
+        } else {
+          this.selected.push(row)
+        }
+      } else {
+        this.selected.push(row)
+      }
+    },
     stringCompare (a, b) {
       /**
-       * Used to sort columns
+       * Used to sort columns.
        * @param {String} a Left string
        * @param {String} b Right string
        * @return {String} If the return value:
@@ -626,19 +677,26 @@ export default {
 
       this.loadAllRows()
     },
-    editRow: function (entry) {
+    editRow: function (uuid) {
       /**
        * helper function to dialog to invoke 'edit'
-       * @param {String} entry: uid of the row (challenges, projects, or users)
+       * @param {String} uuid: uid of the row (challenges, projects, or users)
        * @returns {void}
        */
-
-      this.dialogOption = 'edit'
-      this.uuid = entry
-
-      setTimeout(() => {
-        this.dialog = true
-      }, 200)
+      let uuidAssigned = false
+      if (typeof uuid !== 'undefined') {
+        this.uuid = uuid
+        uuidAssigned = true
+      } else if (this.selected.length === 1) {
+        this.uuid = this.selected[0].uuid
+        uuidAssigned = true
+      }
+      if (uuidAssigned) {
+        this.dialogOption = 'edit'
+        setTimeout(() => {
+          this.dialog = true
+        }, 200)
+      }
     }
   }
 }
@@ -646,14 +704,24 @@ export default {
 
 <style lang="stylus" scoped>
 
+.body-table-row
+  cursor: pointer
+
 .row-name
   width: 400px
 
 .table-header
   font-size: 18px
   font-weight: normal
+  position: sticky !important
+  top: 0
+  z-index: 1
+  background: #fff
 
 .keyword-dropdown
   min-width: 100px
+.table
+  max-height: 68vh
+  margin-bottom: 0
 
 </style>

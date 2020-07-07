@@ -1,5 +1,5 @@
 <!-- ##
-## Copyright (c) 2019 Wind River Systems, Inc.
+## Copyright (c) 2020 Wind River Systems, Inc.
 ##
 ## Licensed under the Apache License, Version 2.0 (the "License");
 ## you may not use this file except in compliance with the License.
@@ -486,17 +486,21 @@ export default {
 
 <style lang="stylus" scoped>
 // console-page page loadout
+
+body {
+  max-height: 50px
+}
+
 .console-page {
   min-width: 800px;
   max-width: 98%;
   margin: auto;
-  // max-height: 78vh;
-  // overflow: hidden;
 }
 
 // left-tab loadout
 .console-content-tab {
   border-radius: 3px;
+  overflow: hidden;
 }
 
 .ap-left-panel {
