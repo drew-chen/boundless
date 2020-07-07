@@ -157,13 +157,12 @@ Methods:
             key="keywords"
             :props="props"
             invisible
-            auto-width
           />
 
           <q-td
             key="name"
-            class="row-name"
             :props="props"
+
           >
             <div align="left">
               {{ props.row[rowType] || props.row.name }}
@@ -346,11 +345,13 @@ export default {
           name: 'name',
           required: true,
           align: 'center',
-          label: `${this.capitalizeFirst(this.rowType)} Name`,
+          label: this.capitalizeFirst(this.rowType),
           field: row => row[this.rowType] || row.name || '',
           format: val => `${val}`,
           sort: this.stringCompare,
-          sortable: true
+          sortable: true,
+          classes: 'left-column',
+          headerClasses: 'left-column'
         },
         {
           name: this.middleColumn,
@@ -360,7 +361,9 @@ export default {
           field: row => row[this.middleColumn] || '',
           format: val => `${val}`,
           sort: this.stringCompare,
-          sortable: true
+          sortable: true,
+          classes: 'middle-column',
+          headerClasses: 'middle-column'
         },
         {
           name: 'uuid',
@@ -370,7 +373,9 @@ export default {
           field: row => row.uuid,
           format: val => `${val}`,
           sort: this.stringCompare,
-          sortable: true
+          sortable: true,
+          classes: 'right-column',
+          headerClasses: 'right-column'
         },
         {
           name: 'icons',
@@ -381,69 +386,6 @@ export default {
     }
   },
   methods: {
-    selectRow (row) {
-      /**
-       * Adds the row clicked to the list of selected rows.
-       * @param {Object} event JS event object
-       * @param {Object} row The row clicked
-       */
-      if (this.selected.length > 0) {
-        let i = 0
-        const matched = this.selected.find((item, index) => {
-          i = index
-          return item[this.rowKey] === row[this.rowKey]
-        })
-        if (matched) {
-          this.selected.splice(i, 1)
-        } else {
-          this.selected.push(row)
-        }
-      } else {
-        this.selected.push(row)
-      }
-    },
-    stringCompare (a, b) {
-      /**
-       * Used to sort columns.
-       * @param {String} a Left string
-       * @param {String} b Right string
-       * @return {String} If the return value:
-       * is less than 0 then sort a to an index lower than b, i.e. a comes first
-       * is 0 then leave a and b unchanged with respect to each other, but sorted with respect to all different elements
-       * is greater than 0 then sort b to an index lower than a, i.e. b comes first
-       */
-      a = a.trim()
-      a = a.toLowerCase()
-      b = b.trim()
-      b = b.toLowerCase()
-      if (a < b) {
-        return -1
-      } else if (a > b) {
-        return 1
-      } else {
-        return 0
-      }
-    },
-    capitalizeFirst (str) {
-      /**
-       * Capitlizes the first character of a string.
-       * Used for rowType for certain imports or labels.
-       * @param {String} str The string to be capitlized.
-       * @return {String} The captilized string
-       */
-      if (typeof str !== 'string') return ''
-      return str.charAt(0).toUpperCase() + str.slice(1)
-    },
-    formatProperty (row, propertyName) {
-      /**
-       * Returns the row.propertyName for display if there is one.
-       * @param row {Object} The project, challenge, or user with a potential property of propertyName.
-       * @return {String} The property value.
-       */
-      if (row && propertyName && row.hasOwnProperty(propertyName)) {
-        return row[propertyName] ? ` (${propertyName}: ${row[propertyName]})` : ''
-      }
-    },
     loadFireRefs: async function () {
       /**
        * load firebase database reference
@@ -702,6 +644,69 @@ export default {
           this.dialog = true
         }, 200)
       }
+    },
+    selectRow (row) {
+      /**
+       * Adds the row clicked to the list of selected rows.
+       * @param {Object} event JS event object
+       * @param {Object} row The row clicked
+       */
+      if (this.selected.length > 0) {
+        let i = 0
+        const matched = this.selected.find((item, index) => {
+          i = index
+          return item[this.rowKey] === row[this.rowKey]
+        })
+        if (matched) {
+          this.selected.splice(i, 1)
+        } else {
+          this.selected.push(row)
+        }
+      } else {
+        this.selected.push(row)
+      }
+    },
+    stringCompare (a, b) {
+      /**
+       * Used to sort columns.
+       * @param {String} a Left string
+       * @param {String} b Right string
+       * @return {String} If the return value:
+       * is less than 0 then sort a to an index lower than b, i.e. a comes first
+       * is 0 then leave a and b unchanged with respect to each other, but sorted with respect to all different elements
+       * is greater than 0 then sort b to an index lower than a, i.e. b comes first
+       */
+      a = a.trim()
+      a = a.toLowerCase()
+      b = b.trim()
+      b = b.toLowerCase()
+      if (a < b) {
+        return -1
+      } else if (a > b) {
+        return 1
+      } else {
+        return 0
+      }
+    },
+    capitalizeFirst (str) {
+      /**
+       * Capitlizes the first character of a string.
+       * Used for rowType for certain imports or labels.
+       * @param {String} str The string to be capitlized.
+       * @return {String} The captilized string
+       */
+      if (typeof str !== 'string') return ''
+      return str.charAt(0).toUpperCase() + str.slice(1)
+    },
+    formatProperty (row, propertyName) {
+      /**
+       * Returns the row.propertyName for display if there is one.
+       * @param row {Object} The project, challenge, or user with a potential property of propertyName.
+       * @return {String} The property value.
+       */
+      if (row && propertyName && row.hasOwnProperty(propertyName)) {
+        return row[propertyName] ? ` (${propertyName}: ${row[propertyName]})` : ''
+      }
     }
   }
 }
@@ -712,8 +717,14 @@ export default {
 .body-table-row
   cursor: pointer
 
-.row-name
-  width: 400px
+.left-column
+  width: 600px
+
+.middle-column
+  min-width: 600px
+
+.right-column
+  min-width: 300px
 
 .table-header
   font-size: 18px
@@ -726,7 +737,7 @@ export default {
 .keyword-dropdown
   min-width: 100px
 .table
-  max-height: 68vh
+  max-height: 74vh
   margin-bottom: 0
 
 </style>
