@@ -25,7 +25,7 @@ Methods:
     <q-table
       flat wrap-cells binary-state-sort virtual-scroll
       color="secondary"
-      row-key="uuid"
+      :row-key="rowKey"
       :data="rowList"
       :columns="columns"
       :filter="filter"
@@ -271,6 +271,11 @@ export default {
     useLoadConfig: {
       type: Boolean,
       default: true
+    },
+    // <String> The name of the row key used by q-table.
+    rowKey: {
+      type: String,
+      default: 'uuid'
     }
   },
   components: {
@@ -386,7 +391,7 @@ export default {
         let i = 0
         const matched = this.selected.find((item, index) => {
           i = index
-          return item.uuid === row.uuid
+          return item[this.rowKey] === row[this.rowKey]
         })
         if (matched) {
           this.selected.splice(i, 1)

@@ -23,6 +23,7 @@ Methods:
   <admin-table
     rowType="user"
     middleColumn="email"
+    rowKey="email"
  />
 </template>
 
