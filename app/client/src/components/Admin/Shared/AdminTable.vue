@@ -194,7 +194,7 @@ Methods:
             <q-btn
               dense round flat
               color="secondary" icon="edit"
-              @click.stop="editRow(props.row.uuid)"
+              @click.stop="editRow(props.row.uuid || props.row[rowKey])"
             />
           </q-td>
 
@@ -271,7 +271,7 @@ export default {
       type: Boolean,
       default: true
     },
-    // <String> The name of the row key used by q-table.
+    // <String> The name of the row key used by q-table. It is also used as an id when a row doesn't have a uuid.
     rowKey: {
       type: String,
       default: 'uuid'
@@ -317,7 +317,8 @@ export default {
     return {
       db: null, // <Object>: firebase object referencing the database
       cloudFunctions: null, // <Object>: firebase ref to cloud functions
-      uuid: '', // <String>: uid of rowType, i.e., project, challenges, or users, to be edited
+      uuid: '', // <String>: uid of rowType, i.e., project, challenges, or users, to be edited. Used in conjunction with
+      //                     rowKey prop since some user data doesn't have a uuid, but does have a rowKey like 'email'.
       // popkeywords <Array<Object>>: list of keywords for projects and challenges converted to object
       //                              with label and value (not for users)
       popkeywords: [],
@@ -518,7 +519,7 @@ export default {
         })
       } else if (this.selected.length === 1) {
         let deletedRow = this.selected[0]
-        let rowId = deletedRow.uuid
+        let rowId = deletedRow.uuid || deletedRow[this.rowKey]
         this.$q.dialog({
           title: 'Confirmation to Delete',
           message: `Delete ${rowId}${this.formatProperty(deletedRow, this.middleColumn)}?`,
@@ -537,7 +538,7 @@ export default {
           cancel: true
         }).onOk(async () => {
           this.selected.forEach(row => {
-            this.deleteRow(row.uuid, row[this.middleColumn])
+            this.deleteRow(row.uuid || row[this.rowKey], row[this.middleColumn])
           })
           this.selected = []
         })
@@ -581,7 +582,7 @@ export default {
             let tmpRowList = []
 
             this.rowList.forEach(row => {
-              if (row.uuid !== entry) {
+              if (row[this.rowKey] !== entry && row.uuid !== entry) {
                 tmpRowList.push(row)
               }
             })
@@ -635,7 +636,8 @@ export default {
         this.uuid = uuid
         uuidAssigned = true
       } else if (this.selected.length === 1) {
-        this.uuid = this.selected[0].uuid
+        let row = this.selected[0]
+        this.uuid = row.uuid || row[this.rowKey]
         uuidAssigned = true
       }
       if (uuidAssigned) {
@@ -718,7 +720,7 @@ export default {
   cursor: pointer
 
 .left-column
-  width: 600px
+  min-width: 600px
 
 .middle-column
   min-width: 600px
