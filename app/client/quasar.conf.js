@@ -80,7 +80,10 @@ module.exports = function (ctx) {
         'QKnob',
         'QColor',
         'QPopupProxy',
-        'QBtnDropdown'
+        'QBtnDropdown',
+        'QStepper',
+        'QStep',
+        'QStepperNavigation'
       ],
 
       directives: [
