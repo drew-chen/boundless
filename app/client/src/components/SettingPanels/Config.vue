@@ -94,7 +94,6 @@ Methods:
 
     <!-- -------------------- Keywords -------------------- -->
     <div>
-
       <div
         v-if="type === 'challenges'"
         class="text-h4 q-mb-md"
@@ -151,6 +150,12 @@ Methods:
         </dir>
       </p>
     </div>
+
+    <!-- -------------------- Project Submission Questions -------------------- -->
+
+    <project-form-custom-create
+      :type="type"
+    />
 
     <!-- -------------------- Listing Table -------------------- -->
     <div>
@@ -569,11 +574,16 @@ import { defaultImages } from '../../../boundless.config'
 import productionDb, { productionStorage } from '../../firebase/init_production'
 import testingDb, { testingStorage } from '../../firebase/init_testing'
 
+import ProjectFormCustomCreate from '../Forms/Project/ProjectFormCustomCreate.vue'
+
 export default {
   props: {
     keywords: Object,
     type: String,
     ratio: String
+  },
+  components: {
+    ProjectFormCustomCreate
   },
   async created () {
     try {

@@ -1,12 +1,11 @@
 <template>
   <q-page>
-    <q-card class="absolute-center">
+    <q-card class="main">
       <q-stepper
         animated keep-alive
         v-model="step"
         ref="stepper"
         color="primary"
-        class="main"
         align="center"
       >
         <q-step
@@ -167,13 +166,16 @@ export default {
 
 <style lang="stylus" scoped>
 
+.q-page
+  margin-top: 10px
+
 .main
   width: 1000px
-  align: center
+  margin: auto
 
 // select child component
 /deep/ .container
-  max-height: 65vh
+  max-height: 64vh
   overflow: auto
 
 /deep/ .container > *
