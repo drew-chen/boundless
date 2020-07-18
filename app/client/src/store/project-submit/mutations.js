@@ -58,6 +58,10 @@ export function setQuestions (state, questions) {
   Vue.set(state, 'questions', questions)
 }
 
+export function setQuestionTemplates (state, questionTemplates) {
+  Vue.set(state, 'questionTemplates', questionTemplates)
+}
+
 export function addEntryToEmailToUuidMap (state, { email, uuid }) {
   Vue.set(state.emailToUuidMap, email, uuid)
 }

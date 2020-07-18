@@ -29,7 +29,6 @@
         >
           <project-custom-form
             ref="projectCustomForm"
-            :questionDetails="questionDetails"
             @submittedSuccessfully="navigateForward"
           />
         </q-step>
@@ -73,34 +72,7 @@ export default {
     ProjectCustomForm,
     ProjectReviewForm
   },
-  data () {
-    return {
-      step: 1, // <Integer> Progress counter representing current panel.
-      questionDetails: [
-        {
-          label: 'What was this project\'s inspiration?',
-          type: 'text'
-        },
-        {
-          label: 'Extended Details',
-          type: 'textarea'
-        },
-        {
-          label: 'Installlation',
-          type: 'textarea'
-        },
-        {
-          label: 'Source code link',
-          type: 'url'
-        },
-        {
-          label: 'What is your favorite number?',
-          type: 'number'
-        }
-      ]
-    }
-  },
-  async mounted () {
+  async created () {
     try {
       // fetches the required data rom the db
       await this.loadFireRefs()
@@ -108,6 +80,11 @@ export default {
       await this.loadConfig()
     } catch (error) {
       throw new Error(error)
+    }
+  },
+  data () {
+    return {
+      step: 1 // <Integer> Progress counter representing current panel.
     }
   },
   methods: {
@@ -149,7 +126,7 @@ export default {
           } catch (error) {
             this.$q.notify({
               type: 'negative',
-              message: 'Unable to submit.'
+              message: 'Unable to submit new project.'
             })
             throw new Error(error)
           }

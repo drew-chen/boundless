@@ -34,6 +34,11 @@ export default function () {
       label: '', // <String> A unique text label above the input field when focused
       type: '', // <String> Input type (see QInput API)
       response: '' // <String> User input
+    }],
+    questionTemplates: [{ // <Array<Object>> Defines the custom questions for new projects.
+      label: '', // <String> A unique text label above the input field when focused
+      type: '', // <String> Input type (see QInput API)
+      order: 0 // <Integer> Unique index with lower numbers displayed first.
     }]
   }
 }

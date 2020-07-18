@@ -152,8 +152,7 @@ Methods:
     </div>
 
     <!-- -------------------- Project Submission Questions -------------------- -->
-
-    <project-form-custom-create
+    <project-create-custom-form
       :type="type"
     />
 
@@ -574,7 +573,7 @@ import { defaultImages } from '../../../boundless.config'
 import productionDb, { productionStorage } from '../../firebase/init_production'
 import testingDb, { testingStorage } from '../../firebase/init_testing'
 
-import ProjectFormCustomCreate from '../Forms/Project/ProjectFormCustomCreate.vue'
+import projectCreateCustomForm from '../Forms/Project/projectCreateCustomForm.vue'
 
 export default {
   props: {
@@ -583,7 +582,7 @@ export default {
     ratio: String
   },
   components: {
-    ProjectFormCustomCreate
+    projectCreateCustomForm
   },
   async created () {
     try {

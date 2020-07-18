@@ -1,10 +1,10 @@
 <template>
   <div>
-    <div v-if="questionDetails.length === 0">
+    <div v-if="!questionTemplates || questionTemplates.length === 0">
       There are no additional details
     </div>
     <div v-else>
-      <h5>Additional Details</h5>
+      <h5>Additional Questions</h5>
       <q-form
         class="q-pd-md"
         ref="form"
@@ -30,25 +30,38 @@
 </template>
 
 <script>
-
 import { createNamespacedHelpers } from 'vuex'
-const { mapMutations } = createNamespacedHelpers('projectSubmit')
+const { mapGetters, mapMutations } = createNamespacedHelpers('projectSubmit')
 
 export default {
-  props: {
-    questionDetails: {
-      type: Array,
-      required: true
+  /**
+   * Create questions for this project based on questionTemplates then
+  *  sort questions based on 'order' property.
+   */
+  created () {
+    if (!this.questionTemplates || this.questionTemplates.length === 0) {
+      this.questions = []
+    } else {
+      console.log(this.questionTemplates)
+      this.questionTemplates.forEach(questionTemplate => {
+        this.questions.push({
+          ...questionTemplate,
+          response: ''
+        })
+      })
+      this.questions.sort((q1, q2) => {
+        if (q1.order > q2.order) {
+          return 1
+        } else if (q1.order > q2.order) {
+          return -1
+        } else {
+          return 0
+        }
+      })
     }
   },
-  created () {
-    this.questionDetails.forEach(questionDetail => {
-      this.questions.push({
-        label: questionDetail.label,
-        type: questionDetail.type,
-        response: ''
-      })
-    })
+  computed: {
+    ...mapGetters(['questionTemplates'])
   },
   data () {
     return {
