@@ -608,6 +608,7 @@ Methods:
 import { required, maxLength } from 'vuelidate/lib/validators'
 import { createNamespacedHelpers } from 'vuex'
 const { mapGetters, mapMutations } = createNamespacedHelpers('projectSubmit')
+import cloneDeep from 'lodash.clonedeep'
 
 export default {
   validations: {
@@ -699,7 +700,6 @@ export default {
           hidden: false,
           alias: ''
         }
-        const cloneDeep = require('lodash.clonedeep')
         this.setProjectMembers(cloneDeep(this.projectMembers))
         this.setWebpage(cloneDeep(this.webpage))
         this.setProject(cloneDeep(newProject))

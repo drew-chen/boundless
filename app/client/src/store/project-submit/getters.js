@@ -74,3 +74,7 @@ export function webpage (state) {
 export function questions (state) {
   return state.questions
 }
+
+export function questionTemplates (state) {
+  return state.questionTemplates
+}

@@ -105,7 +105,6 @@
 </template>
 
 <script>
-
 import { createNamespacedHelpers } from 'vuex'
 const { mapGetters } = createNamespacedHelpers('projectSubmit')
 
