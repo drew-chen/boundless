@@ -13,8 +13,9 @@ Name:     components/Forms/Project/projectCreateCustomForm.vue
 Purpose:  Form configures 'ProjectCustomForm.vue'.
 Methods:
   * Admin goes through form which creates an array that 'ProjectCustomForm.vue'
-  * can display. This array is saved in vuex and submitted to the db in a
-  * vuex action.
+  * can display. Questions support CRUD operations and can be reordered through
+  * drag and dropping them. This array is saved in vuex and submitted to the
+  * db in a vuex action.
 ## -->
 
 <template>
@@ -41,6 +42,7 @@ Methods:
           <q-btn
             slot="header"
             @click="saveQuestionTemplates"
+            :disable="!isModified"
           >
             Save
           </q-btn>
@@ -55,7 +57,7 @@ Methods:
               <q-input
                 filled clearable
                 clear-icon="close"
-                class="q-ma-sm col-2"
+                class="q-ma-sm col-xs-4 col-lg-2"
                 label="Question label"
                 v-model="questionTemplate.label"
               />
@@ -63,7 +65,7 @@ Methods:
               <q-input
                 filled clearable
                 clear-icon="close"
-                class="q-ma-sm col-1"
+                class="q-ma-sm col-xs-2 col-lg-1"
                 label="Question type"
                 v-model="questionTemplate.type"
               />
@@ -82,10 +84,10 @@ Methods:
 
 <script>
 import draggable from 'vuedraggable'
-import cloneDeep from 'lodash.clonedeep'
+import { cloneDeep, isEqual } from 'lodash'
 
 import { createNamespacedHelpers } from 'vuex'
-const { mapActions } = createNamespacedHelpers('projectSubmit')
+const { mapActions, mapGetters } = createNamespacedHelpers('projectSubmit')
 
 export default {
   components: {
@@ -101,23 +103,56 @@ export default {
       }
     }
   },
+  async created () {
+    await this.loadFireRefs()
+    await this.loadConfig()
+    this.questionTemplates = cloneDeep(this.storeQuestionTemplates)
+    this.isModified = false
+  },
+  watch: {
+    /**
+     * If questionTemplate changes and it's different from the
+     * version in the database, then enable the save button.
+     */
+    questionTemplates: {
+      deep: true,
+      handler (newVal, oldVal) {
+        if (!isEqual(this.storeQuestionTemplates, newVal)) {
+          this.isModified = true
+        } else {
+          this.isModified = false
+        }
+      }
+    }
+  },
+  computed: {
+    ...mapGetters({
+      storeQuestionTemplates: 'questionTemplates'
+    })
+  },
   data () {
     return {
-      questionTemplates: [],
+      questionTemplates: [], // <Array<Object> List of question templates.
       newQuestionTemplate: {
         label: '', // <String>: Name of the question.
         type: 'text', // <String>: Question type. See QInput API.
         required: false, // <String>: Whether a response is necessary
         order: 0 // <Integer>: Index which is only unique within questionTemplates.
-      }
+      },
+      isModified: false // <Boolean>: Whether questionTemplates has changed.
     }
   },
   methods: {
-    ...mapActions(['submitQuestionTemplates']),
+    ...mapActions([
+      'submitQuestionTemplates',
+      'loadFireRefs',
+      'loadConfig'
+    ]),
     /** Submits questionTemplates to vuex and to the db. */
     async saveQuestionTemplates () {
       try {
         await this.submitQuestionTemplates(cloneDeep(this.questionTemplates))
+        this.isModified = false
         this.$q.notify({
           type: 'positive',
           message: 'Saved custom question templates.'
