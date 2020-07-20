@@ -22,8 +22,7 @@
 
         <q-step
           :name="2"
-          title="Additional details"
-          caption="Optional"
+          title="Additional questions"
           icon="assignment"
           :done="step > 2"
         >

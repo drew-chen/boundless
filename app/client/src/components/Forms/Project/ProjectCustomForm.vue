@@ -1,4 +1,4 @@
-<template>
+q<template>
   <div>
     <div v-if="!questionTemplates || questionTemplates.length === 0">
       There are no additional details
@@ -12,14 +12,22 @@
         <div class="container">
           <div v-for="question in questions" :key="question.label">
             <q-input
-              filled clearable
+              filled clearable stack-label
               clear-icon="close"
               class="q-mt-sm"
               :placeholder="`Enter optional response (${question.type})`"
               :label="question.label"
               :type="question.type"
               v-model="question.response"
-            />
+              :rules="[val => (!question.required || !!val) || '* Required']"
+            >
+              <template
+                v-if="question.required"
+                v-slot:hint
+              >
+                * Required
+              </template>
+            </q-input>
           </div>
         </div>
       </q-form>
