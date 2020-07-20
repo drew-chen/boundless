@@ -22,9 +22,10 @@ Methods:
   <div>
     <div
       v-if="type === 'projects'"
-      class="text-h4 q-mb-md"
     >
-      Project custom form template
+      <div class="text-h4 q-mb-md">
+        Project custom form template
+      </div>
       <q-separator color="secondary" />
       <q-form>
         <draggable
@@ -61,13 +62,17 @@ Methods:
                 label="Question label"
                 v-model="questionTemplate.label"
               />
-              <!-- TODO: Use option group -->
-              <q-input
-                filled clearable
-                clear-icon="close"
-                class="q-ma-sm col-xs-2 col-lg-1"
-                label="Question type"
+              <q-select
+                filled
                 v-model="questionTemplate.type"
+                :options="options"
+                label="Standard"
+                class="q-ma-sm col-xs-2 col-lg-1"
+              />
+              <q-toggle
+                v-model="questionTemplate.required"
+                color="secondary"
+                label="required"
               />
               <q-btn
                 slot="header"
@@ -135,11 +140,14 @@ export default {
       questionTemplates: [], // <Array<Object> List of question templates.
       newQuestionTemplate: {
         label: '', // <String>: Name of the question.
-        type: 'text', // <String>: Question type. See QInput API.
+        type: 'text', // <String>: Question type. See HTML input types.
         required: false, // <String>: Whether a response is necessary
         order: 0 // <Integer>: Index which is only unique within questionTemplates.
       },
-      isModified: false // <Boolean>: Whether questionTemplates has changed.
+      isModified: false, // <Boolean>: Whether questionTemplates has changed.
+      options: [ // Array<String>: Possible input template types.
+        'text', 'textarea', 'email', 'number', 'date', 'time', 'tel'
+      ]
     }
   },
   methods: {
