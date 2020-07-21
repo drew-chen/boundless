@@ -41,28 +41,28 @@ Methods:
         >
           Save
         </q-btn>
+        <!-- Native drag and drop API is disabled to prevent flickering issues. -->
         <draggable
           tag="ul"
           v-model="questionTemplates"
           @end="updateQuestionOrder"
           handle=".handle"
-          ghost-class="ghost-question"
           chosen-class="chosen-question"
-          drag-class="drag-question"
-          animation="200"
-          force-fall-back
+          :force-fallback="true"
+          fallback-class="hide-question-preview"
+          animation="175"
         >
           <q-card
             flat
-            class="row items-center"
+            class="row items-center handle"
             v-for="(questionTemplate, index) in questionTemplates"
             :key="questionTemplate.order"
           >
             <q-icon
               size="sm"
               color="grey"
-              class="handle q-mx-sm"
               name="drag_indicator"
+              class="q-ma-xs"
             />
             <q-input
               filled clearable
@@ -76,7 +76,7 @@ Methods:
               v-model="questionTemplate.type"
               :options="options"
               label="Input Type"
-              class="q-ma-sm col-2"
+              class="q-mx-sm col-2"
             />
             <q-toggle
               v-model="questionTemplate.required"
@@ -156,7 +156,7 @@ export default {
       isModified: false, // <Boolean>: Whether questionTemplates has changed.
       options: [ // Array<String>: Possible input template types.
         'text', 'textarea', 'email', 'number', 'date', 'url'
-      ]// TODO: rename textarea to 'text box (paragraph)'. text (sentence). Look at google form for exs
+      ] // TODO: rename textarea to 'text box (paragraph)'. text (sentence). Look at google form for exs
       // TODO: Option group
     }
   },
@@ -169,6 +169,7 @@ export default {
     /** Submits questionTemplates to vuex and to the db. */
     async saveQuestionTemplates () {
       try {
+        this.updateQuestionOrder()
         await this.submitQuestionTemplates(cloneDeep(this.questionTemplates))
         this.isModified = false
         this.$q.notify({
@@ -204,7 +205,7 @@ export default {
         this.questionTemplates.splice(index, 1)
       }
     },
-    /** Ensures that a question's order is it's index. */
+    /** Ensures that a question's order is it's index. Does not affect view. */
     updateQuestionOrder () {
       this.questionTemplates.forEach((question, index) => {
         question.order = index
@@ -222,17 +223,16 @@ export default {
 .handle
   cursor: move
 
-// The .chosen-question class is used when a row is clicked. When the mouse
-// moves the chosen question to a new row, the original question element
-// follows. During this movement, the .chosen-question class is also used.
-.ghost-question,
+// The .chosen-question class is used when a row is clicked. During drag
+// and drop movement, the .chosen-question class is also used.
 .chosen-question
   background: $grey-3
+  border 1px
 
-// This is the drag preview that is directly under your mouse. Background is
-// hidden because this preview makes seeing the chosen quesition more
-// difficult.
-.drag-question
-  background: white
+// This is the drag preview that is directly under your mouse. This is
+// hidden because this preview covers the chosen question making it harder to
+// see the chosen question.
+.hide-question-preview
+  display: none
 
 </style>
