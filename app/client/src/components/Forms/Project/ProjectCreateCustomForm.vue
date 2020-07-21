@@ -28,59 +28,68 @@ Methods:
       </div>
       <q-separator color="secondary" />
       <q-form>
+        <q-btn
+          round
+          @click="addQuestionTemplate"
+          class="q-mr-sm"
+          icon="add"
+          color="accent"
+        />
+        <q-btn
+          @click="saveQuestionTemplates"
+          :disable="!isModified"
+        >
+          Save
+        </q-btn>
         <draggable
           tag="ul"
           v-model="questionTemplates"
-          group="questions"
           @end="updateQuestionOrder"
+          handle=".handle"
+          ghost-class="ghost-question"
+          chosen-class="chosen-question"
+          drag-class="drag-question"
+          animation="200"
+          force-fall-back
         >
-          <q-btn
-            slot="header"
-            @click="addQuestionTemplate"
+          <q-card
+            flat
+            class="row items-center"
+            v-for="(questionTemplate, index) in questionTemplates"
+            :key="questionTemplate.order"
           >
-            Add
-          </q-btn>
-          <q-btn
-            slot="header"
-            @click="saveQuestionTemplates"
-            :disable="!isModified"
-          >
-            Save
-          </q-btn>
-          <!-- TODO: Add transition -->
-          <!-- <transition-group> -->
-            <div
-              class="row items-center q-ma-sm"
-              v-for="(questionTemplate, index) in questionTemplates"
-              :key="questionTemplate.order"
-            >
-              <q-icon class="drag-icon" name="drag_indicator"/>
-              <q-input
-                filled clearable
-                clear-icon="close"
-                class="q-ma-sm col-xs-4 col-lg-2"
-                label="Question label"
-                v-model="questionTemplate.label"
-              />
-              <q-select
-                filled
-                v-model="questionTemplate.type"
-                :options="options"
-                label="Standard"
-                class="q-ma-sm col-xs-2 col-lg-1"
-              />
-              <q-toggle
-                v-model="questionTemplate.required"
-                color="secondary"
-                label="required"
-              />
-              <q-btn
-                slot="header"
-                @click="deleteQuestionTemplate(index)"
-                icon="delete"
-              />
-            </div>
-          <!-- </transition-group> -->
+            <q-icon
+              size="sm"
+              color="grey"
+              class="handle q-mx-sm"
+              name="drag_indicator"
+            />
+            <q-input
+              filled clearable
+              clear-icon="close"
+              class="q-ma-sm col-6"
+              label="Label"
+              v-model="questionTemplate.label"
+            />
+            <q-select
+              filled
+              v-model="questionTemplate.type"
+              :options="options"
+              label="Input Type"
+              class="q-ma-sm col-2"
+            />
+            <q-toggle
+              v-model="questionTemplate.required"
+              color="secondary"
+              label="required"
+              class="col-2"
+            />
+            <q-btn
+              round flat
+              @click="deleteQuestionTemplate(index)"
+              icon="delete"
+            />
+          </q-card>
         </draggable>
       </q-form>
     </div>
@@ -146,8 +155,9 @@ export default {
       },
       isModified: false, // <Boolean>: Whether questionTemplates has changed.
       options: [ // Array<String>: Possible input template types.
-        'text', 'textarea', 'email', 'number', 'date', 'time', 'tel'
-      ]
+        'text', 'textarea', 'email', 'number', 'date', 'url'
+      ]// TODO: rename textarea to 'text box (paragraph)'. text (sentence). Look at google form for exs
+      // TODO: Option group
     }
   },
   methods: {
@@ -206,7 +216,23 @@ export default {
 
 <style lang="stylus" scoped>
 
-.drag-icon
+.q-card
+  max-width: 900px
+
+.handle
   cursor: move
+
+// The .chosen-question class is used when a row is clicked. When the mouse
+// moves the chosen question to a new row, the original question element
+// follows. During this movement, the .chosen-question class is also used.
+.ghost-question,
+.chosen-question
+  background: $grey-3
+
+// This is the drag preview that is directly under your mouse. Background is
+// hidden because this preview makes seeing the chosen quesition more
+// difficult.
+.drag-question
+  background: white
 
 </style>
