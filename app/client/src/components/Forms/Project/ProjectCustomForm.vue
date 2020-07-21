@@ -15,12 +15,15 @@ q<template>
               filled clearable stack-label
               clear-icon="close"
               class="q-mt-sm"
-              :placeholder="`Enter optional response (${question.type})`"
+              :placeholder="`${question.type.label} Response`"
               :label="question.label"
-              :type="question.type"
+              :type="question.type.value"
               v-model="question.response"
               :rules="[val => (!question.required || !!val) || '* Required']"
             >
+              <template v-slot:prepend>
+                <q-icon :name="question.type.icon" />
+              </template>
               <template
                 v-if="question.required"
                 v-slot:hint
@@ -50,7 +53,6 @@ export default {
     if (!this.questionTemplates || this.questionTemplates.length === 0) {
       this.questions = []
     } else {
-      console.log(this.questionTemplates)
       this.questionTemplates.forEach(questionTemplate => {
         this.questions.push({
           ...questionTemplate,
