@@ -245,5 +245,9 @@ pre {
 .fade-enter, .fade-leave-to {
   opacity: 0;
 }
+// Normalize Font Awesome icons to be similar to Material icons.
+.fas
+  font-size: 17px !important
+  left: 3px
 
 </style>

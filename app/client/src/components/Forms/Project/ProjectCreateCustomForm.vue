@@ -27,68 +27,89 @@ Methods:
         Project custom form template
       </div>
       <q-separator color="secondary" />
-      <q-form>
-        <q-btn
-          round
-          @click="addQuestionTemplate"
-          class="q-mr-sm"
-          icon="add"
-          color="accent"
-        />
-        <q-btn
-          @click="saveQuestionTemplates"
-          :disable="!isModified"
-        >
-          Save
-        </q-btn>
+      <q-form class="q-ma-lg">
+        <div class="q-mb-md">
+          <q-btn
+            round
+            @click="addQuestionTemplate"
+            class="q-mr-sm"
+            icon="add"
+            color="accent"
+          />
+          <q-btn
+            no-caps
+            @click="saveQuestionTemplates"
+            :disable="!isModified"
+            color="accent"
+          >
+            Save
+          </q-btn>
+        </div>
         <!-- Native drag and drop API is disabled to prevent flickering issues. -->
         <draggable
-          tag="ul"
           v-model="questionTemplates"
           @end="updateQuestionOrder"
           handle=".handle"
-          chosen-class="chosen-question"
+          ghost-class="ghost-question"
           :force-fallback="true"
           fallback-class="hide-question-preview"
           animation="175"
         >
           <q-card
             flat
-            class="row items-center handle"
+            class="row items-center full-height"
             v-for="(questionTemplate, index) in questionTemplates"
             :key="questionTemplate.order"
           >
             <q-icon
+              class="handle col-1"
               size="sm"
               color="grey"
               name="drag_indicator"
-              class="q-ma-xs"
             />
             <q-input
+              @click.stop=""
               filled clearable
               clear-icon="close"
-              class="q-ma-sm col-6"
-              label="Label"
+              class="q-mx-sm col-5"
+              label="Question Label"
               v-model="questionTemplate.label"
+              placeholder="Untitled Question"
             />
             <q-select
               filled
               v-model="questionTemplate.type"
               :options="options"
-              label="Input Type"
-              class="q-mx-sm col-2"
-            />
+              label="Response Type"
+              class="q-mx-sm col-3"
+            >
+              <template v-slot:option="scope">
+                <q-item
+                  v-bind="scope.itemProps"
+                  v-on="scope.itemEvents"
+                >
+                  <q-item-section avatar>
+                    <q-icon :name="scope.opt.icon"/>
+                  </q-item-section>
+                  <q-item-section>
+                    <q-item-label v-html="scope.opt.label" />
+                  </q-item-section>
+                </q-item>
+              </template>
+            </q-select>
             <q-toggle
               v-model="questionTemplate.required"
               color="secondary"
               label="required"
               class="col-2"
             />
-            <q-btn
-              round flat
-              @click="deleteQuestionTemplate(index)"
-              icon="delete"
-            />
+            <div class="col-1">
+              <q-btn
+                round flat
+                @click="deleteQuestionTemplate(index)"
+                icon="delete"
+              />
+            </div>
           </q-card>
         </draggable>
       </q-form>
@@ -146,17 +167,54 @@ export default {
   },
   data () {
     return {
+      isModified: false, // <Boolean>: Whether questionTemplates has changed.
+      options: [ // Array<Object>: Possible input template types.
+        {
+          value: 'text', // <String> HTML input type.
+          icon: 'short_text', // <String>: Icon name.
+          label: 'Short Answer' // <String>: Option label viewed by user.
+        },
+        {
+          value: 'textarea',
+          icon: 'subject',
+          label: 'Paragraph'
+        },
+        {
+          value: 'email',
+          icon: 'email',
+          label: 'Email'
+        },
+        {
+          value: 'number',
+          icon: 'fas fa-hashtag',
+          label: 'Number'
+        },
+        {
+          value: 'date',
+          icon: 'event',
+          label: 'Date'
+        },
+        {
+          type: 'url',
+          icon: 'link',
+          label: 'Link'
+        }
+      ],
       questionTemplates: [], // <Array<Object> List of question templates.
       newQuestionTemplate: {
         label: '', // <String>: Name of the question.
-        type: 'text', // <String>: Question type. See HTML input types.
+        type: { // <Object>: Question type which is same as an element of 'options'.
+          value: 'text',
+          icon: 'short_text',
+          label: 'Short Answer'
+        },
         required: false, // <String>: Whether a response is necessary
-        order: 0 // <Integer>: Index which is only unique within questionTemplates.
-      },
-      isModified: false, // <Boolean>: Whether questionTemplates has changed.
-      options: [ // Array<String>: Possible input template types.
-        'text', 'textarea', 'email', 'number', 'date', 'url'
-      ] // TODO: rename textarea to 'text box (paragraph)'. text (sentence). Look at google form for exs
+        /**
+         * <Integer>: Index which is only unique within an individual
+         * 'questionTemplates' instance.
+         */
+        order: 0
+      }
       // TODO: Option group
     }
   },
@@ -190,8 +248,12 @@ export default {
         this.newQuestionTemplate
       )
       this.newQuestionTemplate = {
+        type: {
+          value: 'text',
+          icon: 'short_text',
+          label: 'Short Answer'
+        },
         label: '',
-        type: 'text',
         required: false,
         order: this.questionTemplates.length
       }
@@ -218,20 +280,25 @@ export default {
 <style lang="stylus" scoped>
 
 .q-card
-  max-width: 900px
+  max-width: 950px
 
+/*
+Handle also define row height. This is done so the cursor can stay
+consistent near the handle, instead of swapping back and forth.
+*/
 .handle
   cursor: move
+  height: 80px
+  width: 40px
 
-// The .chosen-question class is used when a row is clicked. During drag
-// and drop movement, the .chosen-question class is also used.
-.chosen-question
+// During drag and drop movement, this class is used.
+.ghost-question
   background: $grey-3
-  border 1px
-
-// This is the drag preview that is directly under your mouse. This is
-// hidden because this preview covers the chosen question making it harder to
-// see the chosen question.
+/*
+This is the drag preview that is directly under your mouse. This is
+hidden because this preview covers the chosen question making it harder to
+see the chosen question.
+*/
 .hide-question-preview
   display: none
 

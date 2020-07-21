@@ -8,8 +8,8 @@ export default function () {
       timestamp: null, // <Object>: Date object set in submitProject action, not component.
       created: null, // <Object>: Same as 'timestamp'.
       progress: 0, // <Integer>: 0 is uncompleted and higher numbers are closer to completion.
-      hidden: false,
-      alias: ''
+      hidden: false, // <Boolean>: Whether this project is visible.
+      alias: '' // <String>: Project nickname.
     },
     isTestingDb: true, // <Boolean> Whether the db is for testing or production.
     keywordOptions: [], // <Array<Object>>: list of keywords from database
@@ -36,9 +36,18 @@ export default function () {
       response: '' // <String> User input
     }],
     questionTemplates: [{ // <Array<Object>> Defines the custom questions for new projects.
-      label: '', // <String> A unique text label above the input field when focused
-      type: '', // <String> Input type (see HTML input types)
-      order: 0 // <Integer> Unique index with lower numbers displayed first.
+      label: '', // <String>: Name of the question.
+      type: { // <Object>: Question type which is same as an element of 'options'.
+        value: 'text', // <String>: HTML input type.
+        icon: 'short_text', // <String>: Icon name.
+        label: 'Short Answer' // <String>: Question type label displayed.
+      },
+      required: false, // <String>: Whether a response is necessary
+      /**
+        * <Integer>: Index which is only unique within an individual
+        * 'questionTemplates' instance.
+        */
+      order: 0
     }]
   }
 }
