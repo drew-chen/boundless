@@ -35,7 +35,11 @@ Methods:
             class="q-mr-sm"
             icon="add"
             color="accent"
-          />
+          >
+            <q-tooltip>
+              Add question
+            </q-tooltip>
+          </q-btn>
           <q-btn
             no-caps
             @click="saveQuestionTemplates"
@@ -55,62 +59,67 @@ Methods:
           fallback-class="hide-question-preview"
           animation="175"
         >
-          <q-card
-            flat
-            class="row items-center full-height"
-            v-for="(questionTemplate, index) in questionTemplates"
-            :key="questionTemplate.order"
+          <transition-group
+            enter-active-class="animated fadeIn"
+            leave-active-class="animated fadeOut"
           >
-            <q-icon
-              class="handle col-1"
-              size="sm"
-              color="grey"
-              name="drag_indicator"
-            />
-            <q-input
-              @click.stop=""
-              filled clearable
-              clear-icon="close"
-              class="q-mx-sm col-5"
-              label="Question Label"
-              v-model="questionTemplate.label"
-              placeholder="Untitled Question"
-            />
-            <q-select
-              filled
-              v-model="questionTemplate.type"
-              :options="options"
-              label="Response Type"
-              class="q-mx-sm col-3"
+            <q-card
+              flat
+              class="row items-center full-height"
+              v-for="(questionTemplate, index) in questionTemplates"
+              :key="questionTemplate.order"
             >
-              <template v-slot:option="scope">
-                <q-item
-                  v-bind="scope.itemProps"
-                  v-on="scope.itemEvents"
-                >
-                  <q-item-section avatar>
-                    <q-icon :name="scope.opt.icon"/>
-                  </q-item-section>
-                  <q-item-section>
-                    <q-item-label v-html="scope.opt.label" />
-                  </q-item-section>
-                </q-item>
-              </template>
-            </q-select>
-            <q-toggle
-              v-model="questionTemplate.required"
-              color="secondary"
-              label="required"
-              class="col-2"
-            />
-            <div class="col-1">
-              <q-btn
-                round flat
-                @click="deleteQuestionTemplate(index)"
-                icon="delete"
+              <q-icon
+                class="handle col-1"
+                size="sm"
+                color="grey"
+                name="drag_indicator"
               />
-            </div>
-          </q-card>
+              <q-input
+                @click.stop=""
+                filled clearable
+                clear-icon="close"
+                class="q-mx-sm col-5"
+                label="Question Label"
+                v-model="questionTemplate.label"
+                placeholder="Untitled Question"
+              />
+              <q-select
+                filled
+                v-model="questionTemplate.type"
+                :options="options"
+                label="Response Type"
+                class="q-mx-sm col-3"
+              >
+                <template v-slot:option="scope">
+                  <q-item
+                    v-bind="scope.itemProps"
+                    v-on="scope.itemEvents"
+                  >
+                    <q-item-section avatar>
+                      <q-icon :name="scope.opt.icon"/>
+                    </q-item-section>
+                    <q-item-section>
+                      <q-item-label v-html="scope.opt.label" />
+                    </q-item-section>
+                  </q-item>
+                </template>
+              </q-select>
+              <q-toggle
+                v-model="questionTemplate.required"
+                color="secondary"
+                label="required"
+                class="col-2"
+              />
+              <div class="col-1">
+                <q-btn
+                  round flat
+                  @click="deleteQuestionTemplate(index)"
+                  icon="delete"
+                />
+              </div>
+            </q-card>
+          </transition-group>
         </draggable>
       </q-form>
     </div>
@@ -280,7 +289,7 @@ export default {
 <style lang="stylus" scoped>
 
 .q-card
-  max-width: 950px
+  max-width: 1050px
 
 /*
 Handle also define row height. This is done so the cursor can stay

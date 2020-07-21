@@ -130,7 +130,7 @@ module.exports = function (ctx) {
     },
 
     // animations: 'all', // --- includes all animations
-    animations: [],
+    animations: ['fadeIn', 'fadeOut'],
 
     ssr: {
       pwa: false
