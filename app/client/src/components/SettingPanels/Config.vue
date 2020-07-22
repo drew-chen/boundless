@@ -34,10 +34,10 @@ Methods:
 
           <div class="q-mb-xs">
             <q-btn
-              :disabled="!updated"
+              :disabled="!canSave()"
               no-caps
               label="Submit"
-              :color="!updated ? 'accent' : 'secondary'"
+              :color="canSave() ? 'secondary' : 'accent'"
               @click="onSubmit"
             />
           </div>
@@ -154,6 +154,8 @@ Methods:
     <!-- -------------------- Project Submission Questions -------------------- -->
     <project-create-custom-form
       :type="type"
+      ref="projectCreateCustomForm"
+      @mounted="setCanSave()"
     />
 
     <!-- -------------------- Listing Table -------------------- -->
@@ -556,10 +558,10 @@ Methods:
     <div class="q-px-lg q-pb-lg">
       <div class="q-px-md q-pb-md q-gutter-sm" align="right">
         <q-btn
-          :disabled="!updated"
+          :disabled="!canSave()"
           no-caps
           label="Submit"
-          :color="!updated ? 'accent' : 'secondary'"
+          :color="canSave() ? 'secondary' : 'accent'"
           @click="onSubmit"
         />
       </div>
@@ -573,7 +575,7 @@ import { defaultImages } from '../../../boundless.config'
 import productionDb, { productionStorage } from '../../firebase/init_production'
 import testingDb, { testingStorage } from '../../firebase/init_testing'
 
-import projectCreateCustomForm from '../Forms/Project/projectCreateCustomForm.vue'
+import projectCreateCustomForm from '../Forms/Project/ProjectCreateCustomForm.vue'
 
 export default {
   props: {
@@ -678,7 +680,13 @@ export default {
       },
       loading: true, // <Boolean>: flag for the page loading
       submitted: false, // <Boolean>: flag for handling child emitted submit
-      updated: false // <Boolean>: flag for handling child emitted submit
+      /**
+      * <Boolean>: Flag for handling child emitted submit.
+       * Describes to all updates except 'ProjectCreateCustomForm.vue' since
+       * it detects updates differently (does so by comparing with Vuex instead
+       * of on input events).
+       */
+      updated: false
     }
   },
   methods: {
@@ -973,6 +981,7 @@ export default {
           await this.storageUrlFetcher('webpage', 'bannerImg')
           await this.storageUrlFetcher('webpage', 'mainImg')
 
+          this.$refs.projectCreateCustomForm.saveQuestionTemplates()
           setTimeout(() => {
             this.updated = false
 
@@ -1034,6 +1043,21 @@ export default {
       }
 
       return bObject
+    },
+    /** Whether there are any changes to be saved. */
+    canSave () {
+      return this.updated
+    },
+    /**
+     * Once 'ProjectCreateCustomForm.vue' is mounted, use it's ref
+     * to know whether updates within that components have been made.
+     * This is done because 'ProjectCreateCustomForm.vue' needs to be mounted,
+     * in order to use its ref.
+     */
+    setCanSave () {
+      this.canSave = () => {
+        return this.$refs.projectCreateCustomForm.modified || this.updated
+      }
     }
   }
 }

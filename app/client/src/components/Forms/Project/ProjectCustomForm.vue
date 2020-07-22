@@ -1,4 +1,4 @@
-q<template>
+<template>
   <div>
     <div v-if="!questionTemplates || questionTemplates.length === 0">
       There are no additional details

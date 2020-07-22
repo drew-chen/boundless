@@ -40,14 +40,6 @@ Methods:
               Add question
             </q-tooltip>
           </q-btn>
-          <q-btn
-            no-caps
-            @click="saveQuestionTemplates"
-            :disable="!isModified"
-            color="accent"
-          >
-            Save
-          </q-btn>
         </div>
         <!-- Native drag and drop API is disabled to prevent flickering issues. -->
         <draggable
@@ -151,20 +143,24 @@ export default {
     await this.loadFireRefs()
     await this.loadConfig()
     this.questionTemplates = cloneDeep(this.storeQuestionTemplates)
-    this.isModified = false
+    this.modified = false
+  },
+  /** Lets parent component it is ok to use ref. */
+  mounted () {
+    this.$emit('mounted')
   },
   watch: {
     /**
      * If questionTemplate changes and it's different from the
-     * version in the database, then enable the save button.
+     * version in the database, then it has been modified.
      */
     questionTemplates: {
       deep: true,
       handler (newVal, oldVal) {
         if (!isEqual(this.storeQuestionTemplates, newVal)) {
-          this.isModified = true
+          this.modified = true
         } else {
-          this.isModified = false
+          this.modified = false
         }
       }
     }
@@ -176,7 +172,7 @@ export default {
   },
   data () {
     return {
-      isModified: false, // <Boolean>: Whether questionTemplates has changed.
+      modified: false, // <Boolean>: Whether questionTemplates has changed.
       options: [ // Array<Object>: Possible input template types.
         {
           value: 'text', // <String> HTML input type.
@@ -235,20 +231,22 @@ export default {
     ]),
     /** Submits questionTemplates to vuex and to the db. */
     async saveQuestionTemplates () {
-      try {
-        this.updateQuestionOrder()
-        await this.submitQuestionTemplates(cloneDeep(this.questionTemplates))
-        this.isModified = false
-        this.$q.notify({
-          type: 'positive',
-          message: 'Saved custom question templates.'
-        })
-      } catch (error) {
-        this.$q.notify({
-          type: 'negative',
-          message: 'Unable to submit question templates.'
-        })
-        throw new Error(error)
+      if (this.modified) {
+        try {
+          this.updateQuestionOrder()
+          await this.submitQuestionTemplates(cloneDeep(this.questionTemplates))
+          this.modified = false
+          this.$q.notify({
+            type: 'positive',
+            message: 'Saved custom question templates.'
+          })
+        } catch (error) {
+          this.$q.notify({
+            type: 'negative',
+            message: 'Unable to submit question templates.'
+          })
+          throw new Error(error)
+        }
       }
     },
     /** Creates another question. */
@@ -303,6 +301,7 @@ consistent near the handle, instead of swapping back and forth.
 // During drag and drop movement, this class is used.
 .ghost-question
   background: $grey-3
+
 /*
 This is the drag preview that is directly under your mouse. This is
 hidden because this preview covers the chosen question making it harder to
