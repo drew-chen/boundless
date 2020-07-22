@@ -140,8 +140,6 @@ export default {
     }
   },
   async created () {
-    await this.loadFireRefs()
-    await this.loadConfig()
     this.questionTemplates = cloneDeep(this.storeQuestionTemplates)
     this.modified = false
   },
@@ -225,9 +223,7 @@ export default {
   },
   methods: {
     ...mapActions([
-      'submitQuestionTemplates',
-      'loadFireRefs',
-      'loadConfig'
+      'submitQuestionTemplates'
     ]),
     /** Submits questionTemplates to vuex and to the db. */
     async saveQuestionTemplates () {

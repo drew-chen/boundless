@@ -71,16 +71,6 @@ export default {
     ProjectCustomForm,
     ProjectReviewForm
   },
-  async created () {
-    try {
-      // fetches the required data rom the db
-      await this.loadFireRefs()
-      await this.loadUserList()
-      await this.loadConfig()
-    } catch (error) {
-      throw new Error(error)
-    }
-  },
   data () {
     return {
       step: 1 // <Integer> Progress counter representing current panel.
@@ -88,9 +78,6 @@ export default {
   },
   methods: {
     ...mapActions([
-      'loadFireRefs',
-      'loadUserList',
-      'loadConfig',
       'submitProject',
       'submitQuestions',
       'resetProject'

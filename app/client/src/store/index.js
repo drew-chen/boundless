@@ -10,9 +10,9 @@
 ## OR CONDITIONS OF ANY KIND, either express or implied.
 
 Name:     store/project-submit/index.js
-Purpose: A vuex module to handle to project submission data.
+Purpose: A Vuex module to handle to project submission data.
 Methods:
-  * This file tells vuex to use the module defined in './project-submit'.
+  * This file tells Vuex to use the module defined in './project-submit'.
 
 ## */
 

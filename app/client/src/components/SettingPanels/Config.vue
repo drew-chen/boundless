@@ -684,7 +684,7 @@ export default {
       * <Boolean>: Flag for handling child emitted submit.
        * Describes to all updates except 'ProjectCreateCustomForm.vue' since
        * it detects updates differently (does so by comparing with Vuex instead
-       * of on input events).
+       * of on input events). Used in 'this.canSave()'.
        */
       updated: false
     }
@@ -1051,7 +1051,7 @@ export default {
     /**
      * Once 'ProjectCreateCustomForm.vue' is mounted, use it's ref
      * to know whether updates within that components have been made.
-     * This is done because 'ProjectCreateCustomForm.vue' needs to be mounted,
+     * This is done because 'ProjectCreateCustomForm.vue' needs to be mounted
      * in order to use its ref.
      */
     setCanSave () {
