@@ -16,8 +16,6 @@ export async function loadFireRefs ({ commit }) {
     let sessionDb = LocalStorage.getItem('boundless_db')
     // loading firebase references
     commit('setIsTestingDb', sessionDb === 'testing')
-
-    return true
   } else {
     try {
       let doc = await productionDb.collection('config').doc('project').get()
@@ -34,13 +32,9 @@ export async function loadFireRefs ({ commit }) {
         let msg = '"/config/project" path does not exists!'
         throw new Error(msg)
       }
-
-      return true
     } catch (error) {
       commit('setIsTestingDb', false)
       LocalStorage.set('boundless_db', 'production')
-
-      return false
     }
   }
 }
@@ -72,8 +66,6 @@ export async function loadConfig ({ commit, getters }) {
       commit('setAllowedDomain', data.allowedDomain)
       commit('setBodyTypeOptions', data.bodyContentType)
       commit('setChipTypeOptions', data.chipContentType)
-
-      return true
     }
     throw new Error('Required document not found!')
   } catch (error) {
@@ -102,12 +94,10 @@ export async function loadUserList ({ commit, getters }) {
 
       commit('setEmailToUuidMap', emailToUuidMap)
       commit('setEmailToNameMap', emailToNameMap)
-      return true
     }
 
     throw new Error('users/ToC not found!')
   } catch (error) {
-    return false
   }
 }
 
