@@ -6,6 +6,9 @@ import { LocalStorage } from 'quasar'
 
 /**
  * Sets up the firebase reference getter.
+ * Previous versions of this functions return true if there was an error
+ * and false other wise. This has been removed on 7/22/2020 since the purpose
+ * of those return values were unknown.
  *
  * @export
  * @param {*} { commit } Allows action to commit mutations.
@@ -13,10 +16,7 @@ import { LocalStorage } from 'quasar'
 export async function loadFireRefs ({ commit }) {
   if (LocalStorage.has('boundless_db')) {
     let sessionDb = LocalStorage.getItem('boundless_db')
-    // loading firebase references
     commit('setIsTestingDb', sessionDb === 'testing')
-
-    // return true // Removed on 7/22/2020 since purpose is unknown.
   } else {
     let doc = await productionDb.collection('config').doc('project').get()
     if (doc.exists) {
@@ -33,10 +33,6 @@ export async function loadFireRefs ({ commit }) {
       let msg = '"/config/project" path does not exists!'
       throw new DbLoadingException(msg)
     }
-    // Removed catch to be handled by caller.
-    // return true // Removed on 7/22/2020 since purpose is unknown.
-
-    // return false // Removed on 7/22/2020 since purpose is unknown.
   }
 }
 
