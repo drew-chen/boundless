@@ -47,7 +47,7 @@ const { mapGetters, mapMutations } = createNamespacedHelpers('projectSubmit')
 export default {
   /**
    * Create questions for this project based on questionTemplates then
-  *  sort questions based on 'order' property.
+   * sort questions based on 'order' property.
    */
   created () {
     if (!this.questionTemplates || this.questionTemplates.length === 0) {

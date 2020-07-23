@@ -23,8 +23,42 @@ Methods:
 </template>
 
 <script>
+import DbLoadingException from './models/dbLoadingException'
+import { createNamespacedHelpers } from 'vuex'
+const { mapActions } = createNamespacedHelpers('projectSubmit')
+
 export default {
-  name: 'App'
+  name: 'App',
+  /**
+   * Initializes the projectSubmit Vuex module's store.
+   * This is done here instead of a boot file in order to access the
+   * Vue instance.
+   */
+  async mounted () {
+    try {
+      await this.loadFireRefs()
+      // The next 2 calls are independent so no awaiting is needed.
+      this.loadConfig()
+      this.loadUserList()
+    } catch (error) {
+      console.log('error detected')
+      if (error instanceof DbLoadingException) {
+        this.$q.notify({
+          type: 'negative',
+          message: 'There was an error loading the database. Some' +
+            ' functionality will be limited.'
+        })
+      }
+      throw new Error(error)
+    }
+  },
+  methods: {
+    ...mapActions([
+      'loadFireRefs',
+      'loadConfig',
+      'loadUserList'
+    ])
+  }
 }
 </script>
 
