@@ -31,13 +31,12 @@ export default {
   /**
    * Initializes the projectSubmit Vuex module's store.
    * This is done here instead of a boot file so errors can be handled
-   * by Vue's errorHandler.
+   * by Vue's errorHandler, which needs the Vue instance.
    */
   async mounted () {
     await this.loadFireRefs()
-    // The next 2 calls are independent so no awaiting is needed.
-    this.loadConfig()
-    this.loadUserList()
+    await this.loadConfig()
+    await this.loadUserList()
   },
   methods: {
     ...mapActions([

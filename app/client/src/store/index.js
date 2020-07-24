@@ -9,10 +9,13 @@
 ## under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES
 ## OR CONDITIONS OF ANY KIND, either express or implied.
 
-Name:     store/project-submit/index.js
-Purpose: A Vuex module to handle to project submission data.
-Methods:
-  * This file tells Vuex to use the module defined in './project-submit'.
+Name:     store/index.js
+
+Purpose:  Vuex store definition. Modules are added here.
+
+Methods:  For more information on Vuex, see:
+            * https://vuex.vuejs.org/
+            * https://quasar.dev/quasar-cli/vuex-store
 
 ## */
 
@@ -25,7 +28,7 @@ Vue.use(Vuex)
 
 export default function () {
   const Store = new Vuex.Store({
-    // The module name is 'projectSubmit' not 'project-submit'
+    // The module name is 'projectSubmit' not 'project-submit'.
     modules: {
       projectSubmit
     },

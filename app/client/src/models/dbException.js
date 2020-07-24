@@ -10,16 +10,17 @@
 ## under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES
 ## OR CONDITIONS OF ANY KIND, either express or implied.
 
-Name:     models/dbLoadingException.js
+Name:     models/DbException.js
+
 Purpose:  Exception related to Firebase.
 
-Methods: Inherits from Error and can be detected using 'instanceof'.
+Methods:  Inherits from Error and can be detected using 'instanceof'.
 
 ## */
 
-export default class DbLoadingException extends Error {
+export default class DbException extends Error {
   constructor (...params) {
     super(...params)
-    this.name = 'Database Loading Exception'
+    this.name = 'Database Exception'
   }
 }
