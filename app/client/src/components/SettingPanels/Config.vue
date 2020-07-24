@@ -624,13 +624,15 @@ export default {
       await this.storageUrlFetcher('listingTable', 'bannerImg')
       await this.storageUrlFetcher('webpage', 'bannerImg')
       await this.storageUrlFetcher('webpage', 'mainImg')
+
+      window.addEventListener('beforeunload', this.confirmUnload)
     } catch (error) {
       throw new Error(error)
     }
   },
   beforeDestroy () {
     // verfiy for user to leave if changes were detected
-    if (!this.submitted && this.updated) {
+    if (!this.submitted && this.cansave()) {
       this.$q.dialog({
         title: 'Are you sure you want to leave without submitting changes? (All changes will be lost).',
         cancel: {
@@ -658,6 +660,9 @@ export default {
         this.onSubmit()
       })
     }
+  },
+  destroyed () {
+    window.removeEventListener('beforeunload', this.confirmUnload)
   },
   data () {
     return {
@@ -1044,7 +1049,7 @@ export default {
 
       return bObject
     },
-    /** Whether there are any changes to be saved. */
+    /** Whether there are any changes to be saved. See setCanSave(). */
     canSave () {
       return this.updated
     },
@@ -1057,6 +1062,20 @@ export default {
     setCanSave () {
       this.canSave = () => {
         return this.$refs.projectCreateCustomForm.modified || this.updated
+      }
+    },
+    /**
+     * Blocks reloading the webpage or closing the browser if there are
+     * unsaved changes.
+     *
+     * @param event The event which has occured: 'beforeunload'.
+     */
+    confirmUnload (event) {
+      if (!this.submitted && this.canSave()) {
+        // Cancel the event
+        event.preventDefault() // If you prevent default behavior in Mozilla Firefox prompt will always be shown
+        // Chrome requires returnValue to be set
+        event.returnValue = 'You should keep this page open.'
       }
     }
   }

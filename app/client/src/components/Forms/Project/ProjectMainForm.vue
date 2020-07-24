@@ -38,7 +38,6 @@ Methods:  First, some initial data, such as keyword options, are loaded. Then,
           Submit a problem or challenge (an itch)  you would like solve or explore (scratch).
         </p>
         <hr class="newLine2">
-
         <!-- -------------------- Project Name -------------------- -->
         <q-input
           filled lazy-rules clearable
@@ -636,7 +635,13 @@ export default {
       'chipTypeOptions',
       'emailToUuidMap',
       'emailToNameMap'
-    ])
+    ]),
+    // <Boolean>: Whether any input field has been modified (checks explicitly).
+    modified () {
+      return !!(this.projectName !== '' || this.projectDescription !== '' ||
+        (this.projectMembers.length > 1 || this.projectMembers[0].email !== '') ||
+        this.chosenKeywords.length > 0)
+    }
   },
   // Data should be unique from computed.
   data () {

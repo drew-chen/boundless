@@ -14,7 +14,7 @@ Name:     store/project-submit/actions.js
 Purpose:  Actions for the project-submit Vuex module. Methods here are
           responsible for large database interactions or grouping mutations.
 
-Methods:  Firebase and Vuex are both modified here and should be in sync.
+Methods:  Firebase and Vuex are    both modified here and should be in sync.
           The general flow is to load information from the database then
           commit mutations to keep the state up to date. Or, to commit mutations
           then update Firebase to keep Firebase up to date.

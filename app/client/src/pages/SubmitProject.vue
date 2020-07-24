@@ -83,13 +83,22 @@ import ProjectCustomForm from '../components/Forms/Project/ProjectCustomForm.vue
 import ProjectReviewForm from '../components/Forms/Project/ProjectReviewForm.vue'
 
 import { createNamespacedHelpers } from 'vuex'
-const { mapActions } = createNamespacedHelpers('projectSubmit')
+const { mapActions, mapGetters } = createNamespacedHelpers('projectSubmit')
 
 export default {
   components: {
     ProjectMainForm,
     ProjectCustomForm,
     ProjectReviewForm
+  },
+  created () {
+    window.addEventListener('beforeunload', this.confirmUnload)
+  },
+  destroyed () {
+    window.removeEventListener('beforeunload', this.confirmUnload)
+  },
+  computed: {
+    ...mapGetters['project']
   },
   data () {
     return {
@@ -142,6 +151,20 @@ export default {
     navigateForward () {
       /** Advance the stepper page. */
       this.$refs.stepper.next()
+    },
+    /**
+     * Blocks reloading the webpage or closing the browser if there are
+     * unsaved changes.
+     *
+     * @param event The event which has occured: 'beforeunload'.
+     */
+    confirmUnload (event) {
+      if (this.$refs.projectMainForm.modified) {
+        // Cancel the event
+        event.preventDefault() // If you prevent default behavior in Mozilla Firefox prompt will always be shown
+        // Chrome requires returnValue to be set
+        event.returnValue = 'You should keep this page open.'
+      }
     }
   }
 }
