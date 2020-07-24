@@ -9,13 +9,17 @@
 ## under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES
 ## OR CONDITIONS OF ANY KIND, either express or implied.
 
-Name:     components/Forms/Project/projectCreateCustomForm.vue
+Name:     components/Forms/Project/ProjectCreateCustomForm.vue
+
 Purpose:  Form configures 'ProjectCustomForm.vue'.
-Methods:
-  * Admin goes through form which creates an array that 'ProjectCustomForm.vue'
-  * can display. Questions support CRUD operations and can be reordered through
-  * drag and dropping them. This array is saved in vuex and submitted to the
-  * db in a vuex action.
+
+Methods:  Admin goes through this form which creates an array that
+          'ProjectCustomForm.vue' can display. Questions support CRUD operations
+          and can be reordered through drag and dropping them. This array is
+          saved in vuex and submitted to the db in a vuex action. Submission
+          is only possible when this array is diffrent the version already
+          in Vuex. Submission is triggered in the parent component:
+          'Config.vue'.
 ## -->
 
 <template>
@@ -121,7 +125,6 @@ Methods:
 <script>
 import draggable from 'vuedraggable'
 import { cloneDeep, isEqual } from 'lodash'
-
 import { createNamespacedHelpers } from 'vuex'
 const { mapActions, mapGetters } = createNamespacedHelpers('projectSubmit')
 
@@ -241,7 +244,7 @@ export default {
             type: 'negative',
             message: 'Unable to submit question templates.'
           })
-          throw new Error(error)
+          throw error
         }
       }
     },

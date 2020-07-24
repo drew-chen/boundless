@@ -10,15 +10,19 @@ q<!-- ##
 ## OR CONDITIONS OF ANY KIND, either express or implied.
 
 Name:     components/Forms/Project/ProjectMainForm.vue
+
 Purpose:  Form to allow the users to submit projects which are
           either addressing certain challenge or personally hobby projects
-          that the user wishes to show off. Date here does not mutate
+          that the user wishes to show off. Data here does not mutate
           Vuex store until form is submitted.
-Methods:
-  * Allow the users to submit projects
-  * Creates new user as the projects are submitted
-  * Instantiates the individual webpage for the project
-  * Instantiates the user profile for the newly created users
+
+Methods:  First, some initial data, such as keyword options, are loaded. Then,
+          the user fills out the project form. Unlike 'ProjectCustomForm.vue',
+          some of the input fields here are always mandatory. Input is stored
+          as local component level data until validated and submitted to Vuex
+          when the user continues to the next form. The forms don't have a
+          two-way binding with Vuex state to prevent mutations that were not
+          caused by Vuex.
 
 ## -->
 

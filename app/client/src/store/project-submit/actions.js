@@ -1,17 +1,42 @@
-/* This file is responsible for large database interactions or grouping mutations */
+/* ##
+## Copyright (c) 2020 Wind River Systems, Inc.
+##
+## Licensed under the Apache License, Version 2.0 (the "License");
+## you may not use this file except in compliance with the License.
+## You may obtain a copy of the License at:
+##       http://www.apache.org/licenses/LICENSE-2.0
+## Unless required by applicable law or agreed to in writing, software  distributed
+## under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES
+## OR CONDITIONS OF ANY KIND, either express or implied.
+
+Name:     store/project-submit/actions.js
+
+Purpose:  Actions for the project-submit Vuex module. Methods here are
+          responsible for large database interactions or grouping mutations.
+
+Methods:  Firebase and Vuex are both modified here and should be in sync.
+          The general flow is to load information from the database then
+          commit mutations to keep the state up to date. Or, to commit mutations
+          then update Firebase to keep Firebase up to date.
+
+## */
 
 import productionDb from '../../firebase/init_production'
-import DbLoadingException from '../../models/dbLoadingException'
+import DbException from '../../models/DbException'
 import { LocalStorage } from 'quasar'
 
 /**
- * Sets up the firebase reference getter.
+ * Sets up the Firebase reference getter. This should be called foremost before
+ * setting or getting any Vuex state related to the db.
+ *
  * Previous versions of this functions return true if there was an error
  * and false other wise. This has been removed on 7/22/2020 since the purpose
  * of those return values were unknown.
  *
  * @export
- * @param {*} { commit } Allows action to commit mutations.
+ * @param {Object} context Exposes the same set of methods/properties on the
+ *  store instance.
+ * @param {Object} context.commit Allows this action to commit mutations
  */
 export async function loadFireRefs ({ commit }) {
   if (LocalStorage.has('boundless_db')) {
@@ -19,6 +44,7 @@ export async function loadFireRefs ({ commit }) {
     commit('setIsTestingDb', sessionDb === 'testing')
   } else {
     let doc = await productionDb.collection('config').doc('project').get()
+
     if (doc.exists) {
       if (doc.data().db === 'testing') {
         commit('setIsTestingDb', true)
@@ -31,7 +57,7 @@ export async function loadFireRefs ({ commit }) {
       commit('setIsTestingDb', false)
       LocalStorage.set('boundless_db', 'production')
       let msg = '"/config/project" path does not exists!'
-      throw new DbLoadingException(msg)
+      throw new DbException(msg)
     }
   }
 }
@@ -40,6 +66,10 @@ export async function loadFireRefs ({ commit }) {
   * Load the config from the db.
   * TODO: this should be replaced now that config/project
   *       is cached in session
+  *
+  * Previous versions of this functions return true if there was an error
+  * and false other wise. This has been removed on 7/22/2020 since the purpose
+  * of those return values were unknown.
   *
   * @param {*} { commit, getters } Allows this action to
   *  commit mutations and retrieve state.
@@ -61,17 +91,22 @@ export async function loadConfig ({ commit, getters }) {
     commit('setAllowedDomain', data.allowedDomain)
     commit('setBodyTypeOptions', data.bodyContentType)
     commit('setChipTypeOptions', data.chipContentType)
-
-    // return true // Removed on 7/22/2020 since purpose is unknown.
   } else {
-    throw new DbLoadingException('Required document not found!')
+    throw new DbException('Required document not found!')
   }
 }
 
 /**
   * load the user list from the db and store the data into component state
-  * @param {*} { commit, getters } Allows this action to
-  *  commit mutations and retrieve state.
+  *
+  * Previous versions of this functions return true if there was an error
+  * and false other wise. This has been removed on 7/22/2020 since the purpose
+  * of those return values were unknown.
+  *
+  * @param {Object} context Exposes the same set of methods/properties on the
+  *   store instance.
+  * @param {Object} context.commit Allows this action to commit mutations
+  * @param {Object} context.getters Gives access to state.
   */
 export async function loadUserList ({ commit, getters }) {
   let doc = await getters.db.collection('users').doc('ToC').get()
@@ -84,14 +119,11 @@ export async function loadUserList ({ commit, getters }) {
       emailToUuidMap[tocUserData[uuid].email] = uuid
       emailToNameMap[tocUserData[uuid].email] = tocUserData[uuid].name
     }
-
     commit('setEmailToUuidMap', emailToUuidMap)
     commit('setEmailToNameMap', emailToNameMap)
-    // return true // Removed on 7/22/2020 since purpose is unknown.
   } else {
-    throw new DbLoadingException('users/ToC not found!')
+    throw new DbException('users/ToC not found!')
   }
-  // return false // Removed on 7/22/2020 since purpose is unknown.
 }
 
 /**
@@ -99,8 +131,10 @@ export async function loadUserList ({ commit, getters }) {
  * the project to the database.
  *
  * @export
- * @param {*} { commit, getters } Allows this action to
- *  commit mutations and retrieve state.
+ * @param {Object} context Exposes the same set of methods/properties on the
+ *  store instance.
+ * @param {Object} context.commit Allows this action to commit mutations
+ * @param {Object} context.getters Gives access to state.
  */
 export async function submitNewUsers ({ commit, getters }) {
   getters.projectMembers.forEach(async (member) => {
@@ -149,8 +183,11 @@ export async function submitNewUsers ({ commit, getters }) {
  * are finalized in here instead of in ProjectMainForm.vue
  *
  * @export
- * @param {*} { commit, dispatch, getters } Allows action to get from the
- *  vuex store, commit mutations, and dispatch other actions.
+ * @param {Object} context Exposes the same set of methods/properties on the
+ *  store instance.
+ * @param {Object} context.commit Allows this action to commit mutations.
+ * @param {Object} context.dispatch Used to call other actions.
+ * @param {Object} context.getters Gives access to state.
  */
 export async function submitProject ({ commit, dispatch, getters }) {
   await dispatch('submitNewUsers')
@@ -184,10 +221,11 @@ export async function submitProject ({ commit, dispatch, getters }) {
  * Save custom form responses under a field named 'createInfo'.
  *
  * @export
- * @param {*} { commit, getters } Allows this action to
- *  commit mutations and retrieve state.
+ * @param {Object} context Exposes the same set of methods/properties on the
+ *  store instance.
+ * @param {Object} context.getters Gives access to state.
  */
-export async function submitQuestions ({ commit, getters }) {
+export async function submitQuestions ({ getters }) {
   let uuid = getters.projectUuid
   let projectDoc = getters.db.collection('projects').doc(uuid)
   await projectDoc.update({
@@ -199,8 +237,10 @@ export async function submitQuestions ({ commit, getters }) {
  * Save questionTemplates to vuex and into Firestore.
  *
  * @export
- * @param {*} { commit, getters } Allows this action to
- *  commit mutations and retrieve state.
+ * @param {Object} context Exposes the same set of methods/properties on the
+ *  store instance.
+ * @param {Object} context.commit Allows this action to commit mutations
+ * @param {Object} context.getters Gives access to state.
  * @param {Array<Object>} questionTemplates The new state of questionTemplates.
  */
 export async function submitQuestionTemplates ({ commit, getters }, questionTemplates) {
@@ -216,7 +256,9 @@ export async function submitQuestionTemplates ({ commit, getters }, questionTemp
  * Helper function which resets the vuex store to the initial state.
  *
  * @export
- * @param {*} { commit } Allows this action to commit mutations
+ * @param {Object} context Exposes the same set of methods/properties on the
+ *  store instance.
+ * @param {Object} context.commit Allows this action to commit mutations
  */
 export function resetProject ({ commit }) {
   commit('setProject', {
