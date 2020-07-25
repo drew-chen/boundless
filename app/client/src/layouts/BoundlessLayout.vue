@@ -1,5 +1,5 @@
 <!-- ##
-## Copyright (c) 2019 Wind River Systems, Inc.
+## Copyright (c) 2020 Wind River Systems, Inc.
 ##
 ## Licensed under the Apache License, Version 2.0 (the "License");
 ## you may not use this file except in compliance with the License.
@@ -20,7 +20,7 @@ Methods:
 ## -->
 
 <template>
-  <q-layout view="hHh lpR fFf">
+  <q-layout view="hHh lpR fff">
 
     <q-header reveal elevated class="bg-primary text-white">
       <q-toolbar>
@@ -101,11 +101,12 @@ Methods:
       </q-tabs>
     </q-header>
 
-    <q-page-container style="min-height: 87.5vh;">
+    <q-page-container style="min-height: 67.5vh;">
       <router-view />
     </q-page-container>
 
-    <div class="bg-primary" style="min-height: 90px;" >
+    <q-footer
+      class="bg-primary">
       <div class="row" style="width: 98%; margin: 0 auto;">
         <div class="q-pa-md">
           <div class="text-white" style="font-size: 1.5em;">
@@ -176,7 +177,7 @@ Methods:
         </div>
 
       </div>
-    </div>
+    </q-footer>
   </q-layout>
 </template>
 

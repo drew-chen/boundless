@@ -1822,7 +1822,7 @@ Methods:
                 @input="addMemberDialog.edited = true"
               />
 
-              <!-- ---------- Member Dispaly ---------- -->
+              <!-- ---------- Member Display ---------- -->
               <div>
                 <div class="q-mt-sm">
                   <b>Current Members</b>
@@ -1909,8 +1909,11 @@ export default {
     LimitedLenInputPopup
   },
   props: {
-    projectId: String,
-    mode: String
+    uuid: String,
+    mode: {
+      type: String,
+      default: 'edit'
+    }
   },
   async created () {
     try {
@@ -2550,7 +2553,7 @@ export default {
       this.loading = true
 
       let promises = []
-      promises.push(this.db.collection('projects').doc(this.projectId).get())
+      promises.push(this.db.collection('projects').doc(this.uuid).get())
       promises.push(this.db.collection('projects').doc('ToC').get())
       promises.push(this.db.collection('users').doc('ToC').get())
 
@@ -2561,8 +2564,8 @@ export default {
           this.data[objField] = res[0].data()[objField]
         }
 
-        for (let objField in res[1].data()[this.projectId]) {
-          this.data[objField] = res[1].data()[this.projectId][objField]
+        for (let objField in res[1].data()[this.uuid]) {
+          this.data[objField] = res[1].data()[this.uuid][objField]
         }
 
         for (let objField in res[2].data()) {

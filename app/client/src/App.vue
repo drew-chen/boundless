@@ -238,4 +238,12 @@ pre {
   word-wrap: break-word;
   font-family: inherit;
 }
+
+.fade-enter-active, .fade-leave-active {
+  transition: opacity .15s;
+}
+.fade-enter, .fade-leave-to {
+  opacity: 0;
+}
+
 </style>

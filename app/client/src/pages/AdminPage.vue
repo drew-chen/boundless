@@ -1,5 +1,5 @@
 <!-- ##
-## Copyright (c) 2019 Wind River Systems, Inc.
+## Copyright (c) 2020 Wind River Systems, Inc.
 ##
 ## Licensed under the Apache License, Version 2.0 (the "License");
 ## you may not use this file except in compliance with the License.
@@ -300,9 +300,9 @@ Methods:
 <script>
 import { layoutConfig } from '../../boundless.config'
 
-import ManageProjects from '../components/ManageProject'
-import ManageChallenges from '../components/ManageChallenge'
-import ManageUsers from '../components/ManageUser'
+import ManageProjects from '../components/Admin/ManageProject'
+import ManageChallenges from '../components/Admin/ManageChallenge'
+import ManageUsers from '../components/Admin/ManageUser'
 
 import SystemSettings from '../components/SystemSettings'
 import ManageDatabase from '../components/GetDataFromFirestore'
@@ -486,17 +486,21 @@ export default {
 
 <style lang="stylus" scoped>
 // console-page page loadout
+
+body {
+  max-height: 50px
+}
+
 .console-page {
   min-width: 800px;
   max-width: 98%;
   margin: auto;
-  // max-height: 78vh;
-  // overflow: hidden;
 }
 
 // left-tab loadout
 .console-content-tab {
   border-radius: 3px;
+  overflow: hidden;
 }
 
 .ap-left-panel {
