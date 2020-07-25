@@ -411,19 +411,12 @@ Methods:
                                 <q-icon
                                   size=".8em" color="accent" name="edit"
                                 />
-
-                                <q-popup-edit
-                                  buttons
+                                  <limited-len-input-popup
                                   title="Edit Challenge Name"
-                                  v-model="curData.challenge"
-                                  @save="updated = true"
-                                >
-                                  <q-input
-                                    dense autofocus
-                                    class="full-width"
-                                    v-model="curData.challenge"
-                                  />
-                                </q-popup-edit>
+                                  :lenLimit="60"
+                                  :initialValue="curData.challenge"
+                                  @save="saveEditedName($event)"
+                                />
                               </div>
                               <q-separator color="secondary" />
                             </div>
@@ -2037,6 +2030,8 @@ import testingDb, { testingStorage } from '../firebase/init_testing'
 import UploadGUI from '../components/Upload'
 import ProjectTable from '../components/Tables/ProjectTable'
 import AddUser from '../components/SubmitUserAdminConsole'
+import LimitedLenInputPopup from '../components/LimitedLenInputPopup.vue'
+
 import MarkdownTranslator from './MarkdownTranslator'
 
 export default {
@@ -2044,7 +2039,8 @@ export default {
     UploadGUI,
     ProjectTable,
     AddUser,
-    MarkdownTranslator
+    MarkdownTranslator,
+    LimitedLenInputPopup
   },
   props: {
     uuid: String,
@@ -2273,6 +2269,10 @@ export default {
 
       this.userEmailToObjMap[newUser.email] = newUser
       this.addMemberDialog.use.push(newUser)
+    },
+    saveEditedName (editedName) {
+      this.updated = true
+      this.curData.challenge = editedName
     },
     submitAddMembers: function () {
       /**
@@ -3113,18 +3113,6 @@ export default {
       }).onCancel(() => {
       }).onDismiss(() => {
       })
-    },
-    projectNameValidation: function (val) {
-      /**
-       * helper function to validate project name
-       * @param {String} val: string value to be validated
-       * @return {Boolean}
-       */
-
-      if (val === '') {
-        return false
-      }
-      return true
     },
     addCustomField: function () {
       /**

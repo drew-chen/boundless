@@ -61,18 +61,15 @@ Methods:
           >
             <div class="col">
               <strong>{{ k }}:</strong> {{ curData[k].key }}
-              <q-popup-edit
-                buttons
-                v-model="curData[k].key"
-              >
-                <q-input
-                  dense filled autofocus
-                  :label="k"
-                  v-model="curData[k].key"
-                />
-              </q-popup-edit>
-            </div>
 
+              <limited-len-input-popup
+                :initialValue="curData[k].key"
+                :lenLimit="30"
+                :label="k"
+                @save="curData[k].key = $event"
+              />
+
+            </div>
             <div class="col-1 center-div">
               <q-btn
                 flat round dense icon="close"
@@ -118,7 +115,12 @@ Methods:
 import productionDb, { productionStorage } from '../firebase/init_production'
 import testingDb, { testingStorage } from '../firebase/init_testing'
 
+import LimitedLenInputPopup from '../components/LimitedLenInputPopup.vue'
+
 export default {
+  components: {
+    LimitedLenInputPopup
+  },
   props: {
     uid: String,
     type: String

@@ -160,20 +160,14 @@ Methods:
                           Name:
                         </strong>
                         {{ curTocData.name }}
-                        <q-popup-edit
-                          buttons
-                          v-model="curTocData.name"
-                          :validate="popUpNameValidation"
-                          @hide="popUpReset"
-                          @save="reRender"
-                        >
-                          <q-input
-                            dense filled autofocus label="Name"
-                            :error="errorObj.error"
-                            :error-message="errorObj.message"
-                            v-model="curTocData.name"
-                          />
-                        </q-popup-edit>
+
+                        <limited-len-input-popup
+                          :initialValue="curTocData.name"
+                          :lenLimit="60"
+                          :label="name"
+                          @save="saveEditedName"
+                        />
+
                         <dir style="
                           font-style: italic;
                           color: gray;
@@ -385,6 +379,7 @@ import 'firebase/firestore'
 import productionDb, { productionStorage } from '../firebase/init_production'
 import testingDb, { testingStorage } from '../firebase/init_testing'
 
+import LimitedLenInputPopup from '../components/LimitedLenInputPopup'
 import ProjectTable from '../components/Tables/ProjectTable'
 
 export default {
@@ -394,7 +389,8 @@ export default {
   },
   components: {
     // uploadGUI
-    ProjectTable
+    ProjectTable,
+    LimitedLenInputPopup
   },
   async created () {
     try {
@@ -439,30 +435,6 @@ export default {
 
       this.errorObj.error = false
       this.errorObj.messsage = ''
-    },
-    popUpNameValidation: function (val) {
-      /**
-       * validation check for pop-up edit
-       * @param {String} val: value to be validated
-       * @return {void}
-       */
-
-      if (val === undefined) {
-        this.errorObj.error = false
-        this.errorObj.messsage = ''
-        return true
-      }
-
-      if (!val || val.length === 0) {
-        this.errorObj.error = true
-        this.errorObj.message = 'Cannot be empty!'
-        return false
-      }
-
-      // sucessful call
-      this.errorObj.error = false
-      this.errorObj.messsage = ''
-      return true
     },
     popUpEmailValidation: function (val) {
       /**
@@ -517,6 +489,10 @@ export default {
 
       this.updated = true
       this.$forceUpdate()
+    },
+    saveEditedName (editedName) {
+      this.curTocData.name = editedName
+      this.reRender()
     },
     deleteAdditionalInformation: function (entry) {
       /**

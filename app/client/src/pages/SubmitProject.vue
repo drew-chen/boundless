@@ -53,7 +53,11 @@ Methods:
           placeholder="ie. Raspberry Pi BSP for VxWorks7"
           label="Project Name"
           v-model="projectName"
-          :rules="[val => !!val || 'Field is required']"
+          :rules="[
+            val => $v.projectName.required || 'Field is required',
+            val => $v.projectName.maxLength || 'Max length is 60 characters'
+          ]"
+          @input="$v.projectName.$touch()"
           @keydown.ctrl.shift.65="activateAdmin"
         >
           <template v-slot:prepend>
@@ -70,7 +74,8 @@ Methods:
           placeholder="Please give 2-5 sentences overview of the project. (Grows automatically.)"
           label="Description/Overview"
           type="textarea"
-          :rules="[val => !!val || 'Field is required']"
+          @input="$v.projectDescription.$touch()"
+          :rules="[val => $v.projectDescription.required || 'Field is required']"
         >
           <template v-slot:prepend>
             <q-icon name="far fa-comment-alt" />
@@ -122,7 +127,8 @@ Methods:
               label="Contributor's Email" type="email"
               v-model="projectMembers[index].email"
               :ref="`memberEmail${index}`"
-              :rules="[val => !!val || 'Field is required']"
+              :rules="[val => $v.projectMembers.$each[index].email.required || 'Field is required']"
+              @input="$v.projectMembers.$each[index].email.$touch()"
               @blur="emailDomainCheck(projectMembers[index].email, index)"
             >
               <template v-slot:prepend>
@@ -138,7 +144,11 @@ Methods:
               label="Contributor's Full Name"
               v-model="projectMembers[index].name"
               :ref="`memberName${index}`"
-              :rules="[val => !!val || 'Field is required']"
+              :rules="[
+                val => $v.projectMembers.$each[index].name.required || 'Field is required',
+                val => $v.projectMembers.$each[index].name.maxLength || 'Max length is 60 characters'
+              ]"
+              @input="$v.projectMembers.$each[index].name.$touch()"
               @blur="capitalizeFirstChar(index)"
             >
               <template v-slot:prepend>
@@ -614,6 +624,8 @@ Methods:
 import productionDb from '../firebase/init_production'
 import testingDb from '../firebase/init_testing'
 
+import { required, maxLength } from 'vuelidate/lib/validators'
+
 export default {
   async created () {
     try {
@@ -656,6 +668,26 @@ export default {
       addedContent: false,
       loading: false, // <Boolean>: flag for loading animation
       adminMode: false // <Boolean>: flag for activating admin mode
+    }
+  },
+  validations: {
+    projectName: {
+      required,
+      maxLength: maxLength(60)
+    },
+    projectDescription: {
+      required
+    },
+    projectMembers: {
+      $each: {
+        name: {
+          required,
+          maxLength: maxLength(60)
+        },
+        email: {
+          required
+        }
+      }
     }
   },
   methods: {

@@ -304,13 +304,13 @@ Methods:
                                       :key="ulIndex"
                                     >
                                       <div
-                                        v-if="
+                                        v-if="(
                                           bodyContent.content.type ===
                                           'EVENT_LIST'
-                                        "
+                                        )"
                                         style="
-                                          display: inline; padding-left: 12px;
-                                        "
+                                            display: inline; padding-left: 12px;
+                                          "
                                       >
                                         {{ link.subject }}
                                         <hr>
@@ -361,19 +361,12 @@ Methods:
                             name="edit" size=".8em" color="accent"
                           />
 
-                          <q-popup-edit
-                            buttons
-                            title="Edit the Project Name"
-                            v-model="curData.project"
-                            :validate="projectNameValidation"
-                            @save="updated = true"
-                          >
-                            <q-input
-                              dense autofocus filled hide-bottom-space
-                              v-model="curData.project"
-                              :rules="[val => !!val || 'Field is required']"
-                            />
-                          </q-popup-edit>
+                          <limited-len-input-popup
+                            title="Edit Project Name"
+                            :lenLimit="60"
+                            :initialValue="curData.project"
+                            @save="saveEditedName($event)"
+                          />
 
                           <q-separator />
                         </div>
@@ -1904,6 +1897,7 @@ import testingDb, { testingStorage } from '../firebase/init_testing'
 import UploadGUI from '../components/Upload'
 import ProgressBar from '../components/ProgressBar'
 import AddUser from '../components/SubmitUserAdminConsole'
+import LimitedLenInputPopup from '../components/LimitedLenInputPopup'
 import MarkdownTranslator from './MarkdownTranslator'
 
 export default {
@@ -1911,7 +1905,8 @@ export default {
     UploadGUI,
     ProgressBar,
     AddUser,
-    MarkdownTranslator
+    MarkdownTranslator,
+    LimitedLenInputPopup
   },
   props: {
     uuid: String,
@@ -1998,6 +1993,7 @@ export default {
       }
     }
   },
+
   methods: {
     deleteAttachment: async function (key, pathToFile, type) {
       /**
@@ -2135,6 +2131,10 @@ export default {
       this.userEmailToObjMap[newUser.email] = newUser
       newUser.role = 'member'
       this.addMemberDialog.use.push(newUser)
+    },
+    saveEditedName (editedName) {
+      this.updated = true
+      this.curData.project = editedName
     },
     submitAddMembers: function () {
       /**
@@ -2949,17 +2949,17 @@ export default {
         // nothing goes here
       })
     },
-    projectNameValidation: function (val) {
+    projectNameValidation: function () {
       /**
        * helper function to validate the name of the project
-       * @param {String} val: the new title of the project
        * @return {Boolean}
        */
 
-      if (val === '') {
-        return false
+      if (this.$v.curData.project.maxLength && this.$v.curData.project.required) {
+        console.log(this.$v)
+        return true
       }
-      return true
+      return false
     },
     addCustomField: function () {
       /**
