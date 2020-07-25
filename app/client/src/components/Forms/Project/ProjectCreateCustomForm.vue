@@ -44,11 +44,6 @@ Methods:  Admin goes through this form which creates an array that
               Add question
             </q-tooltip>
           </q-btn>
-          <q-btn
-            @click="resetQuestionTemplates"
-          >
-            reset
-          </q-btn>
         </div>
         <!-- Native drag and drop API is disabled to prevent flickering issues. -->
         <draggable

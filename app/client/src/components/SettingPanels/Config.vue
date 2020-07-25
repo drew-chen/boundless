@@ -25,37 +25,18 @@ Methods:
     <div v-if="data.progressBar">
       <div
         v-if="type === 'projects'"
-        class="text-h4 q-mb-md"
+        class="q-my-sm"
       >
-        <div class="row">
-          Project Progress Bar
-
-          <q-space />
-
-          <div class="q-mb-xs">
-            <q-btn
-              :disabled="!canSave()"
-              no-caps
-              label="Submit"
-              :color="canSave() ? 'secondary' : 'accent'"
-              @click="onSubmit"
-            />
-          </div>
-
-          <div class="q-mb-xs">
-            <q-btn
-              :disabled="!canSave()"
-              no-caps
-              label="Cancel"
-              :color="canSave() ? 'secondary' : 'accent'"
-              @click="reset"
-            >
-              <q-tooltip>
-                Reset unsaved changes
-              </q-tooltip>
-            </q-btn>
-          </div>
+        <div class="float-right">
+          <button-undo-and-save
+            :disabled="!canSave()"
+            :save="onSubmit"
+            :undo="reset"
+          />
         </div>
+
+        <div class="text-h4 q-my-sm">Project Progress Bar</div>
+
         <q-separator color="secondary" />
       </div>
 
@@ -569,16 +550,12 @@ Methods:
     </div>
 
     <!-- -------------------- Button -------------------- -->
-    <div class="q-px-lg q-pb-lg">
-      <div class="q-px-md q-pb-md q-gutter-sm" align="right">
-        <q-btn
-          :disabled="!canSave()"
-          no-caps
-          label="Submit"
-          :color="canSave() ? 'secondary' : 'accent'"
-          @click="onSubmit"
-        />
-      </div>
+    <div class="float-right">
+      <button-undo-and-save
+        :disabled="!canSave()"
+        :save="onSubmit"
+        :undo="reset"
+      />
     </div>
   </div>
 </template>
@@ -589,7 +566,8 @@ import { defaultImages } from '../../../boundless.config'
 import productionDb, { productionStorage } from '../../firebase/init_production'
 import testingDb, { testingStorage } from '../../firebase/init_testing'
 
-import projectCreateCustomForm from '../Forms/Project/ProjectCreateCustomForm.vue'
+import ProjectCreateCustomForm from '../Forms/Project/ProjectCreateCustomForm.vue'
+import ButtonUndoAndSave from '../Buttons/ButtonUndoAndSave.vue'
 
 export default {
   props: {
@@ -598,7 +576,8 @@ export default {
     ratio: String
   },
   components: {
-    projectCreateCustomForm
+    ProjectCreateCustomForm,
+    ButtonUndoAndSave
   },
   async created () {
     try {
@@ -1042,27 +1021,6 @@ export default {
 
       eventHandler(event, type, field)
     },
-    deepObjCopy: function (aObject) {
-      /**
-       * https://stackoverflow.com/questions/4459928/how-to-deep-clone-in-javascript/34624648#34624648
-       * creates a deep copy of the input
-       * @param {Object} aObject: the object to be cloned
-       * @return {Object}
-       */
-
-      if (!aObject) {
-        return aObject
-      }
-
-      let v
-      let bObject = Array.isArray(aObject) ? [] : {}
-      for (const k in aObject) {
-        v = aObject[k]
-        bObject[k] = (typeof v === 'object') ? this.deepObjCopy(v) : v
-      }
-
-      return bObject
-    },
     /** Whether there are any changes to be saved. See setCanSave(). */
     canSave () {
       return this.updated
@@ -1079,7 +1037,7 @@ export default {
       }
     },
     /**
-     * Blocks reloading the webpage or closing the browser if there are
+     * Blocks reloading or closing the webpage if there are
      * unsaved changes.
      *
      * @param event The event which has occured: 'beforeunload'.
@@ -1091,6 +1049,16 @@ export default {
         // Chrome requires returnValue to be set
         event.returnValue = 'You should keep this page open.'
       }
+    },
+    /** Undo's local changes */
+    reset () {
+      this.$q.dialog({
+        title: 'Confirm',
+        message: 'Would you like undo all unsaved changes?',
+        cancel: true
+      }).onOk(() => {
+        this.$refs.projectCreateCustomForm.resetQuestionTemplates()
+      })
     }
   }
 }

@@ -63,6 +63,7 @@ Methods:  Displays the template saved in Vuex. The user inputs their responses
 </template>
 
 <script>
+import cloneDeep from 'lodash.clonedeep'
 import { createNamespacedHelpers } from 'vuex'
 const { mapGetters, mapMutations } = createNamespacedHelpers('projectSubmit')
 
@@ -103,7 +104,6 @@ export default {
   methods: {
     ...mapMutations(['setQuestions']),
     saveToVuex () {
-      const cloneDeep = require('lodash.clonedeep')
       this.setQuestions(cloneDeep(this.questions))
     },
     submit () {
