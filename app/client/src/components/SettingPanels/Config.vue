@@ -41,6 +41,20 @@ Methods:
               @click="onSubmit"
             />
           </div>
+
+          <div class="q-mb-xs">
+            <q-btn
+              :disabled="!canSave()"
+              no-caps
+              label="Cancel"
+              :color="canSave() ? 'secondary' : 'accent'"
+              @click="reset"
+            >
+              <q-tooltip>
+                Reset unsaved changes
+              </q-tooltip>
+            </q-btn>
+          </div>
         </div>
         <q-separator color="secondary" />
       </div>

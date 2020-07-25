@@ -44,6 +44,11 @@ Methods:  Admin goes through this form which creates an array that
               Add question
             </q-tooltip>
           </q-btn>
+          <q-btn
+            @click="resetQuestionTemplates"
+          >
+            reset
+          </q-btn>
         </div>
         <!-- Native drag and drop API is disabled to prevent flickering issues. -->
         <draggable
@@ -123,6 +128,7 @@ Methods:  Admin goes through this form which creates an array that
 </template>
 
 <script>
+import Vue from 'vue'
 import draggable from 'vuedraggable'
 import { cloneDeep, isEqual } from 'lodash'
 import { createNamespacedHelpers } from 'vuex'
@@ -250,6 +256,7 @@ export default {
     },
     /** Creates another question. */
     addQuestionTemplate () {
+      this.newQuestionTemplate.order = this.questionTemplates.length
       this.questionTemplates.push(
         this.newQuestionTemplate
       )
@@ -272,12 +279,19 @@ export default {
       if (index > -1) {
         this.questionTemplates.splice(index, 1)
       }
+      this.updateQuestionOrder()
     },
     /** Ensures that a question's order is it's index. Does not affect view. */
     updateQuestionOrder () {
       this.questionTemplates.forEach((question, index) => {
         question.order = index
       })
+    },
+    /**
+     * Reactively sets local questionTemplates to same state in Vuex store.
+     */
+    resetQuestionTemplates () {
+      Vue.set(this.$data, 'questionTemplates', cloneDeep(this.storeQuestionTemplates))
     }
   }
 }
