@@ -10,12 +10,13 @@
 ## OR CONDITIONS OF ANY KIND, either express or implied.
 
 Name:     store/index.js
+Purpose:  Tells Vue to use Vuex state management. Modules are also added here.
+Methods:
 
-Purpose:  Vuex store definition. Modules are added here.
-
-Methods:  For more information on Vuex, see:
-            * https://vuex.vuejs.org/
-            * https://quasar.dev/quasar-cli/vuex-store
+  Adds vuex modules.
+  For more information on Vuex, see:
+  * https://vuex.vuejs.org/
+  * https://quasar.dev/quasar-cli/vuex-store
 
 ## */
 

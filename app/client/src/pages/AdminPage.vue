@@ -10,12 +10,13 @@
 ## OR CONDITIONS OF ANY KIND, either express or implied.
 
 Name:     pages/AdminPage.vue
-Purpose:  Provide graphical user interface for the admin to manage application
+Purpose:  Provide graphical user interface for the admin to manage application.
 Methods:
-  * Provide general settings interface for the admin
-  * Provide user settings interface for the admin
-  * Provide project settings interface for the admin
-  * Provide challange settings interface for the admin
+
+  Provide general settings interface for the admin.
+  Provide user settings interface for the admin.
+  Provide project settings interface for the admin.
+  Provide challange settings interface for the admin.
 
 ## -->
 
@@ -300,9 +301,9 @@ Methods:
 <script>
 import { layoutConfig } from '../../boundless.config'
 
-import ManageProjects from '../components/Admin/ManageProject'
-import ManageChallenges from '../components/Admin/ManageChallenge'
-import ManageUsers from '../components/Admin/ManageUser'
+import ManageProjects from '../components/Manage/ManageProject'
+import ManageChallenges from '../components/Manage/ManageChallenge'
+import ManageUsers from '../components/Manage/ManageUser'
 
 import SystemSettings from '../components/SystemSettings'
 import ManageDatabase from '../components/GetDataFromFirestore'
@@ -372,13 +373,11 @@ export default {
     }
   },
   methods: {
+    /**
+     * Handle page loading via child event.
+     * @param {Boolean} loadVal: Event emitter value to render loading.
+     */
     consoleLoading: function (loadVal) {
-      /**
-       * handle page loading via child event
-       * @param {Boolean} loadVal: event emitter value to render loading
-       * @return {void}
-       */
-
       this.haltConsole = loadVal
 
       if (!loadVal) {
@@ -396,24 +395,20 @@ export default {
         }
       }
     },
+    /**
+     * Handle page loading via child event.
+     * @param {String} databaseId: Project id of the firebase cred.
+     */
     loadDatabaseId: function (databaseId) {
-      /**
-       * handle page loading via child event
-       * @param {Boolean} loadVal: event emitter value to render loading
-       * @return {void}
-       */
-
       this.dbId = databaseId
     },
+    /**
+     * Load keywords from the child component and convert to
+     * map to assign as one of the object inside this.configs var
+     * @param {Object} val: Event emitter value containing keywords
+     *  from database.
+     */
     loadKeywords: function (val) {
-      /**
-       * load keywords from the child component and convert to
-       * map to assign as one of the object inside this.configs var
-       * @param {Object} val: event emitter value containing keywords
-       *                      from database
-       * @return {void}
-       */
-
       if (val) {
         this.configs.keywords = {}
 
@@ -422,55 +417,45 @@ export default {
         }
       }
     },
+    /**
+     * Load project configuartion from the child component and
+     * assign as one of the object inside this.configs var.
+     * @param {Object} val: Event emitter value containing
+     *  database information.
+     */
     loadProjectConfig: function (val) {
-      /**
-       * load project configuartion from the child component and
-       * assign as one of the object inside this.configs var
-       * @param {Object} val: event emitter value containing
-       *                      database information
-       * @return {void}
-       */
-
       if (val) {
         this.configs.projects = val
       }
     },
+    /**
+     * Load challenge configuartion from the child component and
+     * assign as one of the object inside this.configs var
+     * @param {Object} val: Event emitter value containing
+     *                      database information.
+     */
     loadChallengeConfig: function (val) {
-      /**
-       * load challenge configuartion from the child component and
-       * assign as one of the object inside this.configs var
-       * @param {Object} val: event emitter value containing
-       *                      database information
-       * @return {void}
-       */
-
       if (val) {
         this.configs.challenges = val
       }
     },
+    /**
+     * Load user configuartion from the child component and assign
+     * as one of the object inside this.configs var.
+     * @param {Object} val: Event emitter value contating database information.
+     */
     loadUserConfig: function (val) {
-      /**
-       * load user configuartion from the child component and assign
-       * as one of the object inside this.configs var
-       * @param {Object} val: event emitter value contating database information
-       * @return {void}
-       */
-
       if (val) {
         val.list = val.list.sort(
           (a, b) => a.value < b.value ? -1 : 1
         )
-
         this.configs.users.socialNetwork = val
       }
     },
+    /**
+     * Switch database namespace and reload the page.
+     */
     switchDatabase: function () {
-      /**
-       * switch database namespace and reload the page
-       * @param {void}
-       * @return {void}
-       */
-
       this.$q.localStorage.set('boundless_db', this.db)
 
       if (this.$q.sessionStorage.has('boundless_timeout')) {
@@ -482,6 +467,7 @@ export default {
     }
   }
 }
+
 </script>
 
 <style lang="stylus" scoped>
@@ -507,4 +493,5 @@ body {
   border: solid $grey-5 1px;
   border-radius: 3px;
 }
+
 </style>

@@ -10,11 +10,11 @@
 ## OR CONDITIONS OF ANY KIND, either express or implied.
 
 Name:     pages/SubmitProject.vue
-
 Purpose:  Wrapper for project submission forms.
+Methods:
 
-Methods:  Manages the view and submission trigger of multiple child component
-          forms.
+  Manages the view and submission trigger of multiple child component
+  forms.
 
 ## -->
 
@@ -111,11 +111,11 @@ export default {
       'submitQuestions',
       'resetProject'
     ]),
+    /**
+     * On the first two pages, submit the form to vuex. On the third and final
+     * page, submit the forms to Firestore then return to the first page.
+     */
     async submit () {
-      /**
-       * On the first two pages, submit the form to vuex. On the third and final
-       * page, submit the forms to Firestore then return to the first page.
-       */
       switch (this.step) {
         case 1:
           this.$refs.projectMainForm.submit()
@@ -148,8 +148,8 @@ export default {
           break
       }
     },
+    /** Advance the stepper page. */
     navigateForward () {
-      /** Advance the stepper page. */
       this.$refs.stepper.next()
     },
     /**

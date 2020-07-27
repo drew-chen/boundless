@@ -12,7 +12,9 @@
 Name:     App.vue
 Purpose:  Main starting code block of the application.
 Methods:
-  * The application global CSS declarations are found here.
+
+  The application global CSS declarations are found here.
+  Also initializes Vuex.
 
 ##-->
 

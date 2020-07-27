@@ -10,12 +10,16 @@
 ## OR CONDITIONS OF ANY KIND, either express or implied.
 
 Name:     components/SettingPanels/Config.vue
-Purpose:  To allow the user configure project/challenge UI via a config panel
-          inside admin console
+Purpose:
+
+  To allow the user configure project/challenge UI via a config panel
+  inside admin console.
+
 Methods:
-  * Allow the user to manage keywords for project/challenge
-  * Allow the user to manage banners for project/challenge
-  * The changes persists to display table as well
+
+  Allow the user to manage keywords for project/challenge.
+  Allow the user to manage banners for project/challenge.
+  The changes persists to display table as well.
 
 ## -->
 

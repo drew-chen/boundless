@@ -10,12 +10,15 @@
 ## OR CONDITIONS OF ANY KIND, either express or implied.
 
 Name:     boot/errorHandler.js
+Purpose:
 
-Purpose:  Global method of handling expected exceptions generated from Vue
-          components.
+  Global method of handling expected exceptions generated from Vue
+  components.
 
-Methods:  A Vue error handler is configured on boot.
-          NOTE: Async errors currently can only be caught here if awaited!
+Methods:
+
+  A Vue error handler is configured on boot.
+  NOTE: Async errors currently can only be caught here if awaited!
 
 ## */
 

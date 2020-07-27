@@ -10,20 +10,23 @@
 ## OR CONDITIONS OF ANY KIND, either express or implied.
 
 Name:     store/project-submit/getters.js
+Purpose:
 
-Purpose:  Getters for the project-submit Vuex module. Provides read only access
-          to state related to project submission.
+  Getters for the project-submit Vuex module. Provides read only access
+  to state related to project submission.
 
-Methods:  Returns state properties directly. To avoid mutating state, the return
-          value can be copied. Copied data can be free changed without impacting
-          state.
+Methods:
+
+  Returns state properties directly. To avoid mutating state, the return
+  value can be copied. Copied data can be free changed without impacting
+  state.
 
 ## */
 
 import productionDb from '../../firebase/init_production'
 import testingDb from '../../firebase/init_testing'
 
-// <Object>: firebase firestore credentials
+// <Object>: firebase Firestore credentials
 export function db (state) {
   if (state.isTestingDb) {
     return testingDb
