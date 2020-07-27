@@ -142,7 +142,7 @@ export default {
       required: true,
       validator (value) {
         // The value must match one of these strings (can be expanded later).
-        return ['projects'].indexOf(value) !== -1
+        return ['projects', 'challenges'].indexOf(value) !== -1
       }
     }
   },

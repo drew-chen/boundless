@@ -34,7 +34,7 @@ Methods:
         <div class="float-right">
           <button-undo-and-save
             :disabled="!canSave()"
-            :save="onSubmit"
+            :save="submit"
             :undo="reset"
           />
         </div>
@@ -107,7 +107,7 @@ Methods:
               no-caps
               label="Submit"
               :color="!updated ? 'accent' : 'secondary'"
-              @click="onSubmit"
+              @click="submit"
             />
           </div>
         </div>
@@ -557,7 +557,7 @@ Methods:
     <div class="float-right">
       <button-undo-and-save
         :disabled="!canSave()"
-        :save="onSubmit"
+        :save="submit"
         :undo="reset"
       />
     </div>
@@ -583,6 +583,7 @@ export default {
     ProjectCreateCustomForm,
     ButtonUndoAndSave
   },
+  /** Fetches data and add page leaving event listener. */
   async created () {
     try {
       setTimeout(() => {
@@ -627,9 +628,9 @@ export default {
       throw new Error(error)
     }
   },
+  /** Verfiy for user to leave if changes were detected. */
   beforeDestroy () {
-    // verfiy for user to leave if changes were detected
-    if (!this.submitted && this.cansave()) {
+    if (!this.submitted && this.canSave()) {
       this.$q.dialog({
         title: 'Are you sure you want to leave without submitting changes? (All changes will be lost).',
         cancel: {
@@ -654,7 +655,7 @@ export default {
           URL.revokeObjectURL(this.data.webpage.mainImg.url)
         }
       }).onCancel(() => {
-        this.onSubmit()
+        this.submit()
       })
     }
   },
@@ -692,14 +693,13 @@ export default {
     }
   },
   methods: {
+    /**
+     * Helper function to fetch the absolute url given relative
+     * @param {String} property: name of the property inside config
+     * @param {String} obj: name of the field inside the property
+     * @return {Promise<Boolean>} Whether or not there was an error.
+     */
     storageUrlFetcher: async function (property, obj) {
-      /**
-       * helper function to fetch the absolute url given relative
-       * @param {String} property: name of the property inside config
-       * @param {String} obj: name of the field inside the property
-       * @return {Promise<Boolean>}
-       */
-
       if (
         this.data[property] && this.data[property][obj] &&
         this.data[property][obj].url
@@ -727,15 +727,12 @@ export default {
 
       return false
     },
+    /**
+     * Helper function to add new tab on the progress
+     * which creates a dialog when invoked and notifies
+     * the user on success/failure.
+     */
     addProgressTag: function () {
-      /**
-       * helper function to add new tab on the progress
-       * which creates a dialog when invoked and notifies
-       * the user on success/failure
-       * @param {void}
-       * @return {void}
-       */
-
       this.$q.dialog({
         title: 'Add new tag for progress bar',
         prompt: {
@@ -776,14 +773,13 @@ export default {
       }).onDismiss(() => {
       })
     },
+    /**
+     * Helper function deletes the progress tag when invoked
+     * and notifies the user on failure.
+     * @param {Integer} index: of the tag to be deleted
+     * @return {void}
+     */
     deleteProgressTag: function (index) {
-      /**
-       * helper function deletes the progress tag when invoked
-       * and notifies the user on failure
-       * @param {Integer} index: of the tag to be deleted
-       * @return {void}
-       */
-
       if (this.data.progressBar.tags.length > 1) {
         this.data.progressBar.tags.splice(index, 1)
 
@@ -796,24 +792,21 @@ export default {
         })
       }
     },
+    /**
+     * Updates the vue component by force once called and
+     * sets true to this.updated.
+     * @param {void}
+     * @return {void}
+     */
     forceUpdate: function () {
-      /**
-       * updates the vue component by force once called and
-       * sets true to this.updated
-       * @param {void}
-       * @return {void}
-       */
-
       this.updated = true
       this.$forceUpdate()
     },
+    /**
+     * Helper function to check if this.data.keywords is full (length of 5).
+     * @param {Array<String>} keywords: List of keywords.
+     */
     checkMax: function (keywords) {
-      /**
-       * helper function to check if this.data.keywords is full (length of 5)
-       * @param {Array<String>} keywords: list of keywords
-       * @return {void}
-       */
-
       if (keywords.length > 6) {
         this.$q.notify({
           color: 'negative',
@@ -829,17 +822,15 @@ export default {
         this.updated = true
       }
     },
+    /**
+     * https://stackoverflow.com/questions/11876175/how-to-get-a-file-or-blob-from-an-object-url
+     * fetch the blob data from the given url.
+     * @param {String} url: Link of where the blob data is stored.
+     * @param {String} property: Key of the config type.
+     * @param {String} obj: Filename of the file to be stored
+     *                      inside firebase storage.
+     */
     getBlobAndSubmitFromURL: async function (url, property, obj) {
-      /**
-       * https://stackoverflow.com/questions/11876175/how-to-get-a-file-or-blob-from-an-object-url
-       * fetch the blob data from the given url
-       * @param {String} url: link of where the blob data is stored
-       * @param {String} property: key of the config type
-       * @param {String} obj: filename of the file to be stored
-       *                      inside firebase storage
-       * @return {Promise<Blob>}
-       */
-
       try {
         let res = await fetch(url)
         res = await res.blob()
@@ -882,15 +873,12 @@ export default {
         throw new Error(error)
       }
     },
+    /**
+     * Load Firebase database referencem storage reference (if applicable)
+     * and cloud functions reference (if applicable).
+     * @return {Promise<Blob>} Whether or not there was an error.
+     */
     loadFireRefs: async function () {
-      /**
-       * load firebase database reference
-       * load firebase storage reference (if applicable)
-       * load firebase cloud functions reference (if applicable)
-       * @param {void}
-       * @return {Promise<Boolean>}
-       */
-
       if (this.$q.localStorage.has('boundless_db')) {
         let sessionDb = this.$q.localStorage.getItem('boundless_db')
 
@@ -927,13 +915,10 @@ export default {
         }
       }
     },
-    onSubmit: async function () {
-      /**
-       * submit handler for the component
-       * @param {void}
-       * @return {void}
-       */
-
+    /**
+     * Submit handler for the component.
+     */
+    submit: async function () {
       this.endCounter = 0
       this.submitted = true
       this.$emit('submitting', true)
@@ -995,14 +980,12 @@ export default {
         throw new Error(error)
       }
     },
+    /**
+     * Helper function to extract image out of the picked file.
+     * @param {String} type: type of the field to be assigned.
+     * @param {String} field: filed of the object to be assigned.
+     */
     filePickerOnChange: function (type, field) {
-      /**
-       * helper function to extract image out of the picked file
-       * @param {String} type: type of the field to be assigned
-       * @param {String} field: filed of the object to be assigned
-       * @return {void}
-       */
-
       const eventHandler = (e, type, field) => {
         const file = e.target.files[0]
         let fToken = field.split('.')

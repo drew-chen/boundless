@@ -13,8 +13,9 @@ TODO:     Submit{User/Project/Challenge}AdminConsole can be one component
 Name:     components/SubmitProjectAdminConsole.vue
 Purpose:  Encapsulates the Submit Project component to invoke from admin console
 Methods:
-  * Adds project from the admin console
-  * Closes the fullscreen dialog
+
+  Adds project from the admin console.
+  Closes the fullscreen dialog.
 
 ## -->
 
@@ -23,7 +24,7 @@ Methods:
     <q-layout>
 
       <br>
-      <SubmitProjectPage @added="emitAdded" />
+      <submit-project @added="emitAdded" />
 
       <q-page-sticky
         position="bottom-right"
@@ -47,11 +48,11 @@ Methods:
 </template>
 
 <script>
-import SubmitProjectPage from '../pages/SubmitProject'
+import SubmitProject from '../pages/SubmitProject'
 
 export default {
   components: {
-    SubmitProjectPage
+    SubmitProject
   },
   data () {
     return {
