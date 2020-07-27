@@ -11,7 +11,12 @@
 
 Name:     store/project-submit/state.js
 Purpose:  Centralized source data related to project submission.
-Methods:  Data is stored as an object tree.
+Methods:
+
+  Data is stored as an object tree. A field is chosen to be stored here if:
+    1) This field will be used in multiple components, and/or
+    2) This field needs to be synced with Firebase, and
+    3) This field is related to project submission.
 
 ## */
 

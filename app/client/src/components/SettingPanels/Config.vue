@@ -565,6 +565,8 @@ Methods:
 </template>
 
 <script>
+import deepClone from 'lodash.clonedeep'
+import Vue from 'vue'
 import { defaultImages } from '../../../boundless.config'
 
 import productionDb, { productionStorage } from '../../firebase/init_production'
@@ -583,7 +585,10 @@ export default {
     ProjectCreateCustomForm,
     ButtonUndoAndSave
   },
-  /** Fetches data and add page leaving event listener. */
+  /**
+   * Fetches data and add page leaving event listener. Also initializes
+   * 'this.dbData' to the same initial values as 'this.data'.
+   */
   async created () {
     try {
       setTimeout(() => {
@@ -623,6 +628,7 @@ export default {
       await this.storageUrlFetcher('webpage', 'bannerImg')
       await this.storageUrlFetcher('webpage', 'mainImg')
 
+      this.dbData = deepClone(this.data)
       window.addEventListener('beforeunload', this.confirmUnload)
     } catch (error) {
       throw new Error(error)
@@ -673,6 +679,8 @@ export default {
       keywordOptions: [],
       // data <Object>: config information of either project or challenge
       data: {},
+      // <Object>: Unmodified data from the databaseused to reset 'this.data'.
+      dbData: {},
       recoveryPath: {}, // <Object>: record for paths to be recovered
       counter: 0, // <Integer>: couter to track promises
       endCounter: 0, // <Integer>: counter to end the promise calls
@@ -699,7 +707,7 @@ export default {
      * @param {String} obj: name of the field inside the property
      * @return {Promise<Boolean>} Whether or not there was an error.
      */
-    storageUrlFetcher: async function (property, obj) {
+    async storageUrlFetcher (property, obj) {
       if (
         this.data[property] && this.data[property][obj] &&
         this.data[property][obj].url
@@ -732,7 +740,7 @@ export default {
      * which creates a dialog when invoked and notifies
      * the user on success/failure.
      */
-    addProgressTag: function () {
+    addProgressTag () {
       this.$q.dialog({
         title: 'Add new tag for progress bar',
         prompt: {
@@ -779,7 +787,7 @@ export default {
      * @param {Integer} index: of the tag to be deleted
      * @return {void}
      */
-    deleteProgressTag: function (index) {
+    deleteProgressTag (index) {
       if (this.data.progressBar.tags.length > 1) {
         this.data.progressBar.tags.splice(index, 1)
 
@@ -798,7 +806,7 @@ export default {
      * @param {void}
      * @return {void}
      */
-    forceUpdate: function () {
+    forceUpdate () {
       this.updated = true
       this.$forceUpdate()
     },
@@ -806,7 +814,7 @@ export default {
      * Helper function to check if this.data.keywords is full (length of 5).
      * @param {Array<String>} keywords: List of keywords.
      */
-    checkMax: function (keywords) {
+    checkMax (keywords) {
       if (keywords.length > 6) {
         this.$q.notify({
           color: 'negative',
@@ -830,7 +838,7 @@ export default {
      * @param {String} obj: Filename of the file to be stored
      *                      inside firebase storage.
      */
-    getBlobAndSubmitFromURL: async function (url, property, obj) {
+    async getBlobAndSubmitFromURL (url, property, obj) {
       try {
         let res = await fetch(url)
         res = await res.blob()
@@ -864,6 +872,7 @@ export default {
           await this.storageUrlFetcher('webpage', 'bannerImg')
           await this.storageUrlFetcher('webpage', 'mainImg')
 
+          this.dbData = (this.data)
           this.counter = 0
           this.updated = false
           this.$emit('submitting', false)
@@ -878,7 +887,7 @@ export default {
      * and cloud functions reference (if applicable).
      * @return {Promise<Blob>} Whether or not there was an error.
      */
-    loadFireRefs: async function () {
+    async loadFireRefs () {
       if (this.$q.localStorage.has('boundless_db')) {
         let sessionDb = this.$q.localStorage.getItem('boundless_db')
 
@@ -918,7 +927,7 @@ export default {
     /**
      * Submit handler for the component.
      */
-    submit: async function () {
+    async submit () {
       this.endCounter = 0
       this.submitted = true
       this.$emit('submitting', true)
@@ -969,6 +978,7 @@ export default {
           await this.storageUrlFetcher('webpage', 'mainImg')
 
           this.$refs.projectCreateCustomForm.saveQuestionTemplates()
+          this.dbData = deepClone(this.data)
           setTimeout(() => {
             this.updated = false
 
@@ -985,7 +995,7 @@ export default {
      * @param {String} type: type of the field to be assigned.
      * @param {String} field: filed of the object to be assigned.
      */
-    filePickerOnChange: function (type, field) {
+    filePickerOnChange (type, field) {
       const eventHandler = (e, type, field) => {
         const file = e.target.files[0]
         let fToken = field.split('.')
@@ -1031,21 +1041,26 @@ export default {
      */
     confirmUnload (event) {
       if (!this.submitted && this.canSave()) {
-        // Cancel the event
-        event.preventDefault() // If you prevent default behavior in Mozilla Firefox prompt will always be shown
-        // Chrome requires returnValue to be set
+        // Cancel the event.
+        // If you prevent default behavior in Mozilla Firefox prompt will always be shown.
+        event.preventDefault()
+        // Chrome requires returnValue to be set.
         event.returnValue = 'You should keep this page open.'
       }
     },
-    /** Undo's local changes */
+    /** Undo's local changes if there are changes to be saved. */
     reset () {
-      this.$q.dialog({
-        title: 'Confirm',
-        message: 'Would you like undo all unsaved changes?',
-        cancel: true
-      }).onOk(() => {
-        this.$refs.projectCreateCustomForm.resetQuestionTemplates()
-      })
+      if (this.canSave()) {
+        this.$q.dialog({
+          title: 'Confirm',
+          message: 'Would you like undo all unsaved changes?',
+          cancel: true
+        }).onOk(() => {
+          this.$refs.projectCreateCustomForm.resetQuestionTemplates()
+          Vue.set(this.$data, 'data', deepClone(this.dbData))
+          this.updated = false
+        })
+      }
     }
   }
 }
