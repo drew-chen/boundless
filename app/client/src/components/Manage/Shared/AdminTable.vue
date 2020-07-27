@@ -87,11 +87,6 @@ Methods:
             <q-checkbox v-model="props.selected"/>
           </q-th>
           <q-th
-            auto-width
-            class="table-header">
-            <q-checkbox v-model="props.selected"/>
-          </q-th>
-          <q-th
             v-for="col in props.cols"
             :key="col.name"
             :props="props"

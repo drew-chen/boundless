@@ -122,6 +122,12 @@ export default {
           this.$emit('submittedSuccessfully')
         }
       })
+    },
+    /** Deletes input from each form locally. Does not modify Vuex store. */
+    reset () {
+      this.questions.forEach(question => {
+        question.response = ''
+      })
     }
   }
 }
