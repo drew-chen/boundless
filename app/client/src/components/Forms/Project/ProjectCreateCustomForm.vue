@@ -13,13 +13,16 @@ Name:     components/Forms/Project/ProjectCreateCustomForm.vue
 
 Purpose:  Form configures 'ProjectCustomForm.vue'.
 
-Methods:  Admin goes through this form which creates an array that
-          'ProjectCustomForm.vue' can display. Questions support CRUD operations
-          and can be reordered through drag and dropping them. This array is
-          saved in vuex and submitted to the db in a vuex action. Submission
-          is only possible when this array is diffrent the version already
-          in Vuex. Submission is triggered in the parent component:
-          'Config.vue'.
+Methods:
+
+  Admin goes through this form which creates an array that
+  'ProjectCustomForm.vue' can display. Questions support CRUD operations
+  and can be reordered through drag and dropping them. This array is
+  saved in vuex and submitted to the db in a vuex action. Submission
+  is only possible when this array is diffrent the version already
+  in Vuex. Submission is triggered in the parent component:
+  'Config.vue'.
+
 ## -->
 
 <template>

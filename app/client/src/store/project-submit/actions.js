@@ -10,14 +10,17 @@
 ## OR CONDITIONS OF ANY KIND, either express or implied.
 
 Name:     store/project-submit/actions.js
+Purpose:
 
-Purpose:  Actions for the project-submit Vuex module. Methods here are
-          responsible for large database interactions or grouping mutations.
+  Actions for the project-submit Vuex module. Methods here are
+  responsible for large database interactions or grouping mutations.
 
-Methods:  Firebase and Vuex are    both modified here and should be in sync.
-          The general flow is to load information from the database then
-          commit mutations to keep the state up to date. Or, to commit mutations
-          then update Firebase to keep Firebase up to date.
+Methods:
+
+  Firebase and Vuex are    both modified here and should be in sync.
+  The general flow is to load information from the database then
+  commit mutations to keep the state up to date. Or, to commit mutations
+  then update Firebase to keep Firebase up to date.
 
 ## */
 
@@ -97,7 +100,7 @@ export async function loadConfig ({ commit, getters }) {
 }
 
 /**
-  * load the user list from the db and store the data into component state
+  * Load the user list from the db and store the data into component state.
   *
   * Previous versions of this functions return true if there was an error
   * and false other wise. This has been removed on 7/22/2020 since the purpose

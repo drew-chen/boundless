@@ -11,12 +11,16 @@
 
 Name:     components/Forms/Project/ProjectCustomForm.vue
 
-Purpose:  Custom form designed by the admin in 'ProjectCreateCustomForm.vue'.
-          Displays custom questions in order selected by admin.
+Purpose:
 
-Methods:  Displays the template saved in Vuex. The user inputs their responses
-          which are initially only saved locally. When the user moves onto the
-          next form and the data is valid, it is saved to Vuex.
+  Custom form designed by the admin in 'ProjectCreateCustomForm.vue'.
+  Displays custom questions in order selected by admin.
+
+Methods:
+
+  Displays the template saved in Vuex. The user inputs their responses
+  which are initially only saved locally. When the user moves onto the
+  next form and the data is valid, it is saved to Vuex.
 
 ## -->
 
@@ -103,24 +107,20 @@ export default {
   },
   methods: {
     ...mapMutations(['setQuestions']),
+    /** Saves a copy of responses to Vuex. */
     saveToVuex () {
       this.setQuestions(cloneDeep(this.questions))
     },
+    /**
+     * When all form inputs are valid and when submit button is clicked,
+     * save to vuex and tell the parent component to advance the stepper.
+     */
     submit () {
-      /**
-       * When all form inputs are valid and when submit button is clicked,
-       * save to vuex and tell the parent component to advance the stepper.
-       */
       this.$refs.form.validate().then(success => {
         if (success) {
           this.saveToVuex()
           this.$emit('submittedSuccessfully')
         }
-      })
-    },
-    reset () {
-      this.questions.forEach(question => {
-        question.response = ''
       })
     }
   }

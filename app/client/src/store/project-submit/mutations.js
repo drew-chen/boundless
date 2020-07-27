@@ -10,13 +10,16 @@
 ## OR CONDITIONS OF ANY KIND, either express or implied.
 
 Name:     store/project-submit/mutations.js
+Purpose:
 
-Purpose:  Mutations for the project-submit Vuex module. Allows for direct,
-          synchronous changes to the state.
+  Mutations for the project-submit Vuex module. Allows for direct,
+  synchronous changes to the state.
 
-Methods:  Directly assigns payload to state. To avoid unwanted mutations,
-          the input payload can be copied so that the caller doesn't
-          accidentally mutate state without first going through here.
+Methods:
+
+  Directly assigns payload to state. To avoid unwanted mutations,
+  the input payload can be copied so that the caller doesn't
+  accidentally mutate state without first going through here.
 
 ## */
 

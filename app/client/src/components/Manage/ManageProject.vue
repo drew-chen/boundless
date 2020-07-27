@@ -9,13 +9,9 @@
 ## under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES
 ## OR CONDITIONS OF ANY KIND, either express or implied.
 
-Name:     components/Admin/ManageProject.vue
-Purpose:  Display, edit, add, and delete project from the admin console
-Methods:
-  * Allows the project to be added
-  * Allows the project to be deleted
-  * Allows the project to be edited
-  * Display the list of chanllenges in a table
+Name:     components/Manage/ManageProject.vue
+Purpose:  Display, edit, add, and delete project from the admin console.
+Methods:  Performs purpose by configuring 'AdminTable.vue'.
 
 ## -->
 
@@ -27,7 +23,7 @@ Methods:
 </template>
 
 <script>
-import AdminTable from '../Admin/Shared/AdminTable'
+import AdminTable from '../Manage/Shared/AdminTable'
 
 export default {
   components: {

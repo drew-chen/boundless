@@ -11,11 +11,15 @@
 
 Name:     components/Forms/Proejct/ProjectReviewForm.vue
 
-Purpose:  Read only view that allows user to review their input and decide
-          whether or not to submit.
+Purpose:
 
-Methods:  Accesses input from Vuex getters. Final project submission is handled
-          by the parent component: 'SubmitProject.vue'.
+  Read only view that allows user to review their input and decide
+  whether or not to submit.
+
+Methods:
+
+  Accesses input from Vuex getters. Final project submission is handled
+  by the parent component: 'SubmitProject.vue'.
 
 ## -->
 

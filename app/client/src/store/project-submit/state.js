@@ -10,9 +10,7 @@
 ## OR CONDITIONS OF ANY KIND, either express or implied.
 
 Name:     store/project-submit/state.js
-
 Purpose:  Centralized source data related to project submission.
-
 Methods:  Data is stored as an object tree.
 
 ## */

@@ -10,9 +10,7 @@
 ## OR CONDITIONS OF ANY KIND, either express or implied.
 
 Name:     store/project-submit/index.js
-
-Purpose:  Glues the module together
-
+Purpose:  Glues the module together.
 Methods:  Imports separate files then exports them together.
 
 ## */

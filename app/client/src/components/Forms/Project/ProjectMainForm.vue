@@ -11,18 +11,22 @@ q<!-- ##
 
 Name:     components/Forms/Project/ProjectMainForm.vue
 
-Purpose:  Form to allow the users to submit projects which are
-          either addressing certain challenge or personally hobby projects
-          that the user wishes to show off. Data here does not mutate
-          Vuex store until form is submitted.
+Purpose:
 
-Methods:  First, some initial data, such as keyword options, are loaded. Then,
-          the user fills out the project form. Unlike 'ProjectCustomForm.vue',
-          some of the input fields here are always mandatory. Input is stored
-          as local component level data until validated and submitted to Vuex
-          when the user continues to the next form. The forms don't have a
-          two-way binding with Vuex state to prevent mutations that were not
-          caused by Vuex.
+  Form to allow the users to submit projects which are
+  either addressing certain challenge or personally hobby projects
+  that the user wishes to show off. Data here does not mutate
+  Vuex store until form is submitted.
+
+Methods:
+
+  First, some initial data, such as keyword options, are loaded. Then,
+  the user fills out the project form. Unlike 'ProjectCustomForm.vue',
+  some of the input fields here are always mandatory. Input is stored
+  as local component level data until validated and submitted to Vuex
+  when the user continues to the next form. The forms don't have a
+  two-way binding with Vuex state to prevent mutations that were not
+  caused by Vuex.
 
 ## -->
 
@@ -675,15 +679,12 @@ export default {
       'setProjectMembers',
       'setWebpage'
     ]),
+    /**
+     * Submits the project once all the required fields are checked,
+     * creates the new users who are not in the db, and notifies
+     * the user on both success and failure.
+     */
     saveToVuex () {
-      /**
-       * Submits the project once all the required fields are checked,
-       * creates the new users who are not in the db, and notifies
-       * the user on both success and failure
-       * @param {void}
-       * @return {void}
-       */
-      // variables for project submission
       try {
         if (this.chosenKeywords.length === 0) {
           this.chosenKeywords.push('tbd')
@@ -707,11 +708,11 @@ export default {
         throw new Error(error)
       }
     },
+    /**
+      * When all form inputs are valid and when submit button is clicked,
+      * save to vuex and tell the parent component to advance the stepper.
+      */
     submit () {
-      /**
-       * When all form inputs are valid and when submit button is clicked,
-       * save to vuex and tell the parent component to advance the stepper.
-       */
       this.$refs.form.validate().then(success => {
         if (success) {
           this.saveToVuex()
@@ -719,15 +720,13 @@ export default {
         }
       })
     },
+    /**
+     * Check allowed domain for the new users and
+     * notifies the user if the domain is not allowed
+     * @param {String} indexEmail: email at the index
+     * @param {Integer} index: index of the email
+     */
     emailDomainCheck: function (indexEmail, index) {
-      /**
-       * check allowed domain for the new users and
-       * notifies the user if the domain is not allowed
-       * @param {String} indexEmail: email at the index
-       * @param {Integer} index: index of the email
-       * @return {void}
-       */
-
       let validEmail = false
       indexEmail = indexEmail.toLowerCase()
 
@@ -790,14 +789,12 @@ export default {
         }
       }
     },
+    /**
+     * Helper function to help capitalize first character of
+     * the input at a given index and notifies the user on fail
+     * @param {Integer} index: index of the input DOM
+     */
     capitalizeFirstChar: function (index) {
-      /**
-       * helper function to help capitalize first character of
-       * the input at a given index and notifies the user on fail
-       * @param {Integer} index: index of the input DOM
-       * @return {void}
-       */
-
       let nameToken = this.projectMembers[index].name.split(' ')
 
       if (nameToken.length < 2 && nameToken[0] !== '') {
@@ -823,27 +820,21 @@ export default {
         }
       }
     },
+    /**
+     * Adds sponsors with the instantiated values.
+     */
     addContributor: function () {
-      /**
-       * adds sponsors with the instantiated values
-       * @param {void}
-       * @return {void}
-       */
-
       this.projectMembers.push({
         name: '',
         email: '',
         role: 'member'
       })
     },
+    /**
+     * Allow the user to add custom content on the body section
+     * which will be displayed on their individual webpage.
+     */
     addCustomField: function () {
-      /**
-       * allow the user to add custom content on the body section
-       * which will be displayed on their individual webpage
-       * @param {void}
-       * @return {void}
-       */
-
       let tmpBody = {}
 
       if (this.bodyType.value === 'TEXT_BOX') {
@@ -889,14 +880,11 @@ export default {
       tmpBody['hidden'] = false
       this.webpage.body.push(tmpBody)
     },
+    /**
+     * Allow the user to add custom chip for the chips section
+     * which will be displayed on their individual webpage.
+     */
     addChip: function () {
-      /**
-       * allow the user to add custom chip for the chips section
-       * which will be displayed on their individual webpage
-       * @param {void}
-       * @return {void}
-       */
-
       let tmpChip = {}
 
       if (this.chipType.value === 'SOURCE') {
@@ -929,28 +917,23 @@ export default {
       tmpChip['hidden'] = false
       this.webpage.chips.push(tmpChip)
     },
+    /**
+     * Allows the user to see body content and chips on the Add Challenge page
+     * and notifies the user on success.
+     * TODO: will be deprecated later
+     */
     activateAdmin: function () {
-      /**
-       * allows the user to see body content and chips on the Add Challenge page
-       * and notifies the user on success
-       * TODO: will be deprecated later
-       * @param {void}
-       * @return {void}
-       */
-
       this.adminMode = true
       this.$q.notify({
         message: 'Admin mode activated! Enjoy.',
         color: 'positive'
       })
     },
+    /**
+     * Helper function which resets the input fields of the form and
+     * emits 'added' event when the component is a child component.
+     */
     reset () {
-      /**
-       * Helper function which resets the input fields of the form and
-       * emits 'added' event when the component is a child component.
-       * @param {void}
-       * @return {void}
-       */
       this.$refs.form.resetValidation()
       this.projectName = ''
       this.projectDescription = ''

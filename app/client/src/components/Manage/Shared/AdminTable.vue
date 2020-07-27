@@ -1,4 +1,3 @@
-
 <!-- ##
 ## Copyright (c) 2020 Wind River Systems, Inc.
 ##
@@ -10,12 +9,14 @@
 ## under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES
 ## OR CONDITIONS OF ANY KIND, either express or implied.
 
-Name:     components/Admin/Shared/AdminTable.vue
-Purpose:  Display, edit, add, and delete challenge from the admin console
+Name:     components/Manage/Shared/AdminTable.vue
+Purpose:  Display, edit, add, and delete challenge from the admin console.
 Methods:
 
-  * Allows projects, challenges, or users to be added, deleted, or edited
-  * Display the list of projects, challenges, or users in a table
+  Allows projects, challenges, or users to be added, deleted, or edited.
+  Displays the list of projects, challenges, or users in a table. Since
+  the major difference between projects, challenges, and user is the middle
+  column, AdminTable's middle column is configurable via props.
 
 ## -->
 
@@ -256,7 +257,7 @@ import testingDb, { testAppCall } from '../../../firebase/init_testing'
 
 export default {
   props: {
-    // <String>: Whether this component displays projects, challenges, or users
+    // <String>: Whether this component displays projects, challenges, or users.
     rowType: {
       type: String,
       required: true,
@@ -292,24 +293,26 @@ export default {
     editUser
   },
   computed: {
+    /**
+     * Gets the name of the imported component which adds a row to the admin table.
+     * @return {String} The component name
+     */
     getAddRowComponent () {
-      /**
-       * Gets the name of the imported component which adds a row to the admin table.
-       * @return {String} The component name
-       */
       return `add${this.capitalizeFirst(this.rowType)}`
     },
+    /**
+     * Gets the name of the imported component which edits a row of the admin table.
+     * @return {String} The component name
+     */
     getEditRowComponent () {
-      /**
-       * Gets the name of the imported component which edits a row of the admin table.
-       * @return {String} The component name
-       */
       return `edit${this.capitalizeFirst(this.rowType)}`
     }
   },
+  /**
+   * Fetches row of rowType (project, challenges, or users) and config from db
+   */
   async created () {
     try {
-      // fetching row of rowType (project, challenges, or users) and config from db
       await this.loadFireRefs()
       await this.loadAllRows()
       if (this.useLoadConfig) {
@@ -393,15 +396,12 @@ export default {
     }
   },
   methods: {
+    /**
+     * Load firebase database reference, storage reference (if applicable)
+     * and cloud functions reference (if applicable).
+     * @return {Promise<Boolean>} Whether or not there was an error.
+     */
     loadFireRefs: async function () {
-      /**
-       * load firebase database reference
-       * load firebase storage reference (if applicable)
-       * load firebase cloud functions reference (if applicable)
-       * @param {void}
-       * @return {Promise<Boolean>}
-       */
-
       if (this.$q.localStorage.has('boundless_db')) {
         let sessionDb = this.$q.localStorage.getItem('boundless_db')
 
@@ -444,13 +444,11 @@ export default {
         }
       }
     },
+    /**
+     * Load keywords into this.popkeywords by converting to fit q-option.
+     * @return {Promise<Boolean>} Whether or not there was an error.
+     */
     loadConfig: async function () {
-      /**
-       * load keywords into this.popkeywords by converting to fit q-option
-       * @param {void}
-       * @return {Promise<Boolean>}
-       */
-
       if (this.$q.sessionStorage.has('boundless_config')) {
         let cachedConfig = this.$q.sessionStorage.getItem('boundless_config')
 
@@ -479,13 +477,11 @@ export default {
         }
       }
     },
+    /**
+     * Load all the projects, challenges, or users from the ToC for the admin
+     * console.
+     */
     loadAllRows: async function () {
-      /**
-       * load all the projects, challenges, or users from the ToC for the admin console
-       * @param {void}
-       * @return {Promise<Boolean>}
-       */
-
       try {
         let doc = await this.db.collection(`${this.rowType}s`).doc('ToC').get()
 
@@ -508,15 +504,15 @@ export default {
 
         setTimeout(() => {
           this.loading = false
-
-          return true
         }, 300)
       } catch (error) {
         this.loading = false
-
-        return false
       }
     },
+    /**
+     * Confirms the deletion of selected rows. Uses the 'this.deleteRow'
+     * method to perform the actual deletion, then deselects everything.
+     */
     deleteSelected () {
       if (this.selected.length === 0) {
         this.$q.dialog({
@@ -550,15 +546,15 @@ export default {
         })
       }
     },
+    /**
+     * Deletes projects, challenges, or users from the database and stroage;
+     * notifies the user of the status when compeleted. Works by getting a reference
+     * to the field being deleted then removes (by updating) the field in the document.
+     *
+     * @param {String} entry: uid of the projects, challenges, or users to be removed
+     * @param {String} removedMiddleEntry: The alias or email of the projects, challenges, or users to be removed
+     */
     deleteRow: async function (entry, removedMiddleEntry) {
-      /**
-       * Deletes projects, challenges, or users from the database and stroage;
-       * notifies the user of the status when compeleted. Works by getting a reference
-       * to the field being deleted then removes (by updating) the field in the document.
-       * @param{String} entry: uid of the projects, challenges, or users to be removed
-       * @param {String} removedMiddleEntry: The alias or email of the projects, challenges, or users to be removed
-       * @return {void}
-       */
       if (this.rowList.length < 1) {
         this.$q.dialog({
           title: 'Error',
@@ -607,22 +603,17 @@ export default {
         }
       }
     },
+    /**
+     * Helper function to update the list of projects and close the dialog.
+     */
     updateAllRowsAndClose: function () {
-      /**
-       * helper function to update the list of projects and close the dialog
-       * @param {void}
-       * @return {void}
-       */
       this.updateAllRows()
       this.dialog = false
     },
+    /**
+     * Helper function to refetch row (challenges, projects, or users) list.
+     */
     updateAllRows: function () {
-      /**
-       * helper function to refetch row (challenges, projects, or users) list
-       * @param {void}
-       * @return {void}
-       */
-
       this.loading = true
 
       this.rowList = []
@@ -631,12 +622,12 @@ export default {
 
       this.loadAllRows()
     },
+    /**
+     * Helper function to dialog to invoke editing.
+     * @param {String} uuid: uid of the row (challenges, projects, or users)
+     * @returns {void}
+     */
     editRow: function (uuid) {
-      /**
-       * helper function to dialog to invoke 'edit'
-       * @param {String} uuid: uid of the row (challenges, projects, or users)
-       * @returns {void}
-       */
       let uuidAssigned = false
       if (typeof uuid !== 'undefined') {
         this.uuid = uuid
@@ -653,12 +644,12 @@ export default {
         }, 200)
       }
     },
+    /**
+     * Adds the row clicked to the list of selected rows.
+     * @param {Object} event JS event object
+     * @param {Object} row The row clicked
+     */
     selectRow (row) {
-      /**
-       * Adds the row clicked to the list of selected rows.
-       * @param {Object} event JS event object
-       * @param {Object} row The row clicked
-       */
       if (this.selected.length > 0) {
         let i = 0
         const matched = this.selected.find((item, index) => {
@@ -674,16 +665,16 @@ export default {
         this.selected.push(row)
       }
     },
+    /**
+     * Used to sort columns.
+     * @param {String} a Left string.
+     * @param {String} b Right string.
+     * @return {String} If the return value:
+     * is less than 0 then sort a to an index lower than b, i.e. a comes first
+     * is 0 then leave a and b unchanged with respect to each other, but sorted with respect to all different elements
+     * is greater than 0 then sort b to an index lower than a, i.e. b comes first
+     */
     stringCompare (a, b) {
-      /**
-       * Used to sort columns.
-       * @param {String} a Left string
-       * @param {String} b Right string
-       * @return {String} If the return value:
-       * is less than 0 then sort a to an index lower than b, i.e. a comes first
-       * is 0 then leave a and b unchanged with respect to each other, but sorted with respect to all different elements
-       * is greater than 0 then sort b to an index lower than a, i.e. b comes first
-       */
       a = a.trim()
       a = a.toLowerCase()
       b = b.trim()
@@ -696,22 +687,22 @@ export default {
         return 0
       }
     },
+    /**
+     * Capitlizes the first character of a string.
+     * Used for rowType for certain imports or labels.
+     * @param {String} str The string to be capitlized.
+     * @return {String} The captilized string
+     */
     capitalizeFirst (str) {
-      /**
-       * Capitlizes the first character of a string.
-       * Used for rowType for certain imports or labels.
-       * @param {String} str The string to be capitlized.
-       * @return {String} The captilized string
-       */
       if (typeof str !== 'string') return ''
       return str.charAt(0).toUpperCase() + str.slice(1)
     },
+    /**
+     * Returns the row.propertyName for display if there is one.
+     * @param row {Object} The project, challenge, or user with a potential property of propertyName.
+     * @return {String} The property value.
+     */
     formatProperty (row, propertyName) {
-      /**
-       * Returns the row.propertyName for display if there is one.
-       * @param row {Object} The project, challenge, or user with a potential property of propertyName.
-       * @return {String} The property value.
-       */
       if (row && propertyName && row.hasOwnProperty(propertyName)) {
         return row[propertyName] ? ` (${propertyName}: ${row[propertyName]})` : ''
       }
@@ -744,6 +735,7 @@ export default {
 
 .keyword-dropdown
   min-width: 100px
+
 .table
   max-height: 74vh
   margin-bottom: 0
