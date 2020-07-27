@@ -120,7 +120,13 @@ module.exports = function (ctx) {
           loader: 'eslint-loader',
           exclude: /node_modules/
         })
-      }
+      },
+      /*
+        This is a configuration passed on
+        to the underlying Webpack.
+        For debugging purposes.
+      */
+      devtool: 'source-map'
     },
 
     devServer: {
