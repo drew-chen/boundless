@@ -39,7 +39,7 @@ Methods:
       <div>
         <q-tabs
           dense inline-label
-          class="text-grey" align="justify"
+          class="text-grey" align="center"
           active-color="primary" indicator-color="primary"
           v-model="parentOption"
         >
