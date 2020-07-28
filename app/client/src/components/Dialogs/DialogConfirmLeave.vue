@@ -14,7 +14,8 @@ Purpose:  Wrapper for project submission forms.
 Methods:
 
   Manages the view and submission trigger of multiple child component
-  forms.
+  forms. In order to add routing functionality, routing objects accessed in
+  the parent's routing guards can be passed to any method using $refs.
 
 ## -->
 
@@ -22,11 +23,11 @@ Methods:
   <div class="q-pa-md q-gutter-sm">
     <q-dialog
       persistent
-      v-model="isOpen"
+      v-model="dialogOpen"
     >
       <q-card>
         <q-card-section class="row items-center q-pb-none">
-          <div class="text-h6">Title</div>
+          <div class="text-h6">Confirm</div>
         </q-card-section>
 
         <q-card-section>
@@ -61,21 +62,42 @@ Methods:
 export default {
   props: {
     // <Boolean>: Whether this dialog is open or not.
-    isOpen: {
+    dialogOpen: {
       type: Boolean,
       required: true
     }
   },
+  /** Accessed via refs in parent. */
   methods: {
-    /** Accessed via refs. */
+    /**
+     * When the "save" button is clicked, call the given callback.
+     *
+     * @param {Function} callback Function to be called.
+     * @returns {Object} This component instance to allow method chaining.
+     */
     onSave (callback) {
-
+      callback()
+      return this
     },
+    /**
+     * When the "don't save" button is clicked, call the given callback.
+     *
+     * @param {Function} callback Function to be called.
+     * @returns {Object} This component instance to allow method chaining.
+     */
     onNoSave (callback) {
-
+      callback()
+      return this
     },
+    /**
+     * When the "cancel" button is clicked, call the given callback.
+     *
+     * @param {Function} callback Funtion to be called.
+     * @returns {Object} This component instance to allow method chaining.
+     */
     onCancel (callback) {
-
+      callback()
+      return this
     }
   }
 }

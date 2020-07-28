@@ -74,10 +74,6 @@ Methods:
         </template>
       </q-stepper>
     </q-card>
-    <dialog-confirm-leave
-      :isOpen="isLeaving"
-      ref="dialogConfirmLeave"
-    />
   </q-page>
 </template>
 
@@ -85,7 +81,6 @@ Methods:
 import ProjectMainForm from '../components/Forms/Project/ProjectMainForm.vue'
 import ProjectCustomForm from '../components/Forms/Project/ProjectCustomForm.vue'
 import ProjectReviewForm from '../components/Forms/Project/ProjectReviewForm.vue'
-import DialogConfirmLeave from '../components/Dialogs/DialogConfirmLeave.vue'
 
 import { createNamespacedHelpers } from 'vuex'
 const { mapActions, mapGetters } = createNamespacedHelpers('projectSubmit')
@@ -94,8 +89,7 @@ export default {
   components: {
     ProjectMainForm,
     ProjectCustomForm,
-    ProjectReviewForm,
-    DialogConfirmLeave
+    ProjectReviewForm
   },
   created () {
     window.addEventListener('beforeunload', this.confirmUnload)
@@ -108,22 +102,10 @@ export default {
   },
   data () {
     return {
-      step: 1, // <Integer> Progress counter representing current panel.
-      isLeaving: false // <Boolean> Flag for whether the user is navigating away.
+      step: 1 // <Integer> Progress counter representing current panel.
     }
   },
-  /**
-   * Block leaving with persistent dialog if changes have been made.
-   * View specifics on navigation guards at:
-   * https://router.vuejs.org/guide/advanced/navigation-guards.html#global-before-guards
-   *
-   * @param {Object} to The target Route Object being navigated to.
-   * @param {Object} from The current route being navigated away from.
-   * @param {Function} next This function must be called to resolve the hook.
-   */
-  beforeRouteLeave (to, from, next) {
-    this.isLeaving = true
-  },
+
   methods: {
     ...mapActions([
       'submitProject',

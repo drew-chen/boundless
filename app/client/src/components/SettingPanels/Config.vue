@@ -561,6 +561,12 @@ Methods:
         :undo="reset"
       />
     </div>
+
+    <!-- -------------------- Dialog -------------------- -->
+    <dialog-confirm-leave
+      :dialogOpen="dialogOpen"
+      ref="dialogConfirmLeave"
+    />
   </div>
 </template>
 
@@ -574,6 +580,7 @@ import testingDb, { testingStorage } from '../../firebase/init_testing'
 
 import ProjectCreateCustomForm from '../Forms/Project/ProjectCreateCustomForm.vue'
 import ButtonUndoAndSave from '../Buttons/ButtonUndoAndSave.vue'
+import DialogConfirmLeave from '../Dialogs/DialogConfirmLeave.vue'
 
 export default {
   props: {
@@ -583,7 +590,8 @@ export default {
   },
   components: {
     ProjectCreateCustomForm,
-    ButtonUndoAndSave
+    ButtonUndoAndSave,
+    DialogConfirmLeave
   },
   /**
    * Fetches data and add page leaving event listener. Also initializes
@@ -668,6 +676,26 @@ export default {
   destroyed () {
     window.removeEventListener('beforeunload', this.confirmUnload)
   },
+  /**
+   * Block leaving with persistent dialog if changes have been made.
+   * View specifics on navigation guards at:
+   * https://router.vuejs.org/guide/advanced/navigation-guards.html#global-before-guards
+   *
+   * @param {Object} to The target Route Object being navigated to.
+   * @param {Object} from The current route being navigated away from.
+   * @param {Function} next This function must be called to resolve the hook.
+   */
+  beforeRouteLeave (to, from, next) {
+    this.dialogOpen = this.$refs.projectMainForm.modified
+    this.$refs.dialogConfirmLeave.onSave(() => {
+      this.submit()
+      next()
+    }).onNoSave(() => {
+      next()
+    }).onCancel(() => {
+      next(false)
+    })
+  },
   data () {
     return {
       db: null, // <Object>: firebase firestore credentials
@@ -697,7 +725,8 @@ export default {
        * it detects updates differently (does so by comparing with Vuex instead
        * of on input events). Used in 'this.canSave()'.
        */
-      updated: false
+      updated: false,
+      dialogOpen: false // <Boolean> Flag for whether the dialog should be open.
     }
   },
   methods: {
