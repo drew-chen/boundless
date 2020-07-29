@@ -9,8 +9,8 @@
 ## under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES
 ## OR CONDITIONS OF ANY KIND, either express or implied.
 
-Name:     components/Manage/ManageUser.vue
-Purpose:  Display, edit, add, and delete user from the admin console.
+Name:     components/Manage/ManageUsers.vue
+Purpose:  Display, edit, add, and delete users from the admin console.
 Methods:  Performs purpose by configuring 'AdminTable.vue'.
 
 ## -->

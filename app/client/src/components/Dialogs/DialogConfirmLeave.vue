@@ -27,11 +27,11 @@ Methods:
     >
       <q-card>
         <q-card-section class="row items-center q-pb-none">
-          <div class="text-h6">Confirm</div>
+          <div class="text-h6">Save your changes to settings?</div>
         </q-card-section>
 
         <q-card-section>
-          Lorem ipsum dolor sit amet consectetur adipisicing elit. Rerum repellendus sit voluptate voluptas eveniet porro. Rerum blanditiis perferendis totam, ea at omnis vel numquam exercitationem aut, natus minima, porro labore.
+          You have unsaved changes.
         </q-card-section>
         <q-card-actions align="right">
           <q-btn
@@ -73,7 +73,7 @@ export default {
      * When the "save" button is clicked, call the given callback.
      *
      * @param {Function} callback Function to be called.
-     * @returns {Object} This component instance to allow method chaining.
+     * @returns {Object} This component instance (to allow method chaining).
      */
     onSave (callback) {
       callback()
@@ -83,7 +83,7 @@ export default {
      * When the "don't save" button is clicked, call the given callback.
      *
      * @param {Function} callback Function to be called.
-     * @returns {Object} This component instance to allow method chaining.
+     * @returns {Object} This component instance (to allow method chaining).
      */
     onNoSave (callback) {
       callback()
@@ -93,7 +93,7 @@ export default {
      * When the "cancel" button is clicked, call the given callback.
      *
      * @param {Function} callback Funtion to be called.
-     * @returns {Object} This component instance to allow method chaining.
+     * @returns {Object} This component instance (to allow method chaining).
      */
     onCancel (callback) {
       callback()
