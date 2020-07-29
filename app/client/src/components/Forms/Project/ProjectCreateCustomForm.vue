@@ -137,11 +137,12 @@ export default {
     draggable
   },
   props: {
+    // Represents whether the parent component is handling projects or challenges.
     type: {
       type: String,
       required: true,
       validator (value) {
-        // The value must match one of these strings (can be expanded later).
+        // The value must match one of these strings.
         return ['projects', 'challenges'].indexOf(value) !== -1
       }
     }
