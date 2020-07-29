@@ -584,9 +584,25 @@ import DialogConfirmLeave from './Dialogs/DialogConfirmLeave.vue'
 
 export default {
   props: {
-    keywords: Object,
-    type: String,
-    ratio: String
+    // Dictionary containing keywords
+    keywords: {
+      type: Object,
+      required: true
+    },
+    // Represents whether the parent component is handling projects or challenges.
+    type: {
+      type: String,
+      required: true,
+      validator (value) {
+        // The value must match one of these strings.
+        return ['projects', 'challenges'].indexOf(value) !== -1
+      }
+    },
+    // The forced ratio given to images (used as a q-img prop).
+    ratio: {
+      type: String,
+      required: true
+    }
   },
   components: {
     ProjectCreateCustomForm,

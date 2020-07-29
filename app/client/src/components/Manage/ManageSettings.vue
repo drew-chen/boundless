@@ -74,26 +74,23 @@ Methods:
       </q-tabs>
 
     </template>
+      <template v-slot:after>
+        <q-tab-panel :name="tabSelected">
+          <!-- See ./Settings directory for components. -->
+          <router-view :settingProps="settingProps"></router-view>
+        </q-tab-panel>
+      </template>
 
-        <template v-slot:after>
-          <q-tab-panels v-model="tabSelected">
-            <q-tab-panel v-model="tabSelected">
-              <!-- See ./Settings for components. -->
-              <router-view :settingProps="settingProps"></router-view>
-            </q-tab-panel>
-          </q-tab-panels>
-        </template>
+      <!-- Previously, there was commented out code regarding user settings.
+      Code can be reffered to at this commit at 'Config.vue'.
+      "commit 4ce535e8b372ec9d30792999da13c3e89f84ec1f
+      Author: Htut <phyo.htut@windriver.com>
+      Date:   Wed May 20 17:36:06 2020 -0700
 
-        <!-- Previously, there was commented out code regarding user settings.
-        Code can be reffered to at this commit at 'Config.vue'.
-        "commit 4ce535e8b372ec9d30792999da13c3e89f84ec1f
-        Author: Htut <phyo.htut@windriver.com>
-        Date:   Wed May 20 17:36:06 2020 -0700
+          version 0.6.1 hotfix
 
-            version 0.6.1 hotfix
-
-            Signed-off-by: Htut <phyo.htut@windriver.com>
-        " -->
+          Signed-off-by: Htut <phyo.htut@windriver.com>
+      " -->
   </q-splitter>
 </template>
 
@@ -158,14 +155,14 @@ export default {
           }
         case 'projects':
           return {
-            keywords: this.config.keywords,
+            keywords: this.configs.keywords,
             previewRatio: this.previewRatio,
             consoleLoading: this.consoleLoading,
-            loadChallengeConfig: this.loadProjectConfig
+            loadProjectCOnfig: this.loadProjectConfig
           }
         case 'challenges':
           return {
-            keywords: this.config.keywords,
+            keywords: this.configs.keywords,
             previewRatio: this.previewRatio,
             consoleLoading: this.consoleLoading,
             loadChallengeConfig: this.loadChallengeConfig

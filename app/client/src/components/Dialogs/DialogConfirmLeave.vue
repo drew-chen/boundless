@@ -61,7 +61,7 @@ Methods:
 <script>
 export default {
   props: {
-    // <Boolean>: Whether this dialog is open or not.
+    // Whether this dialog is open or not.
     dialogOpen: {
       type: Boolean,
       required: true

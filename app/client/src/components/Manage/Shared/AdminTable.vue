@@ -252,7 +252,7 @@ import testingDb, { testAppCall } from '../../../firebase/init_testing'
 
 export default {
   props: {
-    // <String>: Whether this component displays projects, challenges, or users.
+    // Whether this component displays projects, challenges, or users.
     rowType: {
       type: String,
       required: true,
@@ -262,18 +262,18 @@ export default {
         'user'
       ].includes(prop)
     },
-    // <String>: Label name and row property name of the middle column.
+    // Label name and row property name of the middle column.
     // see ManageChallenge.vue and this.columns for examples.
     middleColumn: {
       required: true,
       type: String
     },
-    // <Boolean> Whether keywords are used. Keywords are currently only used for projects and challenges, not users.
+    // Whether keywords are used. Keywords are currently only used for projects and challenges, not users.
     useLoadConfig: {
       type: Boolean,
       default: true
     },
-    // <String> The name of the row key used by q-table. It is also used as an id when a row doesn't have a uuid.
+    // The name of the row key used by q-table. It is also used as an id when a row doesn't have a uuid.
     rowKey: {
       type: String,
       default: 'uuid'
