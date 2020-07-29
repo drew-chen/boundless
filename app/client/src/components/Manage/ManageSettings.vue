@@ -37,32 +37,34 @@ Methods:
         class="text-primary q-mr-sm ap-left-panel"
         indicator-color="secondary"
         active-color="secondary"
-        v-model="optionTab"
       >
-        <q-tab
-          no-caps
-          name="general" label="General"
+        <q-route-tab
+          no-caps exact
+          label="General"
           style="justify-content: left;"
+          to="/admin/console/settings/general"
         />
         <q-separator />
-        <q-tab
-          no-caps
-          name="database" label="Database"
+        <q-route-tab
+          no-caps exact
+          label="Database"
           style="justify-content: left;"
+          to="/admin/console/settings/database"
         />
         <q-separator />
-        <q-tab
+        <q-route-tab
+          no-caps exact
           v-if="layoutConfig && layoutConfig.challenges"
-          no-caps
-          name="challenges" label="Challenges"
+          label="Challenges"
           style="justify-content: left;"
+          to="/admin/console/settings/challenges"
         />
         <q-separator />
-
-        <q-tab
-          no-caps
+        <q-route-tab
+          no-caps exact
           name="projects" label="Projects"
           style="justify-content: left;"
+          to="/admin/console/settings/projects"
         />
 
       </q-tabs>
@@ -71,70 +73,10 @@ Methods:
 
     <template v-slot:after>
       <q-tab-panels v-model="optionTab">
-        <!-- ---------- Managing Data from Database ---------- -->
-        <q-tab-panel name="database">
-          <div class="text-h4">
-            Database
-            <q-separator color="secondary" />
-          </div>
-          <div class="q-mb-sm q-ml-md">
-            ({{ dbId }})
-          </div>
-
-          <q-page>
-            <ManageDatabase
-              @importingToDB="consoleLoading"
-              @databaseId="loadDatabaseId"
-            />
-
-            <div
-              class="q-px-sm q-mt-lg"
-              :hidden="!layoutConfig.switchDatabase"
-            >
-              <div class="q-pb-sm">
-                <b class="text-h6">Switch Database</b>
-                <q-separator color="secondary" />
-              </div>
-
-              <q-btn-toggle
-                push no-caps
-                toggle-color="positive"
-                :options="[
-                  {label: 'Primary', value: 'production'},
-                  {label: 'Test', value: 'testing'}
-                ]"
-                v-model="db"
-                @input="switchDatabase"
-              />
-            </div>
-          </q-page>
+        <q-tab-panel>
+          <router-view></router-view>
         </q-tab-panel>
 
-        <!-- ---------------- Challenge Settings ----------------- -->
-        <q-tab-panel name="challenges">
-          <div v-if="configs.challenges">
-            <SettingsConfigPanel
-              :keywords="configs.keywords"
-              :type="'challenges'"
-              :ratio="previewRatio"
-              @submitting="consoleLoading"
-              @submitted="loadChallengeConfig"
-            />
-          </div>
-        </q-tab-panel>
-
-        <!-- ----------------- Project Settings ------------------ -->
-        <q-tab-panel name="projects">
-          <div v-if="configs.projects">
-            <SettingsConfigPanel
-              :keywords="configs.keywords"
-              :type="'projects'"
-              :ratio="previewRatio"
-              @submitting="consoleLoading"
-              @submitted="loadProjectConfig"
-            />
-          </div>
-        </q-tab-panel>
         <!-- Previously, there was commented out code regarding user settings.
         Code can be reffered to at this commit at 'Config.vue'.
         "commit 4ce535e8b372ec9d30792999da13c3e89f84ec1f
@@ -145,20 +87,6 @@ Methods:
 
             Signed-off-by: Htut <phyo.htut@windriver.com>
         " -->
-
-        <!-- ------------------ System Settings ------------------ -->
-        <q-tab-panel name="general">
-          <div>
-            <SystemSettings
-              @usersConfigInfo="loadUserConfig"
-              @challengesConfigInfo="loadChallengeConfig"
-              @projectsConfigInfo="loadProjectConfig"
-              @keywords="loadKeywords"
-              @submitting="consoleLoading"
-            />
-          </div>
-        </q-tab-panel>
-      </q-tab-panels>
     </template>
 
   </q-splitter>
@@ -167,21 +95,10 @@ Methods:
 <script>
 import { layoutConfig } from '../../boundless.config'
 
-import SystemSettings from '../components/SystemSettings'
-import ManageDatabase from '../components/GetDataFromFirestore'
-import SettingsConfigPanel from '../components/SettingPanels/Config'
-// import SettingsUsersPanel from '../components/SettingPanels/Users'
-
 export default {
   components: {
-    SystemSettings,
-    ManageDatabase,
-    SettingsConfigPanel
-    // SettingsUsersPanel,
   },
   created () {
-    // TODO: handle inside routes
-    // route guarding for the component
     if (this.$q.sessionStorage.has('admin_token')) {
       this.notFound = false
     } else {
@@ -213,7 +130,6 @@ export default {
     return {
       notFound: false, // <Boolean>: flag for 404
       layoutConfig: null, // <Object>: dictionary of layout values
-      optionTab: 'general', // <String>: name of the option tab
       splitterModel: 15, // <Number>: % of vw that left splitter is located
       db: null, // <String>: name of the database
       dbId: null, // <String>: project id of the firebase cred
