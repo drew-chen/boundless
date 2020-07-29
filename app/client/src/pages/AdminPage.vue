@@ -45,7 +45,6 @@ Methods:
           align="justify"
           active-color="primary"
           indicator-color="primary"
-          v-model="parentOption"
         >
           <q-route-tab
             no-caps exact
@@ -66,7 +65,7 @@ Methods:
             no-caps
             label="Users"
             icon="person"
-            to="/admin/console/manage-userqs"
+            to="/admin/console/manage-users"
           />
 
           <q-route-tab
@@ -91,7 +90,6 @@ Methods:
 
 <script>
 import { layoutConfig } from '../../boundless.config'
-
 
 import NotFound from './Error404'
 
@@ -133,18 +131,7 @@ export default {
     return {
       notFound: false, // <Boolean>: flag for 404
       layoutConfig: null, // <Object>: dictionary of layout values
-      optionTab: 'general', // <String>: name of the option tab
-      splitterModel: 15, // <Number>: % of vw that left splitter is located
       db: null, // <String>: name of the database
-      dbId: null, // <String>: project id of the firebase cred
-      parentOption: 'projects', // <String>: name of the parent tab
-      previewRatio: '5', // <String>: ratio for preview of imges in child
-      configs: { // <Object<Object>>: configuration records of all collections
-        users: {}, // <Object>: configuration record for users
-        projects: {}, // <Object>: configuration record for projects
-        challenges: {}, // <Object>: configuration record for challenges
-        keywords: {} // <Object>: dictionary containing keywords
-      },
       haltConsole: false // <Boolean>: flag for loading animation
     }
   },
@@ -170,76 +157,6 @@ export default {
           this.layoutConfig.homeURL = storedConfig.wikiInfo.url || ''
         }
       }
-    },
-    /**
-     * Handle page loading via child event.
-     * @param {String} databaseId: Project id of the firebase cred.
-     */
-    loadDatabaseId: function (databaseId) {
-      this.dbId = databaseId
-    },
-    /**
-     * Load keywords from the child component and convert to
-     * map to assign as one of the object inside this.configs var
-     * @param {Object} val: Event emitter value containing keywords
-     *  from database.
-     */
-    loadKeywords: function (val) {
-      if (val) {
-        this.configs.keywords = {}
-
-        for (let key in val) {
-          this.configs.keywords[key] = val[key]
-        }
-      }
-    },
-    /**
-     * Load project configuartion from the child component and
-     * assign as one of the object inside this.configs var.
-     * @param {Object} val: Event emitter value containing
-     *  database information.
-     */
-    loadProjectConfig: function (val) {
-      if (val) {
-        this.configs.projects = val
-      }
-    },
-    /**
-     * Load challenge configuartion from the child component and
-     * assign as one of the object inside this.configs var
-     * @param {Object} val: Event emitter value containing
-     *                      database information.
-     */
-    loadChallengeConfig: function (val) {
-      if (val) {
-        this.configs.challenges = val
-      }
-    },
-    /**
-     * Load user configuartion from the child component and assign
-     * as one of the object inside this.configs var.
-     * @param {Object} val: Event emitter value contating database information.
-     */
-    loadUserConfig: function (val) {
-      if (val) {
-        val.list = val.list.sort(
-          (a, b) => a.value < b.value ? -1 : 1
-        )
-        this.configs.users.socialNetwork = val
-      }
-    },
-    /**
-     * Switch database namespace and reload the page.
-     */
-    switchDatabase: function () {
-      this.$q.localStorage.set('boundless_db', this.db)
-
-      if (this.$q.sessionStorage.has('boundless_timeout')) {
-        this.$q.sessionStorage.remove('boundless_timeout')
-        this.$q.sessionStorage.remove('boundless_config')
-      }
-
-      this.$router.go()
     }
   }
 }
