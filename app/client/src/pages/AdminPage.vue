@@ -39,26 +39,46 @@ Methods:
       <div>
         <q-tabs
           dense inline-label
-          class="text-grey" align="center"
-          active-color="primary" indicator-color="primary"
+          class="text-grey"
+          align="justify"
+          active-color="primary"
+          indicator-color="primary"
           v-model="parentOption"
         >
-          <q-tab
-            no-caps icon="img:statics/images/projects-icon.png"
-            name="projects" label="Projects"
-          >
-          </q-tab>
-
-          <q-tab
-            v-if="layoutConfig && layoutConfig.challenges"
-            no-caps icon="img:statics/images/challenge-icon1.png"
-            name="challenges" label="Challenges"
+          <q-route-tab
+            no-caps exact
+            icon="img:statics/images/projects-icon.png"
+            label="Projects"
+            to="/admin/console/manage-projects"
           />
 
-          <q-tab no-caps name="users" label="Users" icon="person"/>
+          <q-route-tab
+            no-caps
+            v-if="layoutConfig && layoutConfig.challenges"
+            icon="img:statics/images/challenge-icon1.png"
+            label="Challenges"
+            to="/admin/console/manage-challenges"
+          />
 
-          <q-tab no-caps name="systems" label="Settings" icon="settings"/>
+          <q-route-tab
+            no-caps
+            label="Users"
+            icon="person"
+            to="/admin/console/manage-userqs"
+          />
+
+          <q-route-tab
+            no-caps
+            label="Settings"
+            icon="settings"
+            to="/admin/console/settings"
+          />
+
         </q-tabs>
+        <!-- Add transition -->
+        <div class="q-pa-xs console-content-tab">
+          <router-view></router-view>
+        </div>
 
         <!-- -------------------- Tab Content -------------------- -->
         <q-tab-panels
@@ -66,29 +86,6 @@ Methods:
           keep-alive animated
           transition-next="fade" transition-prev="fade"
         >
-          <!-- -------------------- Project Tab Content -------------------- -->
-          <q-tab-panel name="projects">
-            <div class="q-pa-xs console-content-tab">
-              <ManageProjects />
-            </div>
-          </q-tab-panel>
-
-          <!-- ------------------- Challenge Tab Content ------------------- -->
-          <q-tab-panel
-            v-if="layoutConfig && layoutConfig.challenges"
-            name="challenges"
-          >
-            <div class="q-pa-xs console-content-tab">
-              <ManageChallenges />
-            </div>
-          </q-tab-panel>
-
-          <!-- -------------------- Users Tab Content -------------------- -->
-          <q-tab-panel name="users">
-            <div class="q-pa-xs console-content-tab">
-              <ManageUsers />
-            </div>
-          </q-tab-panel>
 
           <!-- ------------------- Settings Tab Content -------------------- -->
           <q-tab-panel name="systems">
@@ -106,7 +103,7 @@ Methods:
                   active-color="secondary"
                   v-model="optionTab"
                 >
-                  <q-tab
+                  <q-route-tab
                     no-caps
                     name="general" label="General"
                     style="justify-content: left;"
@@ -301,26 +298,16 @@ Methods:
 <script>
 import { layoutConfig } from '../../boundless.config'
 
-import ManageProjects from '../components/Manage/ManageProject'
-import ManageChallenges from '../components/Manage/ManageChallenge'
-import ManageUsers from '../components/Manage/ManageUser'
-
 import SystemSettings from '../components/SystemSettings'
 import ManageDatabase from '../components/GetDataFromFirestore'
-import SettingsConfigPanel from '../components/SettingPanels/Config'
 // import SettingsUsersPanel from '../components/SettingPanels/Users'
 
 import NotFound from './Error404'
 
 export default {
   components: {
-    ManageProjects,
-    ManageChallenges,
-    ManageUsers,
     SystemSettings,
     ManageDatabase,
-    SettingsConfigPanel,
-    // SettingsUsersPanel,
     NotFound
   },
   created () {
