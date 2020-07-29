@@ -9,24 +9,28 @@
 ## under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES
 ## OR CONDITIONS OF ANY KIND, either express or implied.
 
-Name:     components/SettingPanels/Users.vue
-Purpose:  Currently empty and for future release
-Methods:
+Name:     components/Manage/ManageChallenges.vue
+Purpose:  Display, edit, add, and delete challenges from the admin console.
+Methods:  Performs purpose by configuring 'AdminTable.vue'.
 
 ## -->
 
 <template>
-  
+  <admin-table
+    rowType="challenge"
+    middleColumn="alias"
+  />
 </template>
 
 <script>
-export default {
-  data () {
-    return {
+import AdminTable from '../Manage/Shared/AdminTable'
 
-    }
+export default {
+  components: {
+    AdminTable
   }
 }
+
 </script>
 
 <style lang="stylus">

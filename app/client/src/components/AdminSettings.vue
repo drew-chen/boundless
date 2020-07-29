@@ -9,7 +9,7 @@
 ## under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES
 ## OR CONDITIONS OF ANY KIND, either express or implied.
 
-Name:     components/SettingPanels/Config.vue
+Name:     components/AdminSettings.vue
 Purpose:
 
   To allow the user configure project/challenge UI via a config panel
@@ -219,7 +219,7 @@ Methods:
                       v-if="type === 'challenges'"
                       contain
                       class="center-img"
-                      :src="`../statics/${staticImages.challenges.tableBanner}`"
+                      :src="`./statics/${staticImages.challenges.tableBanner}`"
                       :ratio="ratio"
                       style="max-height: 22vh;"
                     >
@@ -232,7 +232,7 @@ Methods:
                       v-else
                       contain
                       class="center-img"
-                      :src="`../statics/${staticImages.projects.tableBanner}`"
+                      :src="`./statics/${staticImages.projects.tableBanner}`"
                       :ratio="ratio"
                       style="max-height: 22vh;"
                     >
@@ -283,7 +283,7 @@ Methods:
                       v-if="type === 'challenges'"
                       contain
                       class="center-img"
-                      :src="`../statics/${staticImages.challenges.tableBanner}`"
+                      :src="`./statics/${staticImages.challenges.tableBanner}`"
                       :ratio="ratio"
                       style="max-height: 15vh;"
                     >
@@ -296,7 +296,7 @@ Methods:
                       v-else
                       contain
                       class="center-img"
-                      :src="`../statics/${staticImages.projects.tableBanner}`"
+                      :src="`./statics/${staticImages.projects.tableBanner}`"
                       :ratio="ratio"
                       style="max-height: 15vh;"
                     >
@@ -373,7 +373,7 @@ Methods:
                       v-if="type === 'challenges'"
                       contain
                       class="center-img"
-                      :src="`../statics/${staticImages.challenges.webBanner}`"
+                      :src="`./statics/${staticImages.challenges.webBanner}`"
                       :ratio="ratio"
                       style="max-height: 22vh;"
                     >
@@ -386,7 +386,7 @@ Methods:
                       v-else
                       contain
                       class="center-img"
-                      :src="`../statics/${staticImages.projects.webBanner}`"
+                      :src="`./statics/${staticImages.projects.webBanner}`"
                       :ratio="ratio"
                       style="max-height: 22vh;"
                     >
@@ -429,7 +429,7 @@ Methods:
                       v-if="type === 'challenges'"
                       contain
                       class="center-img"
-                      :src="`../statics/${staticImages.challenges.webBanner}`"
+                      :src="`./statics/${staticImages.challenges.webBanner}`"
                       :ratio="ratio"
                       style="max-height: 15vh;"
                     >
@@ -442,7 +442,7 @@ Methods:
                       v-else
                       contain
                       class="center-img"
-                      :src="`../statics/${staticImages.projects.webBanner}`"
+                      :src="`./statics/${staticImages.projects.webBanner}`"
                       :ratio="ratio"
                       style="max-height: 15vh;"
                     >
@@ -492,7 +492,7 @@ Methods:
                     <q-img
                       contain
                       class="center-img"
-                      src="../../statics/images/computer-keyboard.jpg"
+                      src="../statics/images/computer-keyboard.jpg"
                       :ratio="ratio"
                       style="max-height: 22vh;"
                     >
@@ -534,7 +534,7 @@ Methods:
                     <q-img
                       contain
                       class="center-img"
-                      src="../../statics/images/computer-keyboard.jpg"
+                      src="../statics/images/computer-keyboard.jpg"
                       :ratio="ratio"
                       style="max-height: 15vh;"
                     >
@@ -573,14 +573,14 @@ Methods:
 <script>
 import deepClone from 'lodash.clonedeep'
 import Vue from 'vue'
-import { defaultImages } from '../../../boundless.config'
+import { defaultImages } from '../../boundless.config'
 
-import productionDb, { productionStorage } from '../../firebase/init_production'
-import testingDb, { testingStorage } from '../../firebase/init_testing'
+import productionDb, { productionStorage } from '../firebase/init_production'
+import testingDb, { testingStorage } from '../firebase/init_testing'
 
-import ProjectCreateCustomForm from '../Forms/Project/ProjectCreateCustomForm.vue'
-import ButtonUndoAndSave from '../Buttons/ButtonUndoAndSave.vue'
-import DialogConfirmLeave from '../Dialogs/DialogConfirmLeave.vue'
+import ProjectCreateCustomForm from './Forms/Project/ProjectCreateCustomForm.vue'
+import ButtonUndoAndSave from './Buttons/ButtonUndoAndSave.vue'
+import DialogConfirmLeave from './Dialogs/DialogConfirmLeave.vue'
 
 export default {
   props: {
