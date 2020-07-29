@@ -54,6 +54,8 @@ const routes = [
     children: [
       {
         path: 'console',
+        // Default route.
+        redirect: 'console/manage-projects',
         component: () => import('pages/AdminPage.vue'),
         children: [
           {
@@ -70,7 +72,27 @@ const routes = [
           },
           {
             path: 'settings',
-            component: () => import('components/AdminSettings.vue')
+            // Default route.
+            redirect: 'settings/general',
+            component: () => import('components/Manage/ManageSettings.vue'),
+            children: [
+              {
+                path: 'general',
+                component: () => import('components/Manage/Settings/SettingsGeneral.vue')
+              },
+              {
+                path: 'database',
+                component: () => import('components/Manage/Settings/SettingsDatabase.vue')
+              },
+              {
+                path: 'projects',
+                component: () => import('components/Manage/Settings/SettingsProjects.vue')
+              },
+              {
+                path: 'challenges',
+                component: () => import('components/Manage/Settings/SettingsChallenges.vue')
+              }
+            ]
           }
         ]
       }

@@ -56,19 +56,19 @@ Methods:
         <q-separator />
         <q-route-tab
           no-caps exact
+          label="Projects"
+          name="projects"
+          style="justify-content: left;"
+          to="/admin/console/settings/projects"
+        />
+        <q-separator />
+        <q-route-tab
+          no-caps exact
           v-if="layoutConfig && layoutConfig.challenges"
           label="Challenges"
           name="challenges"
           style="justify-content: left;"
           to="/admin/console/settings/challenges"
-        />
-        <q-separator />
-        <q-route-tab
-          no-caps exact
-          label="Projects"
-          name="projects"
-          style="justify-content: left;"
-          to="/admin/console/settings/projects"
         />
 
       </q-tabs>
@@ -76,11 +76,11 @@ Methods:
     </template>
 
         <template v-slot:after>
-          <q-tab-panels v-model="optionTab">
-        <q-tab-panel>
-          <!-- See ./Settings for components. -->
-          <router-view :settingProps="settingProps"></router-view>
-        </q-tab-panel>
+          <q-tab-panels v-model="tabSelected">
+            <q-tab-panel v-model="tabSelected">
+              <!-- See ./Settings for components. -->
+              <router-view :settingProps="settingProps"></router-view>
+            </q-tab-panel>
           </q-tab-panels>
         </template>
 
@@ -94,13 +94,11 @@ Methods:
 
             Signed-off-by: Htut <phyo.htut@windriver.com>
         " -->
-    </template>
-
   </q-splitter>
 </template>
 
 <script>
-import { layoutConfig } from '../../boundless.config'
+import { layoutConfig } from '../../../../client/boundless.config'
 
 export default {
   created () {
@@ -158,19 +156,19 @@ export default {
             db: this.db,
             switchDatabase: this.switchDatabase
           }
-        case 'challenges':
-          return {
-            keywords: this.config.keywords,
-            previewRatio: this.previewRatio,
-            consoleLoading: this.consoleLoading,
-            loadChallengeConfig: this.loadChallengeConfig
-          }
         case 'projects':
           return {
             keywords: this.config.keywords,
             previewRatio: this.previewRatio,
             consoleLoading: this.consoleLoading,
             loadChallengeConfig: this.loadProjectConfig
+          }
+        case 'challenges':
+          return {
+            keywords: this.config.keywords,
+            previewRatio: this.previewRatio,
+            consoleLoading: this.consoleLoading,
+            loadChallengeConfig: this.loadChallengeConfig
           }
         default:
           return {}
