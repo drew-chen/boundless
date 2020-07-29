@@ -5,16 +5,16 @@
       <q-separator color="secondary" />
     </div>
     <div class="q-mb-sm q-ml-md">
-      ({{ dbId }})
+      ({{ settingProps.dbId }})
     </div>
     <q-page>
-      <manage-database
-        @importingToDB="consoleLoading"
-        @databaseId="loadDatabaseId"
+      <get-data-from-firestore
+        @importingToDB="settingProps.consoleLoading"
+        @databaseId="settingProps.loadDatabaseId"
       />
       <div
         class="q-px-sm q-mt-lg"
-        :hidden="!layoutConfig.switchDatabase"
+        :hidden="settingProps.hideDatabaseSwitch"
       >
         <div class="q-pb-sm">
           <b class="text-h6">Switch Database</b>
@@ -27,8 +27,8 @@
             {label: 'Primary', value: 'production'},
             {label: 'Test', value: 'testing'}
           ]"
-          v-model="db"
-          @input="switchDatabase"
+          :value="settingProps.db"
+          @input="settingProps.switchDatabase"
         />
       </div>
     </q-page>
@@ -36,11 +36,18 @@
 </template>
 
 <script>
-import ManageDatabase from '../components/GetDataFromFirestore'
+import GetDataFromFirestore from '../components/GetDataFromFirestore'
 
 export default {
+  props: {
+    // Object containing all custom props. See structure in 'ManageSettings.vue'.
+    settingProps: {
+      type: Object,
+      required: true
+    }
+  },
   components: {
-    ManageDatabase
+    GetDataFromFirestore
   }
 }
 </script>

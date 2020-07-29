@@ -1,10 +1,10 @@
 <template>
   <admin-settings
-    :keywords="configs.keywords"
-    :type="'projects'"
-    :ratio="previewRatio"
-    @submitting="consoleLoading"
-    @submitted="loadProjectConfig"
+    :keywords="settingProps.keywords"
+    type="projects"
+    :ratio="settingProps.previewRatio"
+    @submitting="settingProps.consoleLoading"
+    @submitted="settingProps.loadProjectConfig"
   />
 </template>
 
@@ -12,6 +12,13 @@
 import AdminSettings from '../../../components/AdminSettings.vue'
 
 export default {
+  props: {
+    // Object containing all custom props. See structure in 'ManageSettings.vue'.
+    settingProps: {
+      type: Object,
+      required: true
+    }
+  },
   components: {
     AdminSettings
   }

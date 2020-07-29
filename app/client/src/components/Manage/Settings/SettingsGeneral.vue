@@ -1,10 +1,10 @@
 <template>
   <system-settings
-    @usersConfigInfo="loadUserConfig"
-    @challengesConfigInfo="loadChallengeConfig"
-    @projectsConfigInfo="loadProjectConfig"
-    @keywords="loadKeywords"
-    @submitting="consoleLoading"
+    @usersConfigInfo="settingProps.loadUserConfig"
+    @challengesConfigInfo="settingProps.loadChallengeConfig"
+    @projectsConfigInfo="settingProps.loadProjectConfig"
+    @keywords="settingProps.loadKeywords"
+    @submitting="settingProps.consoleLoading"
   />
 </template>
 
@@ -12,6 +12,13 @@
 import SystemSettings from '../../../components/SystemSettings'
 
 export default {
+  props: {
+    // Object containing all custom props. See structure in 'ManageSettings.vue'.
+    settingProps: {
+      type: Object,
+      required: true
+    }
+  },
   components: {
     SystemSettings
   }
