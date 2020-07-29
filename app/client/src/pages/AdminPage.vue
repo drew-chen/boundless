@@ -10,13 +10,15 @@
 ## OR CONDITIONS OF ANY KIND, either express or implied.
 
 Name:     pages/AdminPage.vue
-Purpose:  Provide graphical user interface for the admin to manage application.
+Purpose:
+
+  This is the page where the admin can manage projects, challenges, users,
+  and settings.
+
 Methods:
 
-  Provide general settings interface for the admin.
-  Provide user settings interface for the admin.
-  Provide project settings interface for the admin.
-  Provide challange settings interface for the admin.
+  Admin functionality is handled in child components. This page provides
+  convenient routing tabs to navigate to child components.
 
 ## -->
 
@@ -75,217 +77,9 @@ Methods:
           />
 
         </q-tabs>
-        <!-- Add transition -->
         <div class="q-pa-xs console-content-tab">
           <router-view></router-view>
         </div>
-
-        <!-- -------------------- Tab Content -------------------- -->
-        <q-tab-panels
-          v-model="parentOption"
-          keep-alive animated
-          transition-next="fade" transition-prev="fade"
-        >
-
-          <!-- ------------------- Settings Tab Content -------------------- -->
-          <q-tab-panel name="systems">
-            <q-splitter
-              disable
-              class="console-content-tab"
-              v-model="splitterModel"
-            >
-              <template v-slot:before>
-                <q-tabs
-                  switch-indicator
-                  vertical inline-label stretch
-                  class="text-primary q-mr-sm ap-left-panel"
-                  indicator-color="secondary"
-                  active-color="secondary"
-                  v-model="optionTab"
-                >
-                  <q-route-tab
-                    no-caps
-                    name="general" label="General"
-                    style="justify-content: left;"
-                  />
-                    <!-- icon="person" -->
-
-                  <q-separator />
-
-                  <q-tab
-                    no-caps
-                    name="database" label="Database"
-                    style="justify-content: left;"
-                  />
-                    <!-- icon="person" -->
-
-                  <q-separator />
-
-                  <q-tab
-                    v-if="layoutConfig && layoutConfig.challenges"
-                    no-caps
-                    name="challenges" label="Challenges"
-                    style="justify-content: left;"
-                  />
-                    <!-- icon="img:statics/images/challenge-icon1.png" -->
-
-                  <q-separator />
-
-                  <q-tab
-                    no-caps
-                    name="projects" label="Projects"
-                    style="justify-content: left;"
-                  />
-                    <!-- icon="img:statics/images/projects-icon.png" -->
-
-                  <!-- <q-separator /> -->
-
-                  <!-- TODO: Pruning users out for Feb release -->
-                  <!-- <q-tab
-                    v-if="configs.users"
-                    no-caps
-                    class="q-ml-xs" name="users" label="Users"
-                    style="justify-content: left;"
-                  /> -->
-                    <!-- icon="person" -->
-
-                  <!-- <q-separator /> -->
-
-                </q-tabs>
-
-              </template>
-
-              <template v-slot:after>
-                <q-tab-panels v-model="optionTab">
-                  <!-- ---------- Managing Data from Database ---------- -->
-                  <q-tab-panel name="database">
-                    <div class="text-h4">
-                      Database
-                      <q-separator color="secondary" />
-                    </div>
-                    <div class="q-mb-sm q-ml-md">
-                      ({{ dbId }})
-                    </div>
-
-                    <q-page>
-                      <ManageDatabase
-                        @importingToDB="consoleLoading"
-                        @databaseId="loadDatabaseId"
-                      />
-
-                      <div
-                        class="q-px-sm q-mt-lg"
-                        :hidden="!layoutConfig.switchDatabase"
-                      >
-                        <div class="q-pb-sm">
-                          <b class="text-h6">Switch Database</b>
-                          <q-separator color="secondary" />
-                        </div>
-
-                        <q-btn-toggle
-                          push no-caps
-                          toggle-color="positive"
-                          :options="[
-                            {label: 'Primary', value: 'production'},
-                            {label: 'Test', value: 'testing'}
-                          ]"
-                          v-model="db"
-                          @input="switchDatabase"
-                        />
-                      </div>
-                    </q-page>
-                  </q-tab-panel>
-
-                  <!-- ---------------- Challenge Settings ----------------- -->
-                  <q-tab-panel name="challenges">
-                    <div v-if="configs.challenges">
-                      <SettingsConfigPanel
-                        :keywords="configs.keywords"
-                        :type="'challenges'"
-                        :ratio="previewRatio"
-                        @submitting="consoleLoading"
-                        @submitted="loadChallengeConfig"
-                      />
-                    </div>
-                  </q-tab-panel>
-
-                  <!-- ----------------- Project Settings ------------------ -->
-                  <q-tab-panel name="projects">
-                    <div v-if="configs.projects">
-                      <SettingsConfigPanel
-                        :keywords="configs.keywords"
-                        :type="'projects'"
-                        :ratio="previewRatio"
-                        @submitting="consoleLoading"
-                        @submitted="loadProjectConfig"
-                      />
-                    </div>
-                  </q-tab-panel>
-
-                  <!-- TODO: Pruning users out for Feb release -->
-                  <!-- ------------------- User Settings ------------------- -->
-                  <!-- <q-tab-panel name="users">
-                    <div v-if="configs.users">
-                      <div class="text-h4 q-mb-md">
-                        Users
-                        <q-separator color="secondary" />
-                      </div>
-
-                      <div>
-                        <div
-                          v-if="configs.users.socialNetwork !== undefined" class="q-pa-lg"
-                        >
-                          <label for="socialNetworks" class="text-h6">
-                            Social Networks:
-                          </label>
-
-                          <q-option-group
-                            inline id="socialNetworks"
-                            color="primary" type="checkbox"
-                            :options="configs.users.socialNetwork.list"
-                            v-model="configs.users.socialNetwork.use"
-                          />
-
-                          <div class="q-py-md">
-                            <q-btn no-caps color="secondary" label="Submit" />
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </q-tab-panel> -->
-
-                  <!-- ------------------ System Settings ------------------ -->
-                  <q-tab-panel name="general">
-                    <!-- <div class="text-h4 q-mb-md">
-                      General {{
-                        $q.sessionStorage.has('boundless_config')
-                        ? ($q.sessionStorage.getItem(
-                          'boundless_config'
-                        ).config_version
-                        ? `(v ${$q.sessionStorage.getItem(
-                          'boundless_config'
-                        ).config_version})` : '')
-                        : ''
-                      }}
-                      <q-separator color="secondary" />
-                    </div> -->
-
-                    <div>
-                      <SystemSettings
-                        @usersConfigInfo="loadUserConfig"
-                        @challengesConfigInfo="loadChallengeConfig"
-                        @projectsConfigInfo="loadProjectConfig"
-                        @keywords="loadKeywords"
-                        @submitting="consoleLoading"
-                      />
-                    </div>
-                  </q-tab-panel>
-                </q-tab-panels>
-              </template>
-
-            </q-splitter>
-          </q-tab-panel>
-        </q-tab-panels>
       </div>
 
       <q-inner-loading :showing="haltConsole">
@@ -298,16 +92,11 @@ Methods:
 <script>
 import { layoutConfig } from '../../boundless.config'
 
-import SystemSettings from '../components/SystemSettings'
-import ManageDatabase from '../components/GetDataFromFirestore'
-// import SettingsUsersPanel from '../components/SettingPanels/Users'
 
 import NotFound from './Error404'
 
 export default {
   components: {
-    SystemSettings,
-    ManageDatabase,
     NotFound
   },
   created () {
