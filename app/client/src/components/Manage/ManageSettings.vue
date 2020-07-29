@@ -32,8 +32,8 @@ Methods:
   >
     <template v-slot:before>
       <q-tabs
-        switch-indicator
-        vertical inline-label stretch
+        switch-indicator vertical inline-label stretch
+        v-model="tabSelected"
         class="text-primary q-mr-sm ap-left-panel"
         indicator-color="secondary"
         active-color="secondary"
@@ -41,6 +41,7 @@ Methods:
         <q-route-tab
           no-caps exact
           label="General"
+          name="general"
           style="justify-content: left;"
           to="/admin/console/settings/general"
         />
@@ -48,6 +49,7 @@ Methods:
         <q-route-tab
           no-caps exact
           label="Database"
+          name="database"
           style="justify-content: left;"
           to="/admin/console/settings/database"
         />
@@ -56,13 +58,15 @@ Methods:
           no-caps exact
           v-if="layoutConfig && layoutConfig.challenges"
           label="Challenges"
+          name="challenges"
           style="justify-content: left;"
           to="/admin/console/settings/challenges"
         />
         <q-separator />
         <q-route-tab
           no-caps exact
-          name="projects" label="Projects"
+          label="Projects"
+          name="projects"
           style="justify-content: left;"
           to="/admin/console/settings/projects"
         />
@@ -71,11 +75,14 @@ Methods:
 
     </template>
 
-    <template v-slot:after>
-      <q-tab-panels v-model="optionTab">
+        <template v-slot:after>
+          <q-tab-panels v-model="optionTab">
         <q-tab-panel>
-          <router-view></router-view>
+          <!-- See ./Settings for components. -->
+          <router-view :settingProps="settingProps"></router-view>
         </q-tab-panel>
+          </q-tab-panels>
+        </template>
 
         <!-- Previously, there was commented out code regarding user settings.
         Code can be reffered to at this commit at 'Config.vue'.
@@ -96,8 +103,6 @@ Methods:
 import { layoutConfig } from '../../boundless.config'
 
 export default {
-  components: {
-  },
   created () {
     if (this.$q.sessionStorage.has('admin_token')) {
       this.notFound = false
@@ -126,14 +131,60 @@ export default {
       }
     }
   },
+  computed: {
+    /**
+     * Each router-view needs different props. Some of these props interact
+     * with the data in 'ManageSettings.vue' which is why they are passed in
+     * here instead of through the router.
+     *
+     * @returns <Object> An object where each property is a prop.
+     */
+    settingProps () {
+      switch (this.tabSelected) {
+        case 'general':
+          return {
+            loadUserConfig: this.loadUserConfig,
+            loadChallengeConfig: this.loadChallengeConfig,
+            loadProjectConfig: this.loadProjectConfig,
+            loadKeywords: this.loadKeywords,
+            consoleLoading: this.consoleLoading
+          }
+        case 'database':
+          return {
+            dbId: this.dbId,
+            consoleLoading: this.consoleLoading,
+            loadDatabaseId: this.loadDatabaseId,
+            hideDatabaseSwitch: !this.layoutConfig.switchDatabase,
+            db: this.db,
+            switchDatabase: this.switchDatabase
+          }
+        case 'challenges':
+          return {
+            keywords: this.config.keywords,
+            previewRatio: this.previewRatio,
+            consoleLoading: this.consoleLoading,
+            loadChallengeConfig: this.loadChallengeConfig
+          }
+        case 'projects':
+          return {
+            keywords: this.config.keywords,
+            previewRatio: this.previewRatio,
+            consoleLoading: this.consoleLoading,
+            loadChallengeConfig: this.loadProjectConfig
+          }
+        default:
+          return {}
+      }
+    }
+  },
   data () {
     return {
+      tabSelected: 'general',
       notFound: false, // <Boolean>: flag for 404
       layoutConfig: null, // <Object>: dictionary of layout values
       splitterModel: 15, // <Number>: % of vw that left splitter is located
       db: null, // <String>: name of the database
       dbId: null, // <String>: project id of the firebase cred
-      parentOption: 'projects', // <String>: name of the parent tab
       previewRatio: '5', // <String>: ratio for preview of imges in child
       configs: { // <Object<Object>>: configuration records of all collections
         users: {}, // <Object>: configuration record for users
