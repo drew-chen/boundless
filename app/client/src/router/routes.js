@@ -10,9 +10,13 @@
 ## OR CONDITIONS OF ANY KIND, either express or implied.
 
 Name:     router/routes.js
-Purpose:
+Purpose:  To handle routing.
 Methods:
-  *
+
+  Routes are handled by using Vue Router. Components are imported through
+  functions for lazy loading. Routes are also used to take advantage of
+  navigation guards. For example, leaving project settings with unsaved changes
+  triggers a navigation guard to make sure the user deals with the changes.
 
 ## */
 
@@ -44,13 +48,31 @@ const routes = [
       }
     ]
   },
-  { // might need to amend this
-    path: '/admin/console',
+  {
+    path: '/admin',
     component: () => import('layouts/BoundlessLayout.vue'),
     children: [
       {
-        path: '',
-        component: () => import('pages/AdminPage.vue')
+        path: 'console',
+        component: () => import('pages/AdminPage.vue'),
+        children: [
+          {
+            path: 'manage-projects',
+            component: () => import('components/Manage/ManageProjects.vue')
+          },
+          {
+            path: 'manage-challenges',
+            component: () => import('components/Manage/ManageChallenges.vue')
+          },
+          {
+            path: 'manage-users',
+            component: () => import('components/Manage/ManageUsers.vue')
+          },
+          {
+            path: 'settings',
+            component: () => import('components/AdminSettings.vue')
+          }
+        ]
       }
     ]
   },

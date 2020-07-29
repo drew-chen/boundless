@@ -686,7 +686,7 @@ export default {
    * @param {Function} next This function must be called to resolve the hook.
    */
   beforeRouteLeave (to, from, next) {
-    this.dialogOpen = this.$refs.projectMainForm.modified
+    this.dialogOpen = this.canSave()
     this.$refs.dialogConfirmLeave.onSave(() => {
       this.submit()
       next()
