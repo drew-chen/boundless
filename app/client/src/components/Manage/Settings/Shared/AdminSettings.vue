@@ -560,7 +560,7 @@ Methods:
 
     <!-- -------------------- Dialog -------------------- -->
     <dialog-confirm-leave
-      :dialogOpen="dialogOpen"
+      v-model="dialogOpen"
       ref="dialogConfirmLeave"
     />
   </div>
@@ -1073,22 +1073,14 @@ export default {
      *  This is the exact same object as beforeRouteLeave's 'next' method.
      */
     openConfirmLeaveDialog (next) {
-      this.$refs.dialogConfirmLeave.onSave(() => {
-        this.submit()
-        this.revokeUrls()
-        this.dialogOpen = false
-        next()
-      }).onNoSave(() => {
-        this.revokeUrls()
-        this.dialogOpen = false
-        next()
-      }).onCancel(() => {
-        this.dialogOpen = false
-        next(false)
-      })
-
-      this.dialogOpen = this.canSave()
-      if (!this.dialogOpen) {
+      if (this.canSave()) {
+        this.$refs.dialogConfirmLeave.constructMethods(
+          this.submit,
+          next,
+          this.revokeUrls
+        )
+        this.dialogOpen = true
+      } else {
         next()
       }
     }
