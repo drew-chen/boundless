@@ -654,59 +654,8 @@ export default {
       throw new Error(error)
     }
   },
-  /** Verfiy for user to leave if changes were detected. */
-  beforeDestroy () {
-    if (!this.submitted && this.canSave()) {
-      this.$q.dialog({
-        title: 'Are you sure you want to leave without submitting changes? (All changes will be lost).',
-        cancel: {
-          flat: true,
-          noCaps: true,
-          label: 'Submit'
-        },
-        ok: {
-          flat: true,
-          noCaps: true,
-          label: 'Leave'
-        },
-        persistent: true
-      }).onOk(() => {
-        if (this.data.listingTable.bannerImg.url) {
-          URL.revokeObjectURL(this.data.listingTable.bannerImg.url)
-        }
-        if (this.data.webpage.bannerImg.url) {
-          URL.revokeObjectURL(this.data.webpage.bannerImg.url)
-        }
-        if (this.data.webpage.mainImg.url) {
-          URL.revokeObjectURL(this.data.webpage.mainImg.url)
-        }
-      }).onCancel(() => {
-        this.submit()
-      })
-    }
-  },
   destroyed () {
     window.removeEventListener('beforeunload', this.confirmUnload)
-  },
-  /**
-   * Block leaving with persistent dialog if changes have been made.
-   * View specifics on navigation guards at:
-   * https://router.vuejs.org/guide/advanced/navigation-guards.html#global-before-guards
-   *
-   * @param {Object} to The target Route Object being navigated to.
-   * @param {Object} from The current route being navigated away from.
-   * @param {Function} next This function must be called to resolve the hook.
-   */
-  beforeRouteLeave (to, from, next) {
-    this.dialogOpen = this.canSave()
-    this.$refs.dialogConfirmLeave.onSave(() => {
-      this.submit()
-      next()
-    }).onNoSave(() => {
-      next()
-    }).onCancel(() => {
-      next(false)
-    })
   },
   data () {
     return {
@@ -1019,7 +968,6 @@ export default {
           await this.storageUrlFetcher('listingTable', 'bannerImg')
           await this.storageUrlFetcher('webpage', 'bannerImg')
           await this.storageUrlFetcher('webpage', 'mainImg')
-
           this.$refs.projectCreateCustomForm.saveQuestionTemplates()
           this.dbData = deepClone(this.data)
           setTimeout(() => {
@@ -1103,6 +1051,45 @@ export default {
           Vue.set(this.$data, 'data', deepClone(this.dbData))
           this.updated = false
         })
+      }
+    },
+    revokeUrls () {
+      if (this.data.listingTable.bannerImg.url) {
+        URL.revokeObjectURL(this.data.listingTable.bannerImg.url)
+      }
+      if (this.data.webpage.bannerImg.url) {
+        URL.revokeObjectURL(this.data.webpage.bannerImg.url)
+      }
+      if (this.data.webpage.mainImg.url) {
+        URL.revokeObjectURL(this.data.webpage.mainImg.url)
+      }
+    },
+    /**
+     * Helper function for parent component's 'beforeRouteLeave' method. The
+     * dialog is first initialized with methods and then opens if changes have
+     * been made.
+     *
+     * @param {Function} next This function must be called to resolve the hook.
+     *  This is the exact same object as beforeRouteLeave's 'next' method.
+     */
+    openConfirmLeaveDialog (next) {
+      this.$refs.dialogConfirmLeave.onSave(() => {
+        this.submit()
+        this.revokeUrls()
+        this.dialogOpen = false
+        next()
+      }).onNoSave(() => {
+        this.revokeUrls()
+        this.dialogOpen = false
+        next()
+      }).onCancel(() => {
+        this.dialogOpen = false
+        next(false)
+      })
+
+      this.dialogOpen = this.canSave()
+      if (!this.dialogOpen) {
+        next()
       }
     }
   }
