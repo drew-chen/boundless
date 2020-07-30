@@ -26,29 +26,29 @@ Methods:
       v-model="dialogOpen"
     >
       <q-card>
-        <q-card-section class="row items-center q-pb-none">
-          <div class="text-h6">Save your changes to settings?</div>
-        </q-card-section>
-
         <q-card-section>
-          You have unsaved changes.
+          <div class="text-h5">Save changes?</div>
+        </q-card-section>
+        <q-card-section>
+          <p>You are leaving with unsaved changes.</p>
         </q-card-section>
         <q-card-actions align="right">
           <q-btn
             no-caps
-            @click="onSave"
+            @click="saveAndLeave"
+            color="secondary"
           >
             Save
           </q-btn>
           <q-btn
             flat no-caps
-            @click="onNoSave"
+            @click="leave"
           >
             Don't Save
           </q-btn>
           <q-btn
             flat no-caps
-            @click="onNoSave"
+            @click="cancel"
           >
             Cancel
           </q-btn>
@@ -70,35 +70,51 @@ export default {
   /** Accessed via refs in parent. */
   methods: {
     /**
-     * When the "save" button is clicked, call the given callback.
+     * Sets the action for clicking "save".
      *
      * @param {Function} callback Function to be called.
      * @returns {Object} This component instance (to allow method chaining).
      */
     onSave (callback) {
-      callback()
+      this.saveAndLeave = callback
       return this
     },
     /**
-     * When the "don't save" button is clicked, call the given callback.
+     * Sets the action for clicking "don't save".
      *
      * @param {Function} callback Function to be called.
      * @returns {Object} This component instance (to allow method chaining).
      */
     onNoSave (callback) {
-      callback()
+      this.leave = callback
       return this
     },
     /**
-     * When the "cancel" button is clicked, call the given callback.
+     * Sets the action for clicking "cancel".
      *
      * @param {Function} callback Funtion to be called.
      * @returns {Object} This component instance (to allow method chaining).
      */
     onCancel (callback) {
-      callback()
+      this.cancel = callback
       return this
+    },
+    /** Method for when the "save" button is clicked. */
+    saveAndLeave () {
+    },
+    /** Method for when the "don't save" button is clicked. */
+    leave () {
+    },
+    /** Method for when the "cancel" button is clicked. */
+    cancel () {
     }
   }
 }
 </script>
+
+<style lang="stylus" scoped>
+
+.q-card__section
+  min-width: 500px
+
+</style>

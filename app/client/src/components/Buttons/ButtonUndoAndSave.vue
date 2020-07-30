@@ -9,7 +9,7 @@
 ## under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES
 ## OR CONDITIONS OF ANY KIND, either express or implied.
 
-Name:     components/Buttons/ButtonUndoAndSubmit.vue
+Name:     components/Buttons/ButtonUndoAndSave.vue
 
 Purpose:  Groups together undo and submit buttons so that they are consistent.
 
