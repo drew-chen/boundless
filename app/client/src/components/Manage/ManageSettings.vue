@@ -38,51 +38,49 @@ Methods:
         indicator-color="secondary"
         active-color="secondary"
       >
-        <q-route-tab
+        <q-tab
           no-caps exact
-          @click="setSettingProps('general')"
+          @click="navigateTo('general')"
           label="General"
           name="general"
           style="justify-content: left;"
-          to="/admin/console/settings/general"
         />
         <q-separator />
-        <q-route-tab
+        <q-tab
           no-caps exact
-          @click="setSettingProps('database')"
+          @click="navigateTo('database')"
           label="Database"
           name="database"
           style="justify-content: left;"
-          to="/admin/console/settings/database"
         />
         <q-separator />
-        <q-route-tab
+        <q-tab
           no-caps exact
-          @click="setSettingProps('projects')"
+          @click="navigateTo('projects')"
           label="Projects"
           name="projects"
           style="justify-content: left;"
-          to="/admin/console/settings/projects"
         />
         <q-separator />
-        <q-route-tab
+        <q-tab
           no-caps exact
-          @click="setSettingProps('challenges')"
+          @click="navigateTo('challenges')"
           v-if="layoutConfig && layoutConfig.challenges"
           label="Challenges"
           name="challenges"
           style="justify-content: left;"
-          to="/admin/console/settings/challenges"
         />
 
       </q-tabs>
 
     </template>
       <template v-slot:after>
-        <q-tab-panel :name="tabSelected">
-          <!-- See ./Settings directory for components. -->
-          <router-view :settingProps="settingProps"></router-view>
-        </q-tab-panel>
+        <keep-alive>
+          <q-tab-panel :name="tabSelected">
+            <!-- See ./Settings directory for components. -->
+            <router-view :settingProps="settingProps"></router-view>
+          </q-tab-panel>
+        </keep-alive>
       </template>
 
       <!-- Previously, there was commented out code regarding user settings.
@@ -100,7 +98,7 @@ Methods:
 
 <script>
 import { layoutConfig } from '../../../../client/boundless.config'
-import Vue from 'vue'
+
 export default {
   created () {
     if (this.$q.sessionStorage.has('admin_token')) {
@@ -129,7 +127,7 @@ export default {
         this.layoutConfig = layoutConfig
       }
     }
-    this.setSettingProps('general')
+    this.navigateTo('general')
   },
   data () {
     return {
@@ -158,7 +156,7 @@ export default {
      *
      * @returns <Object> An object where each property is a prop.
      */
-    setSettingProps (value) {
+    navigateTo (value) {
       console.log(value)
       this.tabSelected = value
       let props = {}
@@ -205,7 +203,8 @@ export default {
           props.name = 'challenges'
           break
       }
-      Vue.set(this.$data, 'settingProps', props)
+      this.settingProps = props
+      this.$router.push(`/admin/console/settings/${this.tabSelected}`)
     },
     /**
      * Handle page loading via child event.
