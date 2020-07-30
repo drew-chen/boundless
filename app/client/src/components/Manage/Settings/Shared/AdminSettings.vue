@@ -530,7 +530,7 @@ Methods:
                     <q-img
                       contain
                       class="center-img"
-                      :src="`${staticsPath}/statics/images/computer-keyboard.jpg`"
+                      :src="`${staticsPath}/images/computer-keyboard.jpg`"
                       :ratio="ratio"
                       style="max-height: 15vh;"
                     >
@@ -560,7 +560,6 @@ Methods:
 
     <!-- -------------------- Dialog -------------------- -->
     <dialog-confirm-leave
-      v-model="dialogOpen"
       ref="dialogConfirmLeave"
     />
   </div>
@@ -614,7 +613,6 @@ export default {
       setTimeout(() => {
         this.loading = false
       }, 100)
-
       // data fetching goes here
       await this.loadFireRefs()
       this.data = this.$q.sessionStorage.getItem('boundless_config')
@@ -687,9 +685,8 @@ export default {
        * of on input events). Used in 'this.canSave()'.
        */
       updated: false,
-      dialogOpen: false, // <Boolean> Flag for whether the dialog should be open.
       // <String>: Relative path of the statics directory
-      staticsPath: '../../../../../src/statics'
+      staticsPath: '../../../../../statics'
     }
   },
   methods: {
@@ -1074,12 +1071,11 @@ export default {
      */
     openConfirmLeaveDialog (next) {
       if (this.canSave()) {
-        this.$refs.dialogConfirmLeave.constructMethods(
+        this.$refs.dialogConfirmLeave.open(
           this.submit,
           next,
           this.revokeUrls
         )
-        this.dialogOpen = true
       } else {
         next()
       }

@@ -23,7 +23,7 @@ Methods:
   <div class="q-pa-md q-gutter-sm">
     <q-dialog
       persistent
-      v-model="value"
+      v-model="dialogOpen"
     >
       <q-card>
         <q-card-section>
@@ -60,17 +60,17 @@ Methods:
 
 <script>
 export default {
-  props: {
-    // Whether this dialog is open or not. Used with v-model.
-    value: {
-      type: Boolean,
-      required: true
+  data () {
+    return {
+    // <Boolean>: Whether this dialog is open or not.
+      dialogOpen: this.value
     }
   },
   /** Accessed via refs in parent. */
   methods: {
     /**
-     * Initializes the methods run when a button is clicked.
+     * Initializes the methods run when a button is clicked and opens
+     * the dialog.
      *
      * @param {Function} save Function to be called to handle saving the page.
      * @param {Function} next This function must be called to resolve the hook.
@@ -78,30 +78,34 @@ export default {
      * @param {Function} onLeave Additonal method to be run during leaving.
      * @returns {Object} This component instance (to allow method chaining).
      */
-    constructMethods (save, next, onLeave) {
+    open (save, next, onLeave) {
       this.save = save
       this.next = next
       this.leave = () => {
         onLeave()
         this.next()
       }
+      this.dialogOpen = true
     },
     /** Method for when the "Save" button is clicked. */
     onSave () {
       this.save()
-      this.leave()
       // Sets the dialogOpen flag in parent to false.
-      this.$emit('input', false)
-    },
-    /** Method for when the "Don't Save" button is clicked */
-    onNoSave () {
+      this.dialogOpen = false
       this.leave()
-      this.$emit('input', false)
     },
-    /** Method for when the "Cancel" button is clicked */
+    /** Method for when the "Don't Save" button is clicked. */
+    onNoSave () {
+      this.dialogOpen = false
+      this.leave()
+    },
+    /**
+     * Method for when the "Cancel" button is clicked. Note: when cancelling,
+     * the page is not left.
+     */
     onCancel () {
+      this.dialogOpen = false
       this.next(false)
-      this.$emit('input', false)
     },
     /** Method using for saving. */
     save () {
