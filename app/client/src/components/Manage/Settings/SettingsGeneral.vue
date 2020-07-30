@@ -1,5 +1,6 @@
 <template>
   <system-settings
+    v-if="settingProps.name === 'general'"
     @usersConfigInfo="settingProps.setUserConfig"
     @challengesConfigInfo="settingProps.setChallengeConfig"
     @projectsConfigInfo="settingProps.setProjectConfig"
@@ -18,7 +19,7 @@ export default {
       type: Object,
       required: true,
       validator (prop) {
-        return prop.hasOwnProperty('name') && prop.name === 'general'
+        return prop.hasOwnProperty('name')
       }
     }
   },

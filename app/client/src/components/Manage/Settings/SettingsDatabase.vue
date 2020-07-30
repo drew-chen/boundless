@@ -1,5 +1,7 @@
 <template>
-  <div>
+  <div
+    v-if="settingProps.name === 'database'"
+  >
     <div class="text-h4">
       Database
       <q-separator color="secondary" />
@@ -43,10 +45,7 @@ export default {
     // Object containing all custom props. See structure in 'ManageSettings.vue'.
     settingProps: {
       type: Object,
-      required: true,
-      validator (prop) {
-        return prop.hasOwnProperty('name') && prop.name === 'database'
-      }
+      required: true
     }
   },
   components: {
