@@ -9,7 +9,7 @@
 ## under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES
 ## OR CONDITIONS OF ANY KIND, either express or implied.
 
-Name:     components/AdminSettings.vue
+Name:     components/Manage/Settings/Shared/AdminSettings.vue
 Purpose:
 
   To allow the user configure project/challenge UI via a config panel
@@ -215,7 +215,7 @@ Methods:
                       v-if="type === 'challenges'"
                       contain
                       class="center-img"
-                      :src="`./statics/${staticImages.challenges.tableBanner}`"
+                      :src="`${staticsPath}/${staticImages.challenges.tableBanner}`"
                       :ratio="ratio"
                       style="max-height: 22vh;"
                     >
@@ -228,7 +228,7 @@ Methods:
                       v-else
                       contain
                       class="center-img"
-                      :src="`./statics/${staticImages.projects.tableBanner}`"
+                      :src="`${staticsPath}/${staticImages.projects.tableBanner}`"
                       :ratio="ratio"
                       style="max-height: 22vh;"
                     >
@@ -279,7 +279,7 @@ Methods:
                       v-if="type === 'challenges'"
                       contain
                       class="center-img"
-                      :src="`./statics/${staticImages.challenges.tableBanner}`"
+                      :src="`${staticsPath}/${staticImages.challenges.tableBanner}`"
                       :ratio="ratio"
                       style="max-height: 15vh;"
                     >
@@ -292,7 +292,7 @@ Methods:
                       v-else
                       contain
                       class="center-img"
-                      :src="`./statics/${staticImages.projects.tableBanner}`"
+                      :src="`${staticsPath}/${staticImages.projects.tableBanner}`"
                       :ratio="ratio"
                       style="max-height: 15vh;"
                     >
@@ -369,7 +369,7 @@ Methods:
                       v-if="type === 'challenges'"
                       contain
                       class="center-img"
-                      :src="`./statics/${staticImages.challenges.webBanner}`"
+                      :src="`${staticsPath}/${staticImages.challenges.webBanner}`"
                       :ratio="ratio"
                       style="max-height: 22vh;"
                     >
@@ -382,7 +382,7 @@ Methods:
                       v-else
                       contain
                       class="center-img"
-                      :src="`./statics/${staticImages.projects.webBanner}`"
+                      :src="`${staticsPath}/${staticImages.projects.webBanner}`"
                       :ratio="ratio"
                       style="max-height: 22vh;"
                     >
@@ -425,7 +425,7 @@ Methods:
                       v-if="type === 'challenges'"
                       contain
                       class="center-img"
-                      :src="`./statics/${staticImages.challenges.webBanner}`"
+                      :src="`${staticsPath}/${staticImages.challenges.webBanner}`"
                       :ratio="ratio"
                       style="max-height: 15vh;"
                     >
@@ -438,7 +438,7 @@ Methods:
                       v-else
                       contain
                       class="center-img"
-                      :src="`./statics/${staticImages.projects.webBanner}`"
+                      :src="`${staticsPath}/${staticImages.projects.webBanner}`"
                       :ratio="ratio"
                       style="max-height: 15vh;"
                     >
@@ -488,7 +488,7 @@ Methods:
                     <q-img
                       contain
                       class="center-img"
-                      src="../statics/images/computer-keyboard.jpg"
+                      :src="`${staticsPath}/images/computer-keyboard.jpg`"
                       :ratio="ratio"
                       style="max-height: 22vh;"
                     >
@@ -530,7 +530,7 @@ Methods:
                     <q-img
                       contain
                       class="center-img"
-                      src="../statics/images/computer-keyboard.jpg"
+                      :src="`${staticsPath}/statics/images/computer-keyboard.jpg`"
                       :ratio="ratio"
                       style="max-height: 15vh;"
                     >
@@ -569,14 +569,14 @@ Methods:
 <script>
 import deepClone from 'lodash.clonedeep'
 import Vue from 'vue'
-import { defaultImages } from '../../boundless.config'
+import { defaultImages } from '../../../../../../client/boundless.config'
 
-import productionDb, { productionStorage } from '../firebase/init_production'
-import testingDb, { testingStorage } from '../firebase/init_testing'
+import productionDb, { productionStorage } from '../../../../firebase/init_production'
+import testingDb, { testingStorage } from '../../../../firebase/init_testing'
 
-import ProjectCreateCustomForm from './Forms/Project/ProjectCreateCustomForm.vue'
-import ButtonUndoAndSave from './Buttons/ButtonUndoAndSave.vue'
-import DialogConfirmLeave from './Dialogs/DialogConfirmLeave.vue'
+import ProjectCreateCustomForm from '../../../Forms/Project/ProjectCreateCustomForm.vue'
+import ButtonUndoAndSave from '../../../Buttons/ButtonUndoAndSave.vue'
+import DialogConfirmLeave from '../../../Dialogs/DialogConfirmLeave.vue'
 
 export default {
   props: {
@@ -732,13 +732,15 @@ export default {
       loading: true, // <Boolean>: flag for the page loading
       submitted: false, // <Boolean>: flag for handling child emitted submit
       /**
-      * <Boolean>: Flag for handling child emitted submit.
+       * <Boolean>: Flag for handling child emitted submit.
        * Describes to all updates except 'ProjectCreateCustomForm.vue' since
        * it detects updates differently (does so by comparing with Vuex instead
        * of on input events). Used in 'this.canSave()'.
        */
       updated: false,
-      dialogOpen: false // <Boolean> Flag for whether the dialog should be open.
+      dialogOpen: false, // <Boolean> Flag for whether the dialog should be open.
+      // <String>: Relative path of the statics directory
+      staticsPath: '../../../../../src/statics'
     }
   },
   methods: {

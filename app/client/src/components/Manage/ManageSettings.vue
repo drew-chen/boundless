@@ -81,15 +81,13 @@ Methods:
               enter-active-class="animated fadeIn"
               leave-active-class="animated fadeOut"
               appear
-              :duration="50"
+              :duration="160"
             >
-              <keep-alive :max="4">
-                <!-- See ./Settings directory for components. -->
-                <router-view
-                  :settingProps="settingProps"
-                >
-                </router-view>
-              </keep-alive>
+              <!-- See ./Settings directory for components. -->
+              <router-view
+                :settingProps="settingProps"
+              >
+              </router-view>
             </transition>
           </q-tab-panel>
         </template>

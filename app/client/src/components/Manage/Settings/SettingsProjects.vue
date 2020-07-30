@@ -10,7 +10,7 @@
 </template>
 
 <script>
-import AdminSettings from '../../../components/AdminSettings.vue'
+import AdminSettings from './Shared/AdminSettings.vue'
 
 export default {
   props: {
