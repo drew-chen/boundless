@@ -83,11 +83,13 @@ Methods:
               appear
               :duration="160"
             >
-              <!-- See ./Settings directory for components. -->
-              <router-view
-                :settingProps="settingProps"
-              >
-              </router-view>
+              <keep-alive>
+                <!-- See ./Settings directory for components. -->
+                <router-view
+                  :settingProps="settingProps"
+                >
+                </router-view>
+              </keep-alive>
             </transition>
           </q-tab-panel>
         </template>
@@ -114,31 +116,18 @@ import { layoutConfig } from '../../../../client/boundless.config'
 
 export default {
   created () {
-    if (this.$q.sessionStorage.has('admin_token')) {
-      this.notFound = false
-    } else {
-      this.notFound = true
+    if (this.$q.localStorage.has('boundless_db')) {
+      this.db = this.$q.localStorage.getItem('boundless_db')
     }
+    if (this.$q.sessionStorage.getItem('boundless_config')) {
+      let cachedConfig = this.$q.sessionStorage.getItem('boundless_config')
+      this.layoutConfig = layoutConfig
 
-    if (this.notFound) {
-      setTimeout(() => {
-        this.$router.replace('/')
-      }, 1500)
+      if (typeof cachedConfig.enabledChallenges === 'boolean') {
+        this.layoutConfig.challenges = cachedConfig.enabledChallenges
+      }
     } else {
-      if (this.$q.localStorage.has('boundless_db')) {
-        this.db = this.$q.localStorage.getItem('boundless_db')
-      }
-
-      if (this.$q.sessionStorage.getItem('boundless_config')) {
-        let cachedConfig = this.$q.sessionStorage.getItem('boundless_config')
-        this.layoutConfig = layoutConfig
-
-        if (typeof cachedConfig.enabledChallenges === 'boolean') {
-          this.layoutConfig.challenges = cachedConfig.enabledChallenges
-        }
-      } else {
-        this.layoutConfig = layoutConfig
-      }
+      this.layoutConfig = layoutConfig
     }
   },
   computed: {
@@ -200,7 +189,6 @@ export default {
   data () {
     return {
       tabSelected: 'general', // <String>: The selected settings panel.
-      notFound: false, // <Boolean>: flag for 404
       layoutConfig: null, // <Object>: dictionary of layout values
       splitterModel: 15, // <Number>: % of vw that left splitter is located
       db: '', // <String>: name of the database
