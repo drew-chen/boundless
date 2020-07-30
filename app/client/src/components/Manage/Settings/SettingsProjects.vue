@@ -1,5 +1,6 @@
 <template>
   <admin-settings
+    v-if="settingProps.name === 'projects'"
     :keywords="settingProps.keywords"
     type="projects"
     :ratio="settingProps.previewRatio"
@@ -16,10 +17,7 @@ export default {
     // Object containing all custom props. See structure in 'ManageSettings.vue'.
     settingProps: {
       type: Object,
-      required: true,
-      validator (prop) {
-        return prop.hasOwnProperty('name') && prop.name === 'projects'
-      }
+      required: true
     }
   },
   components: {

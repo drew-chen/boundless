@@ -38,49 +38,59 @@ Methods:
         indicator-color="secondary"
         active-color="secondary"
       >
-        <q-tab
+        <q-route-tab
           no-caps exact
-          @click="navigateTo('general')"
           label="General"
           name="general"
           style="justify-content: left;"
+          to="/admin/console/settings/general"
         />
         <q-separator />
-        <q-tab
+        <q-route-tab
           no-caps exact
-          @click="navigateTo('database')"
           label="Database"
           name="database"
           style="justify-content: left;"
+          to="/admin/console/settings/database"
         />
         <q-separator />
-        <q-tab
+        <q-route-tab
           no-caps exact
-          @click="navigateTo('projects')"
           label="Projects"
           name="projects"
           style="justify-content: left;"
+          to="/admin/console/settings/projects"
         />
         <q-separator />
-        <q-tab
+        <q-route-tab
           no-caps exact
-          @click="navigateTo('challenges')"
           v-if="layoutConfig && layoutConfig.challenges"
           label="Challenges"
           name="challenges"
           style="justify-content: left;"
+          to="/admin/console/settings/challenges"
         />
 
       </q-tabs>
 
     </template>
       <template v-slot:after>
-        <keep-alive>
-          <q-tab-panel :name="tabSelected">
-            <!-- See ./Settings directory for components. -->
-            <router-view :settingProps="settingProps"></router-view>
-          </q-tab-panel>
-        </keep-alive>
+        <q-tab-panel :name="tabSelected">
+          <transition
+            enter-active-class="animated fadeIn"
+            leave-active-class="animated fadeOut"
+            appear
+            :duration="50"
+          >
+            <keep-alive :max="5">
+              <!-- See ./Settings directory for components. -->
+              <router-view
+                :settingProps="settingProps"
+              >
+              </router-view>
+            </keep-alive>
+          </transition>
+        </q-tab-panel>
       </template>
 
       <!-- Previously, there was commented out code regarding user settings.
@@ -127,7 +137,61 @@ export default {
         this.layoutConfig = layoutConfig
       }
     }
-    this.navigateTo('general')
+  },
+  computed: {
+    /**
+     * Each router-view needs different props. Some of these props interact
+     * with the data in 'ManageSettings.vue' which is why they are passed in
+     * here instead of through the router.
+     *
+     * @returns <Object> An object where each property is a prop.
+     */
+    settingProps () {
+      console.log(this.tabSelected)
+      switch (this.tabSelected) {
+        case 'general':
+          return {
+            /*
+            The 'name' property is important so that the router view doesn't try
+            to render while switching to another route.
+            */
+            name: 'general',
+            setUserConfig: this.setUserConfig,
+            setChallengeConfig: this.setChallengeConfig,
+            setProjectConfig: this.setProjectConfig,
+            setKeywords: this.setKeywords,
+            consoleLoading: this.consoleLoading
+          }
+        case 'database':
+          return {
+            name: 'database',
+            dbId: this.dbId,
+            consoleLoading: this.consoleLoading,
+            setDatabaseId: this.setDatabaseId,
+            hideDatabaseSwitch: !this.layoutConfig.switchDatabase,
+            db: this.db,
+            switchDatabase: this.switchDatabase
+          }
+        case 'projects':
+          return {
+            name: 'projects',
+            keywords: this.configs.keywords,
+            previewRatio: this.previewRatio,
+            consoleLoading: this.consoleLoading,
+            setProjectConfig: this.setProjectConfig
+          }
+        case 'challenges':
+          return {
+            name: 'challenges',
+            keywords: this.configs.keywords,
+            previewRatio: this.previewRatio,
+            consoleLoading: this.consoleLoading,
+            setChallengeConfig: this.setChallengeConfig
+          }
+        default:
+          return {}
+      }
+    }
   },
   data () {
     return {
@@ -144,68 +208,10 @@ export default {
         challenges: {}, // <Object>: configuration record for challenges
         keywords: {} // <Object>: dictionary containing keywords
       },
-      haltConsole: false, // <Boolean>: flag for loading animation
-      settingProps: {}
+      haltConsole: false // <Boolean>: flag for loading animation
     }
   },
   methods: {
-    /**
-     * Each router-view needs different props. Some of these props interact
-     * with the data in 'ManageSettings.vue' which is why they are passed in
-     * here instead of through the router.
-     *
-     * @returns <Object> An object where each property is a prop.
-     */
-    navigateTo (value) {
-      console.log(value)
-      this.tabSelected = value
-      let props = {}
-      switch (this.tabSelected) {
-        case 'general':
-          props = {
-            name: 'general',
-            setUserConfig: this.setUserConfig,
-            setChallengeConfig: this.setChallengeConfig,
-            setProjectConfig: this.setProjectConfig,
-            setKeywords: this.setKeywords,
-            consoleLoading: this.consoleLoading
-          }
-          break
-        case 'database':
-          props = {
-            name: 'database',
-            dbId: this.dbId,
-            consoleLoading: this.consoleLoading,
-            setDatabaseId: this.setDatabaseId,
-            hideDatabaseSwitch: !this.layoutConfig.switchDatabase,
-            db: this.db,
-            switchDatabase: this.switchDatabase
-          }
-          break
-        case 'projects':
-          props = {
-            name: 'projects',
-            keywords: this.configs.keywords,
-            previewRatio: this.previewRatio,
-            consoleLoading: this.consoleLoading,
-            setProjectConfig: this.setProjectConfig
-          }
-          props.name = 'projects'
-          break
-        case 'challenges':
-          props = {
-            name: 'challenges',
-            keywords: this.configs.keywords,
-            previewRatio: this.previewRatio,
-            consoleLoading: this.consoleLoading,
-            setChallengeConfig: this.setChallengeConfig
-          }
-          props.name = 'challenges'
-          break
-      }
-      this.settingProps = props
-      this.$router.push(`/admin/console/settings/${this.tabSelected}`)
-    },
     /**
      * Handle page loading via child event.
      * @param {Boolean} loadVal: event emitter value to render loading
