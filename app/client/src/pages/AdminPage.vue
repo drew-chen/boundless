@@ -77,7 +77,9 @@ Methods:
 
         </q-tabs>
         <div class="q-pa-xs console-content-tab">
-          <router-view></router-view>
+          <keep-alive>
+            <router-view></router-view>
+          </keep-alive>
         </div>
       </div>
     </q-card>
@@ -107,10 +109,6 @@ export default {
         this.$router.replace('/')
       }, 1500)
     } else {
-      if (this.$q.localStorage.has('boundless_db')) {
-        this.db = this.$q.localStorage.getItem('boundless_db')
-      }
-
       if (this.$q.sessionStorage.getItem('boundless_config')) {
         let cachedConfig = this.$q.sessionStorage.getItem('boundless_config')
         this.layoutConfig = layoutConfig
@@ -126,9 +124,7 @@ export default {
   data () {
     return {
       notFound: false, // <Boolean>: flag for 404
-      layoutConfig: null, // <Object>: dictionary of layout values
-      db: null, // <String>: name of the database
-      haltConsole: false // <Boolean>: flag for loading animation
+      layoutConfig: null // <Object>: dictionary of layout values
     }
   }
 }
