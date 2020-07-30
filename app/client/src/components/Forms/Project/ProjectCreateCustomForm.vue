@@ -48,8 +48,12 @@ Methods:
             </q-tooltip>
           </q-btn>
         </div>
+        <div v-if="!Array.isArray(questionTemplates) || !questionTemplates.length">
+          No custom questions configured.
+        </div>
         <!-- Native drag and drop API is disabled to prevent flickering issues. -->
         <draggable
+          v-else
           v-model="questionTemplates"
           @end="updateQuestionOrder"
           handle=".handle"

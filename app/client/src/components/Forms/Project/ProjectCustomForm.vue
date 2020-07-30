@@ -116,12 +116,16 @@ export default {
      * save to vuex and tell the parent component to advance the stepper.
      */
     submit () {
-      this.$refs.form.validate().then(success => {
-        if (success) {
-          this.saveToVuex()
-          this.$emit('submittedSuccessfully')
-        }
-      })
+      if (Array.isArray(this.quesitons) && this.quesitons.length) {
+        this.$refs.form.validate().then(success => {
+          if (success) {
+            this.saveToVuex()
+            this.$emit('submittedSuccessfully')
+          }
+        })
+      } else {
+        this.$emit('submittedSuccessfully')
+      }
     },
     /** Deletes input from each form locally. Does not modify Vuex store. */
     reset () {

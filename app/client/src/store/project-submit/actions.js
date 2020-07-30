@@ -91,6 +91,7 @@ export async function loadConfig ({ commit, getters }) {
     }
     commit('setKeywordOptions', keywordOptions)
     commit('setQuestionTemplates', data.projectsConfig.questionTemplates)
+    commit('setQuestions', [])
     commit('setAllowedDomain', data.allowedDomain)
     commit('setBodyTypeOptions', data.bodyContentType)
     commit('setChipTypeOptions', data.chipContentType)
@@ -249,8 +250,10 @@ export async function submitQuestions ({ getters }) {
 export async function submitQuestionTemplates ({ commit, getters }, questionTemplates) {
   await getters.db.collection('config')
     .doc('project')
-    .update({
-      'projectsConfig.questionTemplates': questionTemplates
+    .set({
+      projectsConfig: {
+        questionTemplates
+      }
     })
   commit('setQuestionTemplates', questionTemplates)
 }
