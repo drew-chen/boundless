@@ -10,7 +10,7 @@
     <q-page>
       <get-data-from-firestore
         @importingToDB="settingProps.consoleLoading"
-        @databaseId="settingProps.loadDatabaseId"
+        @databaseId="settingProps.setDatabaseId"
       />
       <div
         class="q-px-sm q-mt-lg"
@@ -43,7 +43,10 @@ export default {
     // Object containing all custom props. See structure in 'ManageSettings.vue'.
     settingProps: {
       type: Object,
-      required: true
+      required: true,
+      validator (prop) {
+        return prop.hasOwnProperty('name') && prop.name === 'database'
+      }
     }
   },
   components: {

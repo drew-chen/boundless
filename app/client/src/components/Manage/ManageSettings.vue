@@ -40,6 +40,7 @@ Methods:
       >
         <q-route-tab
           no-caps exact
+          @click="setSettingProps('general')"
           label="General"
           name="general"
           style="justify-content: left;"
@@ -48,6 +49,7 @@ Methods:
         <q-separator />
         <q-route-tab
           no-caps exact
+          @click="setSettingProps('database')"
           label="Database"
           name="database"
           style="justify-content: left;"
@@ -56,6 +58,7 @@ Methods:
         <q-separator />
         <q-route-tab
           no-caps exact
+          @click="setSettingProps('projects')"
           label="Projects"
           name="projects"
           style="justify-content: left;"
@@ -64,6 +67,7 @@ Methods:
         <q-separator />
         <q-route-tab
           no-caps exact
+          @click="setSettingProps('challenges')"
           v-if="layoutConfig && layoutConfig.challenges"
           label="Challenges"
           name="challenges"
@@ -96,7 +100,7 @@ Methods:
 
 <script>
 import { layoutConfig } from '../../../../client/boundless.config'
-
+import Vue from 'vue'
 export default {
   created () {
     if (this.$q.sessionStorage.has('admin_token')) {
@@ -125,61 +129,16 @@ export default {
         this.layoutConfig = layoutConfig
       }
     }
-  },
-  computed: {
-    /**
-     * Each router-view needs different props. Some of these props interact
-     * with the data in 'ManageSettings.vue' which is why they are passed in
-     * here instead of through the router.
-     *
-     * @returns <Object> An object where each property is a prop.
-     */
-    settingProps () {
-      switch (this.tabSelected) {
-        case 'general':
-          return {
-            loadUserConfig: this.loadUserConfig,
-            loadChallengeConfig: this.loadChallengeConfig,
-            loadProjectConfig: this.loadProjectConfig,
-            loadKeywords: this.loadKeywords,
-            consoleLoading: this.consoleLoading
-          }
-        case 'database':
-          return {
-            dbId: this.dbId,
-            consoleLoading: this.consoleLoading,
-            loadDatabaseId: this.loadDatabaseId,
-            hideDatabaseSwitch: !this.layoutConfig.switchDatabase,
-            db: this.db,
-            switchDatabase: this.switchDatabase
-          }
-        case 'projects':
-          return {
-            keywords: this.configs.keywords,
-            previewRatio: this.previewRatio,
-            consoleLoading: this.consoleLoading,
-            loadProjectCOnfig: this.loadProjectConfig
-          }
-        case 'challenges':
-          return {
-            keywords: this.configs.keywords,
-            previewRatio: this.previewRatio,
-            consoleLoading: this.consoleLoading,
-            loadChallengeConfig: this.loadChallengeConfig
-          }
-        default:
-          return {}
-      }
-    }
+    this.setSettingProps('general')
   },
   data () {
     return {
-      tabSelected: 'general',
+      tabSelected: 'general', // <String>: The selected settings panel.
       notFound: false, // <Boolean>: flag for 404
       layoutConfig: null, // <Object>: dictionary of layout values
       splitterModel: 15, // <Number>: % of vw that left splitter is located
-      db: null, // <String>: name of the database
-      dbId: null, // <String>: project id of the firebase cred
+      db: '', // <String>: name of the database
+      dbId: '', // <String>: project id of the firebase cred
       previewRatio: '5', // <String>: ratio for preview of imges in child
       configs: { // <Object<Object>>: configuration records of all collections
         users: {}, // <Object>: configuration record for users
@@ -187,17 +146,72 @@ export default {
         challenges: {}, // <Object>: configuration record for challenges
         keywords: {} // <Object>: dictionary containing keywords
       },
-      haltConsole: false // <Boolean>: flag for loading animation
+      haltConsole: false, // <Boolean>: flag for loading animation
+      settingProps: {}
     }
   },
   methods: {
+    /**
+     * Each router-view needs different props. Some of these props interact
+     * with the data in 'ManageSettings.vue' which is why they are passed in
+     * here instead of through the router.
+     *
+     * @returns <Object> An object where each property is a prop.
+     */
+    setSettingProps (value) {
+      console.log(value)
+      this.tabSelected = value
+      let props = {}
+      switch (this.tabSelected) {
+        case 'general':
+          props = {
+            name: 'general',
+            setUserConfig: this.setUserConfig,
+            setChallengeConfig: this.setChallengeConfig,
+            setProjectConfig: this.setProjectConfig,
+            setKeywords: this.setKeywords,
+            consoleLoading: this.consoleLoading
+          }
+          break
+        case 'database':
+          props = {
+            name: 'database',
+            dbId: this.dbId,
+            consoleLoading: this.consoleLoading,
+            setDatabaseId: this.setDatabaseId,
+            hideDatabaseSwitch: !this.layoutConfig.switchDatabase,
+            db: this.db,
+            switchDatabase: this.switchDatabase
+          }
+          break
+        case 'projects':
+          props = {
+            name: 'projects',
+            keywords: this.configs.keywords,
+            previewRatio: this.previewRatio,
+            consoleLoading: this.consoleLoading,
+            setProjectConfig: this.setProjectConfig
+          }
+          props.name = 'projects'
+          break
+        case 'challenges':
+          props = {
+            name: 'challenges',
+            keywords: this.configs.keywords,
+            previewRatio: this.previewRatio,
+            consoleLoading: this.consoleLoading,
+            setChallengeConfig: this.setChallengeConfig
+          }
+          props.name = 'challenges'
+          break
+      }
+      Vue.set(this.$data, 'settingProps', props)
+    },
+    /**
+     * Handle page loading via child event.
+     * @param {Boolean} loadVal: event emitter value to render loading
+     */
     consoleLoading: function (loadVal) {
-      /**
-       * handle page loading via child event
-       * @param {Boolean} loadVal: event emitter value to render loading
-       * @return {void}
-       */
-
       this.haltConsole = loadVal
 
       if (!loadVal) {
@@ -215,24 +229,20 @@ export default {
         }
       }
     },
-    loadDatabaseId: function (databaseId) {
-      /**
-       * handle page loading via child event
-       * @param {Boolean} loadVal: event emitter value to render loading
-       * @return {void}
-       */
-
+    /**
+     * Sets the database id.
+     * @param {Boolean} databaseId: Event emitter value to render loading.
+     */
+    setDatabaseId: function (databaseId) {
       this.dbId = databaseId
     },
-    loadKeywords: function (val) {
-      /**
-       * load keywords from the child component and convert to
-       * map to assign as one of the object inside this.configs var
-       * @param {Object} val: event emitter value containing keywords
-       *                      from database
-       * @return {void}
-       */
-
+    /**
+     * Set keywords from the child component and convert to
+     * map to assign as one of the object inside this.configs var.
+     * @param {Object} val: Event emitter value containing keywords
+     *                      from database.
+     */
+    setKeywords: function (val) {
       if (val) {
         this.configs.keywords = {}
 
@@ -241,40 +251,34 @@ export default {
         }
       }
     },
-    loadProjectConfig: function (val) {
-      /**
-       * load project configuartion from the child component and
-       * assign as one of the object inside this.configs var
-       * @param {Object} val: event emitter value containing
-       *                      database information
-       * @return {void}
-       */
-
+    /**
+     * Set project configuartion from the child component and
+     * assign as one of the object inside this.configs var.
+     * @param {Object} val: Event emitter value containing
+     *                      database information.
+     */
+    setProjectConfig: function (val) {
       if (val) {
         this.configs.projects = val
       }
     },
-    loadChallengeConfig: function (val) {
-      /**
-       * load challenge configuartion from the child component and
-       * assign as one of the object inside this.configs var
-       * @param {Object} val: event emitter value containing
-       *                      database information
-       * @return {void}
-       */
-
+    /**
+     * Set challenge configuartion from the child component and
+     * assign as one of the object inside this.configs var.
+     * @param {Object} val: Event emitter value containing
+     *                      database information.
+     */
+    setChallengeConfig: function (val) {
       if (val) {
         this.configs.challenges = val
       }
     },
-    loadUserConfig: function (val) {
-      /**
-       * load user configuartion from the child component and assign
-       * as one of the object inside this.configs var
-       * @param {Object} val: event emitter value contating database information
-       * @return {void}
-       */
-
+    /**
+     * Set user configuartion from the child component and assign
+     * as one of the object inside this.configs var.
+     * @param {Object} val: Event emitter value contating database information.
+     */
+    setUserConfig: function (val) {
       if (val) {
         val.list = val.list.sort(
           (a, b) => a.value < b.value ? -1 : 1
@@ -283,13 +287,10 @@ export default {
         this.configs.users.socialNetwork = val
       }
     },
+    /**
+      * Switch database namespace and reload the page.
+      */
     switchDatabase: function () {
-      /**
-       * switch database namespace and reload the page
-       * @param {void}
-       * @return {void}
-       */
-
       this.$q.localStorage.set('boundless_db', this.db)
 
       if (this.$q.sessionStorage.has('boundless_timeout')) {
