@@ -20,6 +20,10 @@ Methods:
 
 ## */
 
+/*
+Note: empty fields are shown here just for documentation. Some of these fields
+will change as soon as data is fetched from the database (see 'actions.js').
+*/
 export default function () {
   return {
     project: {
