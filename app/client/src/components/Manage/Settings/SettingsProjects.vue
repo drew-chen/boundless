@@ -4,7 +4,7 @@
     type="projects"
     :ratio="settingProps.previewRatio"
     @submitting="settingProps.consoleLoading"
-    @submitted="settingProps.loadProjectConfig"
+    @submitted="settingProps.setProjectConfig"
   />
 </template>
 
@@ -16,7 +16,10 @@ export default {
     // Object containing all custom props. See structure in 'ManageSettings.vue'.
     settingProps: {
       type: Object,
-      required: true
+      required: true,
+      validator (prop) {
+        return prop.hasOwnProperty('name') && prop.name === 'projects'
+      }
     }
   },
   components: {

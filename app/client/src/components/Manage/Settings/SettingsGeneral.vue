@@ -1,9 +1,9 @@
 <template>
   <system-settings
-    @usersConfigInfo="settingProps.loadUserConfig"
-    @challengesConfigInfo="settingProps.loadChallengeConfig"
-    @projectsConfigInfo="settingProps.loadProjectConfig"
-    @keywords="settingProps.loadKeywords"
+    @usersConfigInfo="settingProps.setUserConfig"
+    @challengesConfigInfo="settingProps.setChallengeConfig"
+    @projectsConfigInfo="settingProps.setProjectConfig"
+    @keywords="settingProps.setKeywords"
     @submitting="settingProps.consoleLoading"
   />
 </template>
@@ -16,7 +16,10 @@ export default {
     // Object containing all custom props. See structure in 'ManageSettings.vue'.
     settingProps: {
       type: Object,
-      required: true
+      required: true,
+      validator (prop) {
+        return prop.hasOwnProperty('name') && prop.name === 'general'
+      }
     }
   },
   components: {
