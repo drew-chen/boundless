@@ -23,7 +23,7 @@ Methods:
   <div class="q-pa-md q-gutter-sm">
     <q-dialog
       persistent
-      v-model="dialogOpen"
+      v-model="value"
     >
       <q-card>
         <q-card-section>
@@ -35,20 +35,20 @@ Methods:
         <q-card-actions align="right">
           <q-btn
             no-caps
-            @click="saveAndLeave"
+            @click="onSave"
             color="secondary"
           >
             Save
           </q-btn>
           <q-btn
             flat no-caps
-            @click="leave"
+            @click="onNoSave"
           >
             Don't Save
           </q-btn>
           <q-btn
             flat no-caps
-            @click="cancel"
+            @click="onCancel"
           >
             Cancel
           </q-btn>
@@ -61,8 +61,8 @@ Methods:
 <script>
 export default {
   props: {
-    // Whether this dialog is open or not.
-    dialogOpen: {
+    // Whether this dialog is open or not. Used with v-model.
+    value: {
       type: Boolean,
       required: true
     }
@@ -70,43 +70,44 @@ export default {
   /** Accessed via refs in parent. */
   methods: {
     /**
-     * Sets the action for clicking "save".
+     * Initializes the methods run when a button is clicked.
      *
-     * @param {Function} callback Function to be called.
+     * @param {Function} save Function to be called to handle saving the page.
+     * @param {Function} next This function must be called to resolve the hook.
+     *  This is the exact same object as beforeRouteLeave's 'next' method.
+     * @param {Function} onLeave Additonal method to be run during leaving.
      * @returns {Object} This component instance (to allow method chaining).
      */
-    onSave (callback) {
-      this.saveAndLeave = callback
-      return this
+    constructMethods (save, next, onLeave) {
+      this.save = save
+      this.next = next
+      this.leave = () => {
+        onLeave()
+        this.next()
+      }
     },
-    /**
-     * Sets the action for clicking "don't save".
-     *
-     * @param {Function} callback Function to be called.
-     * @returns {Object} This component instance (to allow method chaining).
-     */
-    onNoSave (callback) {
-      this.leave = callback
-      return this
+    /** Method for when the "Save" button is clicked. */
+    onSave () {
+      this.save()
+      this.leave()
+      // Sets the dialogOpen flag in parent to false.
+      this.$emit('input', false)
     },
-    /**
-     * Sets the action for clicking "cancel".
-     *
-     * @param {Function} callback Funtion to be called.
-     * @returns {Object} This component instance (to allow method chaining).
-     */
-    onCancel (callback) {
-      this.cancel = callback
-      return this
+    /** Method for when the "Don't Save" button is clicked */
+    onNoSave () {
+      this.leave()
+      this.$emit('input', false)
     },
-    /** Method for when the "save" button is clicked. */
-    saveAndLeave () {
+    /** Method for when the "Cancel" button is clicked */
+    onCancel () {
+      this.next(false)
+      this.$emit('input', false)
     },
-    /** Method for when the "don't save" button is clicked. */
+    /** Method using for saving. */
+    save () {
+    },
+    /** Method ran for leaving. */
     leave () {
-    },
-    /** Method for when the "cancel" button is clicked. */
-    cancel () {
     }
   }
 }
