@@ -80,10 +80,6 @@ Methods:
           <router-view></router-view>
         </div>
       </div>
-
-      <q-inner-loading :showing="haltConsole">
-        <q-spinner-gears size="50px" color="primary" />
-      </q-inner-loading>
     </q-card>
   </q-page>
 </template>
@@ -134,30 +130,6 @@ export default {
       db: null, // <String>: name of the database
       haltConsole: false // <Boolean>: flag for loading animation
     }
-  },
-  methods: {
-    /**
-     * Handle page loading via child event.
-     * @param {Boolean} loadVal: Event emitter value to render loading.
-     */
-    consoleLoading: function (loadVal) {
-      this.haltConsole = loadVal
-
-      if (!loadVal) {
-        let storedConfig = this.$q.sessionStorage.getItem('boundless_config')
-        if (typeof storedConfig.enabledChallenges === 'boolean') {
-          this.layoutConfig.challenges = storedConfig.enabledChallenges
-        }
-
-        if (
-          storedConfig.wikiInfo &&
-          typeof storedConfig.wikiInfo.name === 'string'
-        ) {
-          this.layoutConfig.homeName = storedConfig.wikiInfo.name
-          this.layoutConfig.homeURL = storedConfig.wikiInfo.url || ''
-        }
-      }
-    }
   }
 }
 
@@ -165,10 +137,6 @@ export default {
 
 <style lang="stylus" scoped>
 // console-page page loadout
-
-body {
-  max-height: 50px
-}
 
 .console-page {
   min-width: 800px;

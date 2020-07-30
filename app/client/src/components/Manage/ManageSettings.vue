@@ -25,85 +25,90 @@ Methods:
 
 <template>
 
-  <q-splitter
-    disable
-    class="console-content-tab"
-    v-model="splitterModel"
-  >
-    <template v-slot:before>
-      <q-tabs
-        switch-indicator vertical inline-label stretch
-        v-model="tabSelected"
-        class="text-primary q-mr-sm ap-left-panel"
-        indicator-color="secondary"
-        active-color="secondary"
-      >
-        <q-route-tab
-          no-caps exact
-          label="General"
-          name="general"
-          style="justify-content: left;"
-          to="/admin/console/settings/general"
-        />
-        <q-separator />
-        <q-route-tab
-          no-caps exact
-          label="Database"
-          name="database"
-          style="justify-content: left;"
-          to="/admin/console/settings/database"
-        />
-        <q-separator />
-        <q-route-tab
-          no-caps exact
-          label="Projects"
-          name="projects"
-          style="justify-content: left;"
-          to="/admin/console/settings/projects"
-        />
-        <q-separator />
-        <q-route-tab
-          no-caps exact
-          v-if="layoutConfig && layoutConfig.challenges"
-          label="Challenges"
-          name="challenges"
-          style="justify-content: left;"
-          to="/admin/console/settings/challenges"
-        />
+  <div>
+    <q-splitter
+      disable
+      class="console-content-tab"
+      v-model="splitterModel"
+    >
+      <template v-slot:before>
+        <q-tabs
+          switch-indicator vertical inline-label stretch
+          v-model="tabSelected"
+          class="text-primary q-mr-sm ap-left-panel"
+          indicator-color="secondary"
+          active-color="secondary"
+        >
+          <q-route-tab
+            no-caps exact
+            label="General"
+            name="general"
+            style="justify-content: left;"
+            to="/admin/console/settings/general"
+          />
+          <q-separator />
+          <q-route-tab
+            no-caps exact
+            label="Database"
+            name="database"
+            style="justify-content: left;"
+            to="/admin/console/settings/database"
+          />
+          <q-separator />
+          <q-route-tab
+            no-caps exact
+            label="Projects"
+            name="projects"
+            style="justify-content: left;"
+            to="/admin/console/settings/projects"
+          />
+          <q-separator />
+          <q-route-tab
+            no-caps exact
+            v-if="layoutConfig && layoutConfig.challenges"
+            label="Challenges"
+            name="challenges"
+            style="justify-content: left;"
+            to="/admin/console/settings/challenges"
+          />
 
-      </q-tabs>
+        </q-tabs>
 
-    </template>
-      <template v-slot:after>
-        <q-tab-panel :name="tabSelected">
-          <transition
-            enter-active-class="animated fadeIn"
-            leave-active-class="animated fadeOut"
-            appear
-            :duration="50"
-          >
-            <keep-alive :max="5">
-              <!-- See ./Settings directory for components. -->
-              <router-view
-                :settingProps="settingProps"
-              >
-              </router-view>
-            </keep-alive>
-          </transition>
-        </q-tab-panel>
       </template>
+        <template v-slot:after>
+          <q-tab-panel :name="tabSelected">
+            <transition
+              enter-active-class="animated fadeIn"
+              leave-active-class="animated fadeOut"
+              appear
+              :duration="50"
+            >
+              <keep-alive :max="4">
+                <!-- See ./Settings directory for components. -->
+                <router-view
+                  :settingProps="settingProps"
+                >
+                </router-view>
+              </keep-alive>
+            </transition>
+          </q-tab-panel>
+        </template>
 
-      <!-- Previously, there was commented out code regarding user settings.
-      Code can be reffered to at this commit at 'Config.vue'.
-      "commit 4ce535e8b372ec9d30792999da13c3e89f84ec1f
-      Author: Htut <phyo.htut@windriver.com>
-      Date:   Wed May 20 17:36:06 2020 -0700
+        <!-- Previously, there was commented out code regarding user settings.
+        Code can be reffered to at this commit at 'Config.vue'.
+        "commit 4ce535e8b372ec9d30792999da13c3e89f84ec1f
+        Author: Htut <phyo.htut@windriver.com>
+        Date:   Wed May 20 17:36:06 2020 -0700
 
-          version 0.6.1 hotfix
+            version 0.6.1 hotfix
 
-          Signed-off-by: Htut <phyo.htut@windriver.com>
-      " -->
-  </q-splitter>
+            Signed-off-by: Htut <phyo.htut@windriver.com>
+        " -->
+    </q-splitter>
+    <q-inner-loading :showing="haltConsole">
+      <q-spinner size="50px" color="primary" />
+    </q-inner-loading>
+</div>
 </template>
 
 <script>
@@ -142,12 +147,13 @@ export default {
     /**
      * Each router-view needs different props. Some of these props interact
      * with the data in 'ManageSettings.vue' which is why they are passed in
-     * here instead of through the router.
+     * here instead of through the router. 'this' is explicitly binded
+     * to make sure each callback acts as if it was called in
+     * 'ManageSettings.vue' instead of in a child component.
      *
      * @returns <Object> An object where each property is a prop.
      */
     settingProps () {
-      console.log(this.tabSelected)
       switch (this.tabSelected) {
         case 'general':
           return {
@@ -156,37 +162,37 @@ export default {
             to render while switching to another route.
             */
             name: 'general',
-            setUserConfig: this.setUserConfig,
-            setChallengeConfig: this.setChallengeConfig,
-            setProjectConfig: this.setProjectConfig,
-            setKeywords: this.setKeywords,
-            consoleLoading: this.consoleLoading
+            setUserConfig: this.setUserConfig.bind(this),
+            setChallengeConfig: this.setChallengeConfig.bind(this),
+            setProjectConfig: this.setProjectConfig.bind(this),
+            setKeywords: this.setKeywords.bind(this),
+            consoleLoading: this.consoleLoading.bind(this)
           }
         case 'database':
           return {
             name: 'database',
             dbId: this.dbId,
-            consoleLoading: this.consoleLoading,
-            setDatabaseId: this.setDatabaseId,
+            consoleLoading: this.consoleLoading.bind(this),
+            setDatabaseId: this.setDatabaseId.bind(this),
             hideDatabaseSwitch: !this.layoutConfig.switchDatabase,
             db: this.db,
-            switchDatabase: this.switchDatabase
+            switchDatabase: this.switchDatabase.bind(this)
           }
         case 'projects':
           return {
             name: 'projects',
             keywords: this.configs.keywords,
             previewRatio: this.previewRatio,
-            consoleLoading: this.consoleLoading,
-            setProjectConfig: this.setProjectConfig
+            consoleLoading: this.consoleLoading.bind(this),
+            setProjectConfig: this.setProjectConfig.bind(this)
           }
         case 'challenges':
           return {
             name: 'challenges',
             keywords: this.configs.keywords,
             previewRatio: this.previewRatio,
-            consoleLoading: this.consoleLoading,
-            setChallengeConfig: this.setChallengeConfig
+            consoleLoading: this.consoleLoading.bind(this),
+            setChallengeConfig: this.setChallengeConfig.bind(this)
           }
         default:
           return {}
@@ -311,10 +317,6 @@ export default {
 
 <style lang="stylus" scoped>
 // console-page page loadout
-
-body {
-  max-height: 50px
-}
 
 .console-page {
   min-width: 800px;

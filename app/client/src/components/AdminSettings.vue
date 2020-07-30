@@ -74,19 +74,15 @@ Methods:
           Half-step:
         </div>
 
-        <div class="col q-pt-sm">
-          <q-item tag="label" v-ripple style="border-radius: 3px;">
+        <div class="col-2 q-pt-sm q-ml-md">
             <!-- <q-item-section>
             </q-item-section> -->
-            <q-item-section avatar>
               <q-toggle
                 color="green"
                 v-model="data.progressBar.half"
                 @input="forceUpdate()"
               />
-            </q-item-section>
-          </q-item>
-        </div>
+          </div>
       </div>
 
     </div>
