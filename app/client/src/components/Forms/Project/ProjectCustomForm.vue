@@ -115,7 +115,7 @@ export default {
      * save to vuex and tell the parent component to advance the stepper.
      */
     submit () {
-      if (Array.isArray(this.quesitons) && this.quesitons.length) {
+      if (Array.isArray(this.questions) && this.questions.length > 0) {
         this.$refs.form.validate().then(success => {
           if (success) {
             this.saveToVuex()
