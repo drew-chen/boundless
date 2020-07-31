@@ -81,7 +81,7 @@ export default {
       this.dbId = this.db.XT.bT.ci.projectId
       this.$emit('databaseId', this.dbId)
     } catch (error) {
-      throw new Error(error)
+      throw error
     }
   },
   data () {

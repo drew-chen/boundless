@@ -314,7 +314,7 @@ export default {
         await this.loadConfig()
       }
     } catch (error) {
-      throw new Error(error)
+      throw error
     }
   },
   data () {

@@ -531,7 +531,7 @@ export default {
       this.loadProgressBarConf()
       this.setPageTab()
     } catch (error) {
-      throw new Error(error)
+      throw error
     }
   },
   beforeUpdate () {

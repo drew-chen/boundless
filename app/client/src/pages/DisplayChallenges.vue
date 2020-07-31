@@ -353,7 +353,7 @@ export default {
         v => v in this.keywordsValToKeyMap
       )
     } catch (error) {
-      throw new Error(error)
+      throw error
     }
   },
   data () {

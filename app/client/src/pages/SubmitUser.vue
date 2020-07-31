@@ -131,7 +131,7 @@ export default {
       await this.loadUserList()
       await this.loadAllowedDomain()
     } catch (error) {
-      throw new Error(error)
+      throw error
     }
   },
   data () {

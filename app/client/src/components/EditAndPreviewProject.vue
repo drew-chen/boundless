@@ -1924,7 +1924,7 @@ export default {
 
       this.loadProgressBarConf()
     } catch (error) {
-      throw new Error(error)
+      throw error
     }
   },
   beforeUpdate () {

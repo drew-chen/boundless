@@ -704,7 +704,7 @@ export default {
         this.setWebpage(cloneDeep(this.webpage))
         this.setProject(cloneDeep(newProject))
       } catch (error) {
-        throw new Error(error)
+        throw error
       }
     },
     /**

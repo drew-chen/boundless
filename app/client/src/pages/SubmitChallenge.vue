@@ -684,7 +684,7 @@ export default {
         this.$router.push('/err')
       }
     } catch (error) {
-      throw new Error(error)
+      throw error
     }
   },
   data () {
@@ -906,7 +906,7 @@ export default {
 
         this.onReset()
       } catch (error) {
-        throw new Error(error)
+        throw error
       }
     },
     onReset: function () {
@@ -982,7 +982,7 @@ export default {
           }
         })
       } catch (error) {
-        throw new Error(error)
+        throw error
       }
     },
     emailDomainCheck: function (indexEmail, index) {

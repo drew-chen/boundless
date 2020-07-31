@@ -396,7 +396,7 @@ export default {
         this.layoutConfig = layoutConfig
       }
     } catch (error) {
-      throw new Error(error)
+      throw error
     }
   },
   data () {

@@ -575,7 +575,7 @@ export default {
 
       await this.storageUrlFetcher()
     } catch (error) {
-      throw new Error(error)
+      throw error
     }
   },
   beforeDestroy () {

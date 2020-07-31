@@ -219,7 +219,7 @@ export default {
         this.$q.localStorage.set('boundless_db', 'production')
       }
     } catch (error) {
-      throw new Error(error)
+      throw error
     }
   },
   beforeUpdate () {
