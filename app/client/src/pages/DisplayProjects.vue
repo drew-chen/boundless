@@ -325,7 +325,7 @@ export default {
         v => v in this.keywordsValToKeyMap
       )
     } catch (error) {
-      throw new Error(error)
+      throw error
     }
   },
   beforeUpdate () {
@@ -476,7 +476,7 @@ export default {
           this.storage = productionStorage
           this.$q.localStorage.set('boundless_db', 'production')
 
-          return false
+          throw error
         }
       }
     },
@@ -606,7 +606,7 @@ export default {
       } catch (error) {
         this.loading = false
 
-        return false
+        throw error
       }
     },
     loadConfig: async function () {
@@ -660,6 +660,7 @@ export default {
                 ).getDownloadURL()
               } catch (error) {
                 this.keywordsImage[key] = '../statics/images/other-icon.png'
+                throw error
               }
             }
           }
@@ -667,7 +668,6 @@ export default {
           if (typeof data['pagination'] === 'number') {
             this.pagination.rowsPerPage = data['pagination']
           }
-
           let expireDate = data.newFlag * 24 * 60 * 60 * 1000
           this.todayDate = new Date(Date.now() - expireDate)
           this.todayDate = this.todayDate.toISOString().substring(0, 10)
@@ -677,7 +677,7 @@ export default {
           throw new Error('File not found!')
         }
       } catch (error) {
-        return false
+        throw error
       }
     },
     gettingCount: function () {

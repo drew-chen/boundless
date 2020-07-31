@@ -10,7 +10,6 @@
 ## OR CONDITIONS OF ANY KIND, either express or implied.
 
 Name:     components/Forms/Project/ProjectCustomForm.vue
-
 Purpose:
 
   Custom form designed by the admin in 'ProjectCreateCustomForm.vue'.
@@ -42,7 +41,7 @@ Methods:
               clear-icon="close"
               class="q-mt-sm"
               :placeholder="`${question.type.label} Response`"
-              :label="question.label"
+              :label="question.label ? question.label : 'Untitled'"
               :type="question.type.value"
               v-model="question.response"
               :rules="[val => (!question.required || !!val) || '* Required']"

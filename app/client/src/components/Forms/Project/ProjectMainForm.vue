@@ -10,7 +10,6 @@ q<!-- ##
 ## OR CONDITIONS OF ANY KIND, either express or implied.
 
 Name:     components/Forms/Project/ProjectMainForm.vue
-
 Purpose:
 
   Form to allow the users to submit projects which are
@@ -729,7 +728,6 @@ export default {
     emailDomainCheck: function (indexEmail, index) {
       let validEmail = false
       indexEmail = indexEmail.toLowerCase()
-
       if (this.allowedDomain.length > 0) {
         this.allowedDomain.forEach(entry => {
           if (indexEmail.includes(entry)) {
