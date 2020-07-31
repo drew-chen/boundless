@@ -398,7 +398,7 @@ export default {
       await this.loadFireRefs()
       await this.loadInformation()
     } catch (error) {
-      throw new Error(error)
+      throw error
     }
   },
   data () {
