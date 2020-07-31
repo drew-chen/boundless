@@ -34,7 +34,7 @@ Methods:
           @change="retrieveDataFromFile"
         >
 
-        <q-form @submit="onSubmit">
+        <q-form @submit="submit">
           <div class="">
             <q-btn
               no-caps label="Import" type="submit"
@@ -144,7 +144,7 @@ export default {
         }
       }
     },
-    onSubmit: async function () {
+    submit: async function () {
       /**
        * importing to the database
        * @param {void}

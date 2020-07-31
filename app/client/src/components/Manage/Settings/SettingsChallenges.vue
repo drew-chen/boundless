@@ -6,6 +6,7 @@
     :ratio="settingProps.previewRatio"
     @submitting="settingProps.consoleLoading"
     @submitted="settingProps.setChallengeConfig"
+    ref="adminSettings"
   />
 </template>
 
@@ -19,6 +20,18 @@ export default {
       type: Object,
       required: true
     }
+  },
+  /**
+   * Block leaving with persistent dialog if changes have been made.
+   * View specifics on navigation guards at:
+   * https://router.vuejs.org/guide/advanced/navigation-guards.html#global-before-guards
+   *
+   * @param {Object} to The target Route Object being navigated to.
+   * @param {Object} from The current route being navigated away from.
+   * @param {Function} next This function must be called to resolve the hook.
+   */
+  beforeRouteLeave (to, from, next) {
+    this.$refs.adminSettings.openConfirmLeaveDialog(next)
   },
   components: {
     AdminSettings
