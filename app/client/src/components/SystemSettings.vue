@@ -23,7 +23,7 @@ Methods:
 
 <template>
   <div>
-    <div class="">
+    <div>
       <div class="row text-h4">
         General
 
@@ -35,7 +35,7 @@ Methods:
             class="float-right"
             label="Submit"
             :color="!updated ? 'accent' : 'secondary'"
-            @click="onSubmit"
+            @click="submit"
           />
         </div>
       </div>
@@ -413,7 +413,7 @@ Methods:
             class="float-right"
             label="Submit"
             :color="!updated ? 'accent' : 'secondary'"
-            @click="onSubmit"
+            @click="submit"
           />
 
           <q-btn
@@ -540,6 +540,11 @@ Methods:
         </q-card>
       </q-dialog>
     </div>
+
+    <!-- -------------------- Dialog -------------------- -->
+    <dialog-confirm-leave
+      ref="dialogConfirmLeave"
+    />
   </div>
 </template>
 
@@ -550,11 +555,13 @@ import { layoutConfig } from '../../boundless.config'
 
 import sha256 from 'sha256'
 
-import Markdown from '../components/Markdown'
+import Markdown from '../components/Markdown.vue'
+import DialogConfirmLeave from '../components/Dialogs/DialogConfirmLeave.vue'
 
 export default {
   components: {
-    Markdown
+    Markdown,
+    DialogConfirmLeave
   },
   async created () {
     try {
@@ -576,29 +583,6 @@ export default {
       await this.storageUrlFetcher()
     } catch (error) {
       throw error
-    }
-  },
-  beforeDestroy () {
-    // not submitted and updated, ask sure to either abort of submit changes
-
-    if (!this.submitted && this.updated) {
-      this.$q.dialog({
-        title: 'Are you sure you want to leave without submitting changes? (All changes will be lost).',
-        cancel: {
-          flat: true,
-          noCaps: true,
-          label: 'Submit'
-        },
-        ok: {
-          flat: true,
-          noCaps: true,
-          label: 'Leave'
-        },
-        persistent: true
-      }).onOk(() => {
-      }).onCancel(() => {
-        this.onSubmit()
-      })
     }
   },
   data () {
@@ -1096,7 +1080,7 @@ export default {
         }
       }
     },
-    onSubmit: async function () {
+    submit: async function () {
       /**
        * submit files, gets urls, and upate session config
        * @param {void}
@@ -1320,6 +1304,29 @@ export default {
           strTokens[i] = strTokens[i][0].toUpperCase() + strTokens[i].slice(1).toLowerCase()
         }
         return strTokens.join(' ')
+      }
+    },
+    /**
+     * Helper function for parent component's 'beforeRouteLeave' method. The
+     * dialog is first initialized with methods and then opens if changes have
+     * been made.
+     *
+     * @param {Function} next This function must be called to resolve the hook.
+     *  This is the exact same object as beforeRouteLeave's 'next' method.
+     */
+    openConfirmLeaveDialog (next) {
+      if (!this.submitted && this.updated) {
+        /*
+        No special action upon leaving is done other than leaving so
+        the 'onLeave' parameter has an empty function argument.
+        */
+        this.$refs.dialogConfirmLeave.open(
+          this.submit,
+          next,
+          () => {}
+        )
+      } else {
+        next()
       }
     }
   }
