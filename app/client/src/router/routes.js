@@ -17,6 +17,8 @@ Methods:
   functions for lazy loading. Routes are also used to take advantage of
   navigation guards. For example, leaving project settings with unsaved changes
   triggers a navigation guard to make sure the user deals with the changes.
+  That guard is placed 'SettingsProject.vue' instead of here since that
+  specific guard needs '$refs' to work.
 
 ## */
 

@@ -45,6 +45,7 @@ Methods:
             name="general"
             style="justify-content: left;"
             to="/admin/console/settings/general"
+            v-focus:general
           />
           <q-separator />
           <q-route-tab
@@ -53,6 +54,7 @@ Methods:
             name="database"
             style="justify-content: left;"
             to="/admin/console/settings/database"
+            v-focus:database
           />
           <q-separator />
           <q-route-tab
@@ -61,6 +63,7 @@ Methods:
             name="projects"
             style="justify-content: left;"
             to="/admin/console/settings/projects"
+            v-focus:projects
           />
           <q-separator />
           <q-route-tab
@@ -70,6 +73,7 @@ Methods:
             name="challenges"
             style="justify-content: left;"
             to="/admin/console/settings/challenges"
+            v-focus:challenges
           />
 
         </q-tabs>
@@ -128,6 +132,31 @@ export default {
       }
     } else {
       this.layoutConfig = layoutConfig
+    }
+  },
+  directives: {
+    focus: {
+      /**
+       * Custom directive to control tab focusing. This is needed to override
+       * the focus based on route pathing. When navigating away and
+       * pressing "cancel" on a confirm leave dialog, the cancelled
+       * navigation will no longer cause a wrong tab focus.
+       *
+       * @param <Object>: el The element the directive is bound to. This can be used to directly manipulate the DOM.
+       * @param <Object>: binding An object containg the 'arg' property. 'arg'
+       *  is the argument passed to the directive, if any. For example in
+       *  v-my-directive:foo, the arg would be "foo".
+       * @param <Object>: vnode The virtual node produced by Vue’s compiler.
+       *  The 'context' property provides this component's 'this'.
+       */
+      inserted (el, binding, vnode) {
+        if (binding.args === vnode.context.tabSelected) {
+          console.log(binding.args, vnode.context.tabSelected)
+          el.focus()
+        } else {
+          el.blur()
+        }
+      }
     }
   },
   computed: {
@@ -302,22 +331,14 @@ export default {
 </script>
 
 <style lang="stylus" scoped>
-// console-page page loadout
-
-.console-page {
-  min-width: 800px;
-  max-width: 98%;
-  margin: auto;
-}
 
 // left-tab loadout
-.console-content-tab {
-  border-radius: 3px;
-  overflow: hidden;
-}
+.console-content-tab
+  border-radius: 3px
+  overflow: hidden
 
-.ap-left-panel {
-  border: solid $grey-5 1px;
-  border-radius: 3px;
-}
+.ap-left-panel
+  border: solid $grey-5 1px
+  border-radius: 3px
+
 </style>

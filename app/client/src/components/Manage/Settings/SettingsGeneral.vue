@@ -25,7 +25,8 @@ export default {
     }
   },
   /**
-   * Block leaving with persistent dialog if changes have been made.
+   * Block leaving with persistent dialog if changes have been made. Since this
+   * function needs access to '$refs', it isn't placed in 'routes.js'.
    * View specifics on navigation guards at:
    * https://router.vuejs.org/guide/advanced/navigation-guards.html#global-before-guards
    *
