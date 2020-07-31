@@ -90,7 +90,10 @@ export async function loadConfig ({ commit, getters }) {
       })
     }
     commit('setKeywordOptions', keywordOptions)
-    commit('setQuestionTemplates', data.projectsConfig.questionTemplates)
+    let qTemplates = data.projectsConfig.questionTemplates
+    qTemplates = (qTemplates === undefined) ? [] : qTemplates
+
+    commit('setQuestionTemplates', qTemplates)
     commit('setQuestions', [])
     commit('setAllowedDomain', data.allowedDomain)
     commit('setBodyTypeOptions', data.bodyContentType)
@@ -211,7 +214,6 @@ export async function submitProject ({ commit, dispatch, getters }) {
 
   commit('setProjectUuid', projectDoc.id)
   commit('setProjectSubmitTime', submitTime)
-
   await projectDoc.set({
     webpage: getters.webpage,
     files: {}
@@ -254,7 +256,7 @@ export async function submitQuestionTemplates ({ commit, getters }, questionTemp
       projectsConfig: {
         questionTemplates
       }
-    })
+    }, { merge: true })
   commit('setQuestionTemplates', questionTemplates)
 }
 

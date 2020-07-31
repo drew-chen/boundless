@@ -153,6 +153,9 @@ export default {
   },
   async created () {
     this.questionTemplates = cloneDeep(this.storeQuestionTemplates)
+    if (this.storeQuestionTemplates === undefined) {
+      this.questionTemplates = []
+    }
     this.modified = false
   },
   /** Lets parent component it is ok to use ref. */

@@ -649,7 +649,7 @@ export default {
       this.dbData = deepClone(this.data)
       window.addEventListener('beforeunload', this.confirmUnload)
     } catch (error) {
-      throw new Error(error)
+      throw error
     }
   },
   destroyed () {
@@ -868,7 +868,7 @@ export default {
           this.$emit('submitted', this.data)
         }
       } catch (error) {
-        throw new Error(error)
+        throw error
       }
     },
     /**
@@ -965,7 +965,9 @@ export default {
           await this.storageUrlFetcher('listingTable', 'bannerImg')
           await this.storageUrlFetcher('webpage', 'bannerImg')
           await this.storageUrlFetcher('webpage', 'mainImg')
-          this.$refs.projectCreateCustomForm.saveQuestionTemplates()
+          if (this.type === 'projects') {
+            this.$refs.projectCreateCustomForm.saveQuestionTemplates()
+          }
           this.dbData = deepClone(this.data)
           setTimeout(() => {
             this.updated = false
@@ -975,7 +977,7 @@ export default {
           }, 300)
         }
       } catch (error) {
-        throw new Error(error)
+        throw error
       }
     },
     /**
