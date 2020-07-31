@@ -318,7 +318,6 @@ export default {
       await this.loadFireRefs()
       await this.loadConfig()
       await this.loadProjectList()
-
       this.loadProgressBarConf()
 
       this.keywordsInUse = this.keywordsInUse.filter(
@@ -455,7 +454,6 @@ export default {
       } else {
         try {
           let doc = await productionDb.collection('config').doc('project').get()
-
           if (doc.exists) {
             if (doc.data().db === 'testing') {
               this.db = testingDb
@@ -554,7 +552,6 @@ export default {
 
       try {
         let doc = await this.db.collection('projects').doc('ToC').get()
-
         if (doc.exists) {
           for (let project in doc.data()) {
             if (project !== 'alias') {
@@ -619,7 +616,6 @@ export default {
 
       try {
         let doc = await this.db.collection('config').doc('project').get()
-
         if (doc.exists) {
           let data = doc.data()
 
@@ -643,7 +639,6 @@ export default {
             //   cachedKeywords.push(data['keywords'][key])
             // }
           }
-
           // this.keywordsInUse = cachedKeywords
           this.keywordsInUse = data.projectsConfig.keywords
 
@@ -659,8 +654,13 @@ export default {
                   data.extraKeywordsData[prop]
                 ).getDownloadURL()
               } catch (error) {
-                this.keywordsImage[key] = '../statics/images/other-icon.png'
-                throw error
+                // TODO: Use class 'instanceof' instead of this method.
+                if (error.message && error.message.includes('Firebase Storage')) {
+                  this.keywordsImage[key] = '../statics/images/other-icon.png'
+                  console.error(error)
+                } else {
+                  throw error
+                }
               }
             }
           }
