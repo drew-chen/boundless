@@ -34,7 +34,6 @@ Methods:
       <template v-slot:before>
         <q-tabs
           switch-indicator vertical inline-label stretch
-          v-model="tabSelected"
           class="text-primary q-mr-sm ap-left-panel"
           indicator-color="secondary"
           active-color="secondary"
@@ -43,27 +42,21 @@ Methods:
             no-caps exact
             label="General"
             name="general"
-            style="justify-content: left;"
-            to="/admin/console/settings/general"
-            v-focus:general
+            :to="`${basePath}/general`"
           />
           <q-separator />
           <q-route-tab
             no-caps exact
             label="Database"
             name="database"
-            style="justify-content: left;"
-            to="/admin/console/settings/database"
-            v-focus:database
+            :to="`${basePath}/database`"
           />
           <q-separator />
           <q-route-tab
             no-caps exact
             label="Projects"
             name="projects"
-            style="justify-content: left;"
-            to="/admin/console/settings/projects"
-            v-focus:projects
+            :to="`${basePath}/projects`"
           />
           <q-separator />
           <q-route-tab
@@ -71,32 +64,30 @@ Methods:
             v-if="layoutConfig && layoutConfig.challenges"
             label="Challenges"
             name="challenges"
-            style="justify-content: left;"
-            to="/admin/console/settings/challenges"
-            v-focus:challenges
+            :to="`${basePath}/challenges`"
           />
 
         </q-tabs>
 
       </template>
-        <template v-slot:after>
-          <q-tab-panel :name="tabSelected">
-            <transition
-              enter-active-class="animated fadeIn"
-              leave-active-class="animated fadeOut"
-              appear
-              :duration="160"
-            >
-              <keep-alive>
-                <!-- See ./Settings directory for components. -->
-                <router-view
-                  :settingProps="settingProps"
-                >
-                </router-view>
-              </keep-alive>
-            </transition>
-          </q-tab-panel>
-        </template>
+      <template v-slot:after>
+        <q-tab-panel :name="tabSelected">
+          <transition
+            enter-active-class="animated fadeIn"
+            leave-active-class="animated fadeOut"
+            appear
+            :duration="160"
+          >
+            <keep-alive>
+              <!-- See ./Settings directory for components. -->
+              <router-view
+                :settingProps="settingProps"
+              >
+              </router-view>
+            </keep-alive>
+          </transition>
+        </q-tab-panel>
+      </template>
 
         <!-- Previously, there was commented out code regarding user settings.
         Code can be reffered to at this commit at 'Config.vue'.
@@ -149,10 +140,11 @@ export default {
        * @param <Object>: vnode The virtual node produced by Vue’s compiler.
        *  The 'context' property provides this component's 'this'.
        */
-      inserted (el, binding, vnode) {
+      update (el, binding, vnode) {
+        el.blur()
         if (binding.args === vnode.context.tabSelected) {
           console.log(binding.args, vnode.context.tabSelected)
-          el.focus()
+          el.blur()
         } else {
           el.blur()
         }
@@ -161,12 +153,21 @@ export default {
   },
   computed: {
     /**
+     * Returns the name of the tab selected by slicing off the path of this
+     * component from the url. The + 1 is needed to also slice off the
+     * '/' before the child path.
+     */
+    tabSelected () {
+      return this.$route.path.slice(this.basePath.length + 1)
+    },
+    /**
      * Each router-view needs different props. Some of these props interact
      * with the data in 'ManageSettings.vue' which is why they are passed in
      * here instead of through the router. 'this' is explicitly binded
      * to make sure each callback acts as if it was called in
      * 'ManageSettings.vue' instead of in a child component.
      *
+     * @param <String>: The value of 'tabSelected'.
      * @returns <Object> An object where each property is a prop.
      */
     settingProps () {
@@ -217,7 +218,6 @@ export default {
   },
   data () {
     return {
-      tabSelected: 'general', // <String>: The selected settings panel.
       layoutConfig: null, // <Object>: dictionary of layout values
       splitterModel: 15, // <Number>: % of vw that left splitter is located
       db: '', // <String>: name of the database
@@ -229,7 +229,9 @@ export default {
         challenges: {}, // <Object>: configuration record for challenges
         keywords: {} // <Object>: dictionary containing keywords
       },
-      haltConsole: false // <Boolean>: flag for loading animation
+      haltConsole: false, // <Boolean>: flag for loading animation
+      // <String>: The path of this component and the parent path of child routes.
+      basePath: '/admin/console/settings'
     }
   },
   methods: {
@@ -331,6 +333,10 @@ export default {
 </script>
 
 <style lang="stylus" scoped>
+
+// Affects .q-route-tab
+.q-tab
+  justify-content: left
 
 // left-tab loadout
 .console-content-tab

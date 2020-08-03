@@ -31,7 +31,11 @@ export default {
    * @param {Function} next This function must be called to resolve the hook.
    */
   beforeRouteLeave (to, from, next) {
-    this.$refs.adminSettings.openConfirmLeaveDialog(next)
+    if (this.settingProps.name === 'challenges') {
+      this.$refs.adminSettings.openConfirmLeaveDialog(next)
+    } else {
+      next()
+    }
   },
   components: {
     AdminSettings
