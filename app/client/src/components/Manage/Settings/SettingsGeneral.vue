@@ -35,7 +35,11 @@ export default {
    * @param {Function} next This function must be called to resolve the hook.
    */
   beforeRouteLeave (to, from, next) {
-    this.$refs.systemSettings.openConfirmLeaveDialog(next)
+    if (this.settingProps.name === 'general') {
+      this.$refs.systemSettings.openConfirmLeaveDialog(next)
+    } else {
+      next()
+    }
   },
   components: {
     SystemSettings
