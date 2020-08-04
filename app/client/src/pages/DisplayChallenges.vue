@@ -492,7 +492,7 @@ export default {
           this.storage = productionStorage
           this.$q.localStorage.set('boundless_db', 'production')
 
-          return false
+          throw error
         }
       }
     },
@@ -599,7 +599,7 @@ export default {
       } catch (error) {
         this.loading = false
 
-        return false
+        throw error
       }
     },
     loadConfig: async function () {
@@ -670,7 +670,7 @@ export default {
           throw new Error('File not found!')
         }
       } catch (error) {
-        return false
+        throw error
       }
     },
     gettingCount: function () {
