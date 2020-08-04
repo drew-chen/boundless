@@ -30,6 +30,7 @@ Methods:
     <div
       class="container"
     >
+      <!-- Main form review. -->
       <q-input
         filled readonly
         label="Project Name"
@@ -115,15 +116,23 @@ Methods:
           </div>
         </div>
       </div>
-      <div v-for="question in questions" :key="question.label">
-        <q-input
-          filled readonly
-          class="q-mt-sm"
-          placeholder="a"
-          :label="question.label"
-          :type="question.type"
-          :value="question.response"
-        />
+
+      <!-- Custom form review. -->
+
+      <div v-if="customFormEnabled">
+        <div
+          v-for="question in questions"
+          :key="question.label"
+        >
+          <q-input
+            filled readonly
+            class="q-mt-sm"
+            placeholder="a"
+            :label="question.label"
+            :type="question.type"
+            :value="question.response"
+          />
+        </div>
       </div>
     </div>
   </div>
@@ -141,7 +150,8 @@ export default {
       'projectMembers',
       'keywordOptions',
       'projectKeywords',
-      'questions'
+      'questions',
+      'customFormEnabled'
     ])
   }
 }
