@@ -331,8 +331,9 @@ export default {
     /**
      * Reactively sets local questionTemplates to same state in Vuex store.
      */
-    resetQuestionTemplates () {
+    resetForm () {
       Vue.set(this.$data, 'questionTemplates', cloneDeep(this.storeQuestionTemplates))
+      Vue.set(this.$data, 'customFormEnabled', this.storeCustomFormEnabled)
     }
   }
 }

@@ -1046,7 +1046,7 @@ export default {
           message: 'Would you like undo all unsaved changes?',
           cancel: true
         }).onOk(() => {
-          this.$refs.projectCreateCustomForm.resetQuestionTemplates()
+          this.$refs.projectCreateCustomForm.resetForm()
           Vue.set(this.$data, 'data', deepClone(this.dbData))
           this.updated = false
         })
