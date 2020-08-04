@@ -35,7 +35,7 @@ Methods:
           <button-undo-and-save
             :disabled="!canSave()"
             :save="submit"
-            :undo="reset"
+            :undo="openResetDialog"
           />
         </div>
 
@@ -554,13 +554,16 @@ Methods:
       <button-undo-and-save
         :disabled="!canSave()"
         :save="submit"
-        :undo="reset"
+        :undo="openResetDialog"
       />
     </div>
 
     <!-- -------------------- Dialog -------------------- -->
     <dialog-confirm-leave
       ref="dialogConfirmLeave"
+      :save="submit"
+      :onLeave="revokeUrls"
+      :undo="reset"
     />
   </div>
 </template>
@@ -1038,18 +1041,23 @@ export default {
         event.returnValue = 'You should keep this page open.'
       }
     },
+    /** Opens confirmation to undo unsaved changes. */
+    openResetDialog () {
+      this.$q.dialog({
+        title: 'Confirm',
+        message: 'Would you like undo all unsaved changes?',
+        cancel: true
+      }).onOk(() => {
+        this.reset()
+      })
+    },
     /** Undo's local changes if there are changes to be saved. */
     reset () {
+      console.log('sdsds')
       if (this.canSave()) {
-        this.$q.dialog({
-          title: 'Confirm',
-          message: 'Would you like undo all unsaved changes?',
-          cancel: true
-        }).onOk(() => {
-          this.$refs.projectCreateCustomForm.resetForm()
-          Vue.set(this.$data, 'data', deepClone(this.dbData))
-          this.updated = false
-        })
+        this.$refs.projectCreateCustomForm.resetForm()
+        Vue.set(this.$data, 'data', deepClone(this.dbData))
+        this.updated = false
       }
     },
     revokeUrls () {
@@ -1065,19 +1073,14 @@ export default {
     },
     /**
      * Helper function for parent component's 'beforeRouteLeave' method. The
-     * dialog is first initialized with methods and then opens if changes have
-     * been made.
+     * dialog opens if changes have been made.
      *
      * @param {Function} next This function must be called to resolve the hook.
-     *  This is the exact same object as beforeRouteLeave's 'next' method.
+     *  This is the exact same object as 'beforeRouteLeave''s 'next' method.
      */
     openConfirmLeaveDialog (next) {
       if (this.canSave()) {
-        this.$refs.dialogConfirmLeave.open(
-          this.submit,
-          next,
-          this.revokeUrls
-        )
+        this.$refs.dialogConfirmLeave.open(next)
       } else {
         next()
       }

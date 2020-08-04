@@ -544,6 +544,7 @@ Methods:
     <!-- -------------------- Dialog -------------------- -->
     <dialog-confirm-leave
       ref="dialogConfirmLeave"
+      :save="submit"
     />
   </div>
 </template>
@@ -1308,23 +1309,14 @@ export default {
     },
     /**
      * Helper function for parent component's 'beforeRouteLeave' method. The
-     * dialog is first initialized with methods and then opens if changes have
-     * been made.
+     * dialog opens if changes have been made.
      *
      * @param {Function} next This function must be called to resolve the hook.
-     *  This is the exact same object as beforeRouteLeave's 'next' method.
+     *  This is the exact same object as 'beforeRouteLeave''s 'next' method.
      */
     openConfirmLeaveDialog (next) {
-      if (!this.submitted && this.updated) {
-        /*
-        No special action upon leaving is done other than leaving so
-        the 'onLeave' parameter has an empty function argument.
-        */
-        this.$refs.dialogConfirmLeave.open(
-          this.submit,
-          next,
-          () => {}
-        )
+      if (this.canSave()) {
+        this.$refs.dialogConfirmLeave.open(next)
       } else {
         next()
       }

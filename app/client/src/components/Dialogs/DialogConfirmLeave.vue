@@ -60,6 +60,23 @@ Methods:
 
 <script>
 export default {
+  props: {
+    // Function to be called to handle saving the page.
+    save: {
+      type: Function,
+      required: true
+    },
+    // Additonal method to be run while leaving.
+    onLeave: {
+      type: Function,
+      default: () => {}
+    },
+    // Resets unsaved changes if possible.
+    undo: {
+      type: Function,
+      default: () => {}
+    }
+  },
   data () {
     return {
     // <Boolean>: Whether this dialog is open or not.
@@ -69,21 +86,13 @@ export default {
   /** Accessed via refs in parent. */
   methods: {
     /**
-     * Initializes the methods run when a button is clicked and opens
-     * the dialog.
-     *
-     * @param {Function} save Function to be called to handle saving the page.
+     * Opens the dialog and initializes 'leave'.
      * @param {Function} next This function must be called to resolve the hook.
-     *  This is the exact same object as beforeRouteLeave's 'next' method.
-     * @param {Function} onLeave Additonal method to be run during leaving.
-     * @returns {Object} This component instance (to allow method chaining).
      */
-    open (save, next, onLeave) {
-      this.save = save
-      this.next = next
+    open (next) {
       this.leave = () => {
-        onLeave()
-        this.next()
+        this.onLeave()
+        next()
       }
       this.dialogOpen = true
     },
@@ -96,6 +105,7 @@ export default {
     },
     /** Method for when the "Don't Save" button is clicked. */
     onNoSave () {
+      this.undo()
       this.dialogOpen = false
       this.leave()
     },
@@ -107,10 +117,7 @@ export default {
       this.dialogOpen = false
       this.next(false)
     },
-    /** Method using for saving. */
-    save () {
-    },
-    /** Method ran for leaving. */
+    /** Method run for leaving. Initialized in created hook. */
     leave () {
     }
   }
