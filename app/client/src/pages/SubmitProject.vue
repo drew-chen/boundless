@@ -41,6 +41,7 @@ Methods:
         </q-step>
 
         <q-step
+          v-if="customFormEnabled"
           :name="2"
           title="Additional questions"
           icon="assignment"
@@ -69,10 +70,19 @@ Methods:
               color="secondary"
               :label="step === 3 ? 'Submit' : 'Continue'"
             />
-            <q-btn v-if="step > 1" flat color="primary" @click="$refs.stepper.previous()" label="Back" class="q-ml-sm"></q-btn>
+            <q-btn
+              v-if="step > 1"
+              flat
+              color="primary"
+              @click="navigateBackward"
+              label="Back"
+              class="q-ml-sm"
+            />
           </q-stepper-navigation>
         </template>
       </q-stepper>
+      <q-inner-loading :showing="submitting">
+      </q-inner-loading>
     </q-card>
   </q-page>
 </template>
@@ -98,11 +108,15 @@ export default {
     window.removeEventListener('beforeunload', this.confirmUnload)
   },
   computed: {
-    ...mapGetters['project']
+    ...mapGetters([
+      'project',
+      'customFormEnabled'
+    ])
   },
   data () {
     return {
-      step: 1 // <Integer> Progress counter representing current panel.
+      step: 1, // <Integer> Progress counter representing current panel.
+      submitting: false // <Boolean> Whether data is being submitted.
     }
   },
 
@@ -126,13 +140,17 @@ export default {
           break
         case 3:
           try {
+            this.submitting = true
             await this.submitProject()
             await this.submitQuestions()
 
             this.resetProject()
             this.$refs.projectMainForm.reset()
-            this.$refs.projectCustomForm.reset()
-
+            // If disabled, this ref does not exist.
+            if (this.customFormEnabled) {
+              this.$refs.projectCustomForm.reset()
+            }
+            this.submitting = false
             this.$q.notify({
               type: 'positive',
               message: 'Submitted successfully!'
@@ -144,6 +162,7 @@ export default {
               type: 'negative',
               message: 'Unable to submit new project.'
             })
+            this.submitting = false
             throw error
           }
           break
@@ -151,7 +170,19 @@ export default {
     },
     /** Advance the stepper page. */
     navigateForward () {
-      this.$refs.stepper.next()
+      if (this.step === 1 && !this.customFormEnabled) {
+        this.$refs.stepper.goTo(3)
+      } else {
+        this.$refs.stepper.next()
+      }
+    },
+    /** Go back to the previous stepper page. */
+    navigateBackward () {
+      if (this.step === 3 && !this.customFormEnabled) {
+        this.$refs.stepper.goTo(1)
+      } else {
+        this.$refs.stepper.previous()
+      }
     },
     /**
      * Blocks reloading the webpage or closing the browser if there are
