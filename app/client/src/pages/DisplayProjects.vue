@@ -655,7 +655,7 @@ export default {
                 ).getDownloadURL()
               } catch (error) {
                 // TODO: Use class 'instanceof' instead of this method.
-                if (error.message && error.message.includes('Firebase Storage')) {
+                if (error.name && error.name === 'FirebaseError') {
                   this.keywordsImage[key] = '../statics/images/other-icon.png'
                   console.error(error)
                 } else {
