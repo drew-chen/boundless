@@ -87,6 +87,10 @@ export function setQuestionTemplates (state, questionTemplates) {
   Vue.set(state, 'questionTemplates', questionTemplates)
 }
 
+export function setCustomFormEnabled (state, customFormEnabled) {
+  Vue.set(state, 'customFormEnabled', customFormEnabled)
+}
+
 export function addEntryToEmailToUuidMap (state, { email, uuid }) {
   Vue.set(state.emailToUuidMap, email, uuid)
 }

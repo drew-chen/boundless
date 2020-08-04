@@ -34,97 +34,119 @@ Methods:
         Project custom form template
       </div>
       <q-separator color="secondary" />
-      <q-form class="q-ma-lg">
-        <div class="q-mb-md">
-          <q-btn
-            round
-            @click="addQuestionTemplate"
-            class="q-mr-sm"
-            icon="add"
-            color="accent"
-          >
-            <q-tooltip>
-              Add question
-            </q-tooltip>
-          </q-btn>
-        </div>
-        <div v-if="!Array.isArray(questionTemplates) || !questionTemplates.length">
-          No custom questions configured.
-        </div>
-        <!-- Native drag and drop API is disabled to prevent flickering issues. -->
-        <draggable
-          v-else
-          v-model="questionTemplates"
-          @end="updateQuestionOrder"
-          handle=".handle"
-          ghost-class="ghost-question"
-          :force-fallback="true"
-          fallback-class="hide-question-preview"
-          animation="175"
-        >
-          <transition-group
-            enter-active-class="animated fadeIn"
-            leave-active-class="animated fadeOut"
-          >
-            <q-card
-              flat
-              class="row items-center full-height"
-              v-for="(questionTemplate, index) in questionTemplates"
-              :key="questionTemplate.order"
+      <q-card
+        flat bordered
+        class="q-ma-sm"
+      >
+        <q-form class="q-ma-lg">
+          <div class="q-mb-md">
+            <q-toggle
+              v-model="customFormEnabled"
+              color="green"
+              label="Enable"
+            />
+            <q-btn
+              round
+              @click="addQuestionTemplate"
+              class="q-mr-md float-right"
+              icon="add"
+              color="accent"
+              size="md"
+              :disable="!customFormEnabled"
             >
-              <q-icon
-                class="handle col-1"
-                size="sm"
-                color="grey"
-                name="drag_indicator"
-              />
-              <q-input
-                @click.stop=""
-                filled clearable
-                clear-icon="close"
-                class="q-mx-sm col-5"
-                label="Question Label"
-                v-model="questionTemplate.label"
-                placeholder="Untitled Question"
-              />
-              <q-select
-                filled
-                v-model="questionTemplate.type"
-                :options="options"
-                label="Response Type"
-                class="q-mx-sm col-3"
+              <q-tooltip>
+                Add question
+              </q-tooltip>
+            </q-btn>
+          </div>
+          <q-separator
+            inset
+            class="q-my-sm"
+          />
+          <div v-if="!Array.isArray(questionTemplates) || !questionTemplates.length">
+            No custom questions configured.
+          </div>
+          <!-- Native drag and drop API is disabled to prevent flickering issues. -->
+          <draggable
+            v-else
+            v-model="questionTemplates"
+            @end="updateQuestionOrder"
+            handle=".handle"
+            ghost-class="ghost-question"
+            :force-fallback="true"
+            fallback-class="hide-question-preview"
+            animation="175"
+          >
+            <transition-group
+              enter-active-class="animated fadeIn"
+              leave-active-class="animated fadeOut"
+            >
+              <q-card
+                flat
+                class="row items-center full-height"
+                v-for="(questionTemplate, index) in questionTemplates"
+                :key="questionTemplate.order"
               >
-                <template v-slot:option="scope">
-                  <q-item
-                    v-bind="scope.itemProps"
-                    v-on="scope.itemEvents"
-                  >
-                    <q-item-section avatar>
-                      <q-icon :name="scope.opt.icon"/>
-                    </q-item-section>
-                    <q-item-section>
-                      <q-item-label v-html="scope.opt.label" />
-                    </q-item-section>
-                  </q-item>
-                </template>
-              </q-select>
-              <q-toggle
-                v-model="questionTemplate.required"
-                color="secondary"
-                label="required"
-                class="col-2"
-              />
-              <div class="col-1">
-                <q-btn
-                  round flat
-                  @click="deleteQuestionTemplate(index)"
-                  icon="delete"
+                <q-icon
+                  class="handle col-1"
+                  size="sm"
+                  color="grey"
+                  name="drag_indicator"
+                  :disabled="!customFormEnabled"
                 />
-              </div>
-            </q-card>
-          </transition-group>
-        </draggable>
-      </q-form>
+                <q-input
+                  @click.stop=""
+                  filled clearable
+                  clear-icon="close"
+                  class="q-mx-sm col-5"
+                  label="Question Label"
+                  v-model="questionTemplate.label"
+                  placeholder="Untitled Question"
+                  :disable="!customFormEnabled"
+                />
+                <q-select
+                  filled
+                  v-model="questionTemplate.type"
+                  :options="options"
+                  label="Response Type"
+                  class="q-mx-sm col-3"
+                  :disable="!customFormEnabled"
+                >
+                  <!-- Display option's icon and label. -->
+                  <template v-slot:option="scope">
+                    <q-item
+                      v-bind="scope.itemProps"
+                      v-on="scope.itemEvents"
+                    >
+                      <q-item-section avatar>
+                        <q-icon :name="scope.opt.icon"/>
+                      </q-item-section>
+                      <q-item-section>
+                        <q-item-label v-html="scope.opt.label" />
+                      </q-item-section>
+                    </q-item>
+                  </template>
+                </q-select>
+                <q-toggle
+                  v-model="questionTemplate.required"
+                  color="secondary"
+                  label="required"
+                  class="col-2"
+                  :disable="!customFormEnabled"
+                />
+                <div class="col-1">
+                  <q-btn
+                    round flat
+                    @click="deleteQuestionTemplate(index)"
+                    icon="delete"
+                    :disable="!customFormEnabled"
+                  />
+                </div>
+              </q-card>
+            </transition-group>
+          </draggable>
+        </q-form>
+      </q-card>
     </div>
   </div>
 </template>
@@ -151,12 +173,11 @@ export default {
       }
     }
   },
+  /** Initialize data from the store. Cloning is needed for non-primitive types. */
   async created () {
     this.questionTemplates = cloneDeep(this.storeQuestionTemplates)
-    if (this.storeQuestionTemplates === undefined) {
-      this.questionTemplates = []
-    }
     this.modified = false
+    this.customFormEnabled = this.storeCustomFormEnabled
   },
   /** Lets parent component it is ok to use ref. */
   mounted () {
@@ -176,15 +197,28 @@ export default {
           this.modified = false
         }
       }
+    },
+    /**
+     * If questionTemplate is different from the
+     * version in the database, then there are modified changes.
+     */
+    customFormEnabled (val) {
+      this.modified = val !== this.storeCustomFormEnabled
     }
   },
   computed: {
     ...mapGetters({
-      storeQuestionTemplates: 'questionTemplates'
+      storeQuestionTemplates: 'questionTemplates',
+      storeCustomFormEnabled: 'customFormEnabled'
     })
   },
   data () {
     return {
+      /*
+      <Boolean>: Whether custom forms are used during project creation.
+      This also disables the editing of custom forms.
+      */
+      customFormEnabled: true,
       modified: false, // <Boolean>: Whether questionTemplates has changed.
       options: [ // Array<Object>: Possible input template types.
         {
@@ -233,19 +267,20 @@ export default {
          */
         order: 0
       }
-      // TODO: Option group
     }
   },
   methods: {
     ...mapActions([
-      'submitQuestionTemplates'
+      'submitQuestionTemplates',
+      'submitCustomFormEnabled'
     ]),
     /** Submits questionTemplates to vuex and to the db. */
-    async saveQuestionTemplates () {
+    async saveForm () {
       if (this.modified) {
         try {
           this.updateQuestionOrder()
           await this.submitQuestionTemplates(cloneDeep(this.questionTemplates))
+          await this.submitCustomFormEnabled(this.customFormEnabled)
           this.modified = false
           this.$q.notify({
             type: 'positive',

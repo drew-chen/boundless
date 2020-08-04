@@ -966,7 +966,7 @@ export default {
           await this.storageUrlFetcher('webpage', 'bannerImg')
           await this.storageUrlFetcher('webpage', 'mainImg')
           if (this.type === 'projects') {
-            this.$refs.projectCreateCustomForm.saveQuestionTemplates()
+            this.$refs.projectCreateCustomForm.saveForm()
           }
           this.dbData = deepClone(this.data)
           setTimeout(() => {
