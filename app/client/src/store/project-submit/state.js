@@ -74,6 +74,11 @@ export default function () {
         * 'questionTemplates' instance.
         */
       order: 0
-    }]
+    }],
+    /*
+    <Boolean>: Whether custom forms are used during project creation.
+    This also disables the editing of custom forms.
+    */
+    customFormEnabled: true
   }
 }

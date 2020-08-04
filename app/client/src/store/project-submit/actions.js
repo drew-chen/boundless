@@ -89,12 +89,14 @@ export async function loadConfig ({ commit, getters }) {
         value: data['keywords'][key]
       })
     }
+    let questionTemplates = data.projectsConfig.questionTemplates
+    questionTemplates = (questionTemplates === undefined) ? [] : questionTemplates
+    let customFormEnabled = data.projectsConfig.customFormEnabled
+    customFormEnabled = (customFormEnabled === undefined) ? true : customFormEnabled
     commit('setKeywordOptions', keywordOptions)
-    let qTemplates = data.projectsConfig.questionTemplates
-    qTemplates = (qTemplates === undefined) ? [] : qTemplates
-
-    commit('setQuestionTemplates', qTemplates)
+    commit('setQuestionTemplates', questionTemplates)
     commit('setQuestions', [])
+    commit('setCustomFormEnabled', customFormEnabled)
     commit('setAllowedDomain', data.allowedDomain)
     commit('setBodyTypeOptions', data.bodyContentType)
     commit('setChipTypeOptions', data.chipContentType)
@@ -240,7 +242,7 @@ export async function submitQuestions ({ getters }) {
 }
 
 /**
- * Save questionTemplates to vuex and into Firestore.
+ * Save questionTemplates to vuex and Firestore.
  *
  * @export
  * @param {Object} context Exposes the same set of methods/properties on the
@@ -258,6 +260,27 @@ export async function submitQuestionTemplates ({ commit, getters }, questionTemp
       }
     }, { merge: true })
   commit('setQuestionTemplates', questionTemplates)
+}
+
+/**
+ * Save customFormEnabled to vuex and Firestore.
+ *
+ * @export
+ * @param {Object} context Exposes the same set of methods/properties on the
+ *  store instance.
+ * @param {Object} context.commit Allows this action to commit mutations
+ * @param {Object} context.getters Gives access to state.
+ * @param {Array<Object>} questionTemplates The new state of questionTemplates.
+ */
+export async function submitCustomFormEnabled ({ commit, getters }, customFormEnabled) {
+  await getters.db.collection('config')
+    .doc('project')
+    .set({
+      projectsConfig: {
+        customFormEnabled
+      }
+    }, { merge: true })
+  commit('setCustomFormEnabled', customFormEnabled)
 }
 
 /**

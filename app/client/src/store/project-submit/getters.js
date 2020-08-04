@@ -17,9 +17,9 @@ Purpose:
 
 Methods:
 
-  Returns state properties directly. To avoid mutating state, the return
-  value can be copied. Copied data can be free changed without impacting
-  state.
+  Returns state properties directly. To avoid mutating the state of non-primitive
+  types, the return value can be copied. Copied data can then be freely changed
+  without impacting state.
 
 ## */
 
@@ -102,4 +102,8 @@ export function questions (state) {
 
 export function questionTemplates (state) {
   return state.questionTemplates
+}
+
+export function customFormEnabled (state) {
+  return state.customFormEnabled
 }
