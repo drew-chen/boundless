@@ -28,6 +28,8 @@ Log into firebase console via the following link: https://firebase.google.com/
     }
   }
   ```
+  Click [**Publish**]
+  
 * **Set Up the Firebase Storage:**
   1. Select "**Storage**" tab on left menu under "**Develop**"
   1. Choose [**Get started**]
@@ -44,7 +46,9 @@ Log into firebase console via the following link: https://firebase.google.com/
         }
       }
       ```
-We need to set the server side functions. In order to config Firebase functions you will need to install firebase-tools
+  Click [**Publish**]
+  
+Next we need to set the server side functions. In order to config Firebase functions you will need to install firebase-tools
 Although we provide instructions here, a more details installation guide can be found here:
 https://firebase.google.com/docs/functions/get-started
 
