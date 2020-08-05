@@ -11,7 +11,7 @@
 </template>
 
 <script>
-import SystemSettings from '../../../components/SystemSettings'
+import SystemSettings from './Components/SystemSettings.vue'
 
 export default {
   props: {

@@ -11,7 +11,7 @@
 </template>
 
 <script>
-import AdminSettings from './Shared/AdminSettings.vue'
+import AdminSettings from './Components/AdminSettings.vue'
 
 export default {
   props: {
