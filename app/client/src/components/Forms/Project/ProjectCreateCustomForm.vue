@@ -154,7 +154,7 @@ Methods:
 <script>
 import Vue from 'vue'
 import draggable from 'vuedraggable'
-import { cloneDeep, isEqual } from 'lodash'
+import cloneDeep from 'lodash.clonedeep'
 import { createNamespacedHelpers } from 'vuex'
 const { mapActions, mapGetters } = createNamespacedHelpers('projectSubmit')
 
@@ -176,34 +176,35 @@ export default {
   /** Initialize data from the store. Cloning is needed for non-primitive types. */
   async created () {
     this.questionTemplates = cloneDeep(this.storeQuestionTemplates)
-    this.modified = false
     this.customFormEnabled = this.storeCustomFormEnabled
+    this.modified = false
   },
   /** Lets parent component it is ok to use ref. */
   mounted () {
+    // Skip the first change.
+    this.$nextTick(() => {
+      this.dataLoaded = true
+    })
     this.$emit('mounted')
   },
   watch: {
     /**
-     * If questionTemplate changes and it's different from the
-     * version in the database, then it has been modified.
+     * If 'questionTemplate' changes, even if it's the same as the
+     * version in the database, then it is marked as modified. This is to
+     * keep change detection simple and consistent with the rest of the
+     * settings. The initialization does not count as a change.
      */
     questionTemplates: {
       deep: true,
-      handler (newVal, oldVal) {
-        if (!isEqual(this.storeQuestionTemplates, newVal)) {
-          this.modified = true
-        } else {
-          this.modified = false
-        }
+      handler (newArr, oldArr) {
+        this.modified = this.dataLoaded
       }
     },
     /**
-     * If questionTemplate is different from the
-     * version in the database, then there are modified changes.
+     * If 'customFormEnabled' changes then there are changes to be saved.
      */
     customFormEnabled (val) {
-      this.modified = val !== this.storeCustomFormEnabled
+      this.modified = this.dataLoaded
     }
   },
   computed: {
@@ -266,7 +267,12 @@ export default {
          * 'questionTemplates' instance.
          */
         order: 0
-      }
+      },
+      /*
+      <Boolean>: Whether local state has been set to the db state.
+      Used with watchers to avoid checking for changes when initializing.
+      */
+      dataLoaded: false
     }
   },
   methods: {
@@ -332,8 +338,13 @@ export default {
      * Reactively sets local questionTemplates to same state in Vuex store.
      */
     resetForm () {
+      this.dataLoaded = false
       Vue.set(this.$data, 'questionTemplates', cloneDeep(this.storeQuestionTemplates))
       Vue.set(this.$data, 'customFormEnabled', this.storeCustomFormEnabled)
+      this.modified = false
+      this.$nextTick(() => {
+        this.dataLoaded = true
+      })
     }
   }
 }
