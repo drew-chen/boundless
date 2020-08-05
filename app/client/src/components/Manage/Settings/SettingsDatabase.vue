@@ -29,7 +29,7 @@
             {label: 'Primary', value: 'production'},
             {label: 'Test', value: 'testing'}
           ]"
-          :value="settingProps.db"
+          :value="settingProps.dbName"
           @input="settingProps.switchDatabase"
         />
       </div>
