@@ -123,32 +123,32 @@ export default {
       this.layoutConfig = layoutConfig
     }
   },
-  directives: {
-    focus: {
-      /**
-       * Custom directive to control tab focusing. This is needed to override
-       * the focus based on route pathing. When navigating away and
-       * pressing "cancel" on a confirm leave dialog, the cancelled
-       * navigation will no longer cause a wrong tab focus.
-       *
-       * @param <Object>: el The element the directive is bound to. This can be used to directly manipulate the DOM.
-       * @param <Object>: binding An object containg the 'arg' property. 'arg'
-       *  is the argument passed to the directive, if any. For example in
-       *  v-my-directive:foo, the arg would be "foo".
-       * @param <Object>: vnode The virtual node produced by Vue’s compiler.
-       *  The 'context' property provides this component's 'this'.
-       */
-      update (el, binding, vnode) {
-        el.blur()
-        if (binding.args === vnode.context.tabSelected) {
-          console.log(binding.args, vnode.context.tabSelected)
-          el.blur()
-        } else {
-          el.blur()
-        }
-      }
-    }
-  },
+  // directives: {
+  //   focus: {
+  //     /**
+  //      * Custom directive to control tab focusing. This is needed to override
+  //      * the focus based on route pathing. When navigating away and
+  //      * pressing "cancel" on a confirm leave dialog, the cancelled
+  //      * navigation will no longer cause a wrong tab focus.
+  //      *
+  //      * @param <Object>: el The element the directive is bound to. This can be used to directly manipulate the DOM.
+  //      * @param <Object>: binding An object containg the 'arg' property. 'arg'
+  //      *  is the argument passed to the directive, if any. For example in
+  //      *  v-my-directive:foo, the arg would be "foo".
+  //      * @param <Object>: vnode The virtual node produced by Vue’s compiler.
+  //      *  The 'context' property provides this component's 'this'.
+  //      */
+  //     update (el, binding, vnode) {
+  //       el.blur()
+  //       if (binding.args === vnode.context.tabSelected) {
+  //         console.log(binding.args, vnode.context.tabSelected)
+  //         el.blur()
+  //       } else {
+  //         el.blur()
+  //       }
+  //     }
+  //   }
+  // },
   computed: {
     /**
      * Returns the name of the tab selected by slicing off the path of this
@@ -212,6 +212,13 @@ export default {
         default:
           return {}
       }
+    }
+  },
+  watch: {
+    $route () {
+      this.$nextTick(() => {
+        setTimeout(this.__checkActivation, 100)
+      })
     }
   },
   data () {

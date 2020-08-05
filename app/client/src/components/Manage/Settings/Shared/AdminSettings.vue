@@ -150,7 +150,7 @@ Methods:
     <project-create-custom-form
       :type="type"
       ref="projectCreateCustomForm"
-      @mounted="setCanSave()"
+      @mounted="setCanSave"
     />
 
     <!-- -------------------- Listing Table -------------------- -->
@@ -680,7 +680,6 @@ export default {
         borderRadius: '3px' // <String>: css property border-radius
       },
       loading: true, // <Boolean>: flag for the page loading
-      submitted: false, // <Boolean>: flag for handling child emitted submit
       /**
        * <Boolean>: Flag for handling child emitted submit.
        * Describes to all updates except 'ProjectCreateCustomForm.vue' since
@@ -921,7 +920,6 @@ export default {
      */
     async submit () {
       this.endCounter = 0
-      this.submitted = true
       this.$emit('submitting', true)
 
       let blobFlag = false
@@ -1033,7 +1031,7 @@ export default {
      * @param event The event which has occured: 'beforeunload'.
      */
     confirmUnload (event) {
-      if (!this.submitted && this.canSave()) {
+      if (this.canSave()) {
         // Cancel the event.
         // If you prevent default behavior in Mozilla Firefox prompt will always be shown.
         event.preventDefault()
@@ -1053,7 +1051,6 @@ export default {
     },
     /** Undo's local changes if there are changes to be saved. */
     reset () {
-      console.log('sdsds')
       if (this.canSave()) {
         this.$refs.projectCreateCustomForm.resetForm()
         Vue.set(this.$data, 'data', deepClone(this.dbData))

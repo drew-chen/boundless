@@ -1027,10 +1027,7 @@ export default {
             this.updated = true
             this.$forceUpdate()
           }
-        } else {
         }
-      }).onCancel(() => {
-      }).onDismiss(() => {
       })
     },
     loadFireRefs: async function () {
@@ -1315,7 +1312,7 @@ export default {
      *  This is the exact same object as 'beforeRouteLeave''s 'next' method.
      */
     openConfirmLeaveDialog (next) {
-      if (this.canSave()) {
+      if (!this.submitted && this.updated) {
         this.$refs.dialogConfirmLeave.open(next)
       } else {
         next()
