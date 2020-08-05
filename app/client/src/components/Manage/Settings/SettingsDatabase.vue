@@ -38,7 +38,7 @@
 </template>
 
 <script>
-import GetDataFromFirestore from '../../../components/GetDataFromFirestore.vue'
+import GetDataFromFirestore from './Components/GetDataFromFirestore.vue'
 
 export default {
   props: {

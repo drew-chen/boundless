@@ -9,7 +9,7 @@
 ## under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES
 ## OR CONDITIONS OF ANY KIND, either express or implied.
 
-Name:     components/Manage/Settings/Shared/AdminSettings.vue
+Name:     components/Manage/Settings/Components/AdminSettings.vue
 Purpose:
 
   To allow the user configure project/challenge UI via a config panel

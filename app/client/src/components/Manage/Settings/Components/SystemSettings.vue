@@ -1,5 +1,5 @@
 <!-- ##
-## Copyright (c) 2019 Wind River Systems, Inc.
+## Copyright (c) 2020 Wind River Systems, Inc.
 ##
 ## Licensed under the Apache License, Version 2.0 (the "License");
 ## you may not use this file except in compliance with the License.
@@ -9,9 +9,9 @@
 ## under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES
 ## OR CONDITIONS OF ANY KIND, either express or implied.
 
-Name:     components/SystemSettings.vue
+Name:     components/Manage/Settings/Components/SystemSettings.vue
 Purpose:  To allow the admin to customize general settings from
-          the admin console
+          the admin console.
 Methods:
   * Allows the admin to customize logo
   * Allows the admin to customize chips
@@ -550,14 +550,14 @@ Methods:
 </template>
 
 <script>
-import productionDb, { productionStorage } from '../firebase/init_production'
-import testingDb, { testingStorage } from '../firebase/init_testing'
-import { layoutConfig } from '../../boundless.config'
+
+import productionDb, { productionStorage } from '../../../../firebase/init_production.js'
+import testingDb, { testingStorage } from '../../../../firebase/init_testing'
+import { layoutConfig } from '../../../../../../client/boundless.config'
 
 import sha256 from 'sha256'
-
-import Markdown from '../components/Markdown.vue'
-import DialogConfirmLeave from '../components/Dialogs/DialogConfirmLeave.vue'
+import Markdown from '../../../../components/Markdown.vue'
+import DialogConfirmLeave from '../../../../components/Dialogs/DialogConfirmLeave.vue'
 
 export default {
   components: {
@@ -615,13 +615,11 @@ export default {
     }
   },
   methods: {
+    /**
+     * Helper function to fetch the absolute url for system settings.
+     * @return {Promise<Boolean>}
+     */
     storageUrlFetcher: async function () {
-      /**
-       * helper function to fetch the absolute url for system settings
-       * @param {void}
-       * @return {Promise<Boolean>}
-       */
-
       try {
         let promises = []
         let keysWithNewImage = []
@@ -669,13 +667,10 @@ export default {
         return false
       }
     },
+    /**
+     * Keep track of layoutConfig changing to update the App.vue.
+     */
     staticDataChange: function () {
-      /**
-       * keep track of layoutConfig changing to update the App.vue
-       * @param {void}
-       * @return {void}
-       */
-
       let storedConfig = this.$q.sessionStorage.getItem('boundless_config')
 
       if (typeof storedConfig.enabledChallenges === 'boolean') {
@@ -690,13 +685,11 @@ export default {
         this.layoutConfig.homeURL = storedConfig.wikiInfo.url || ''
       }
     },
+    /**
+     * Submit handler for the wiki.
+     * @return {Promise<Boolean>}
+     */
     wikiSubmit: async function () {
-      /**
-       * submit handler for the wiki
-       * @param {void}
-       * @return {Promise<Boolean>}
-       */
-
       this.$emit('submitting', true)
       let storedConfig = this.$q.sessionStorage.getItem('boundless_config')
 
@@ -715,22 +708,17 @@ export default {
         return false
       }
     },
+    /**
+     * Helper function for force update.
+     */
     forceUpdateWOSubmit: function () {
-      /**
-       * helper function for force update
-       * @param {void}
-       * @return {void}
-       */
-
       this.$forceUpdate()
     },
+    /**
+     * Logo of the left panel on the about page
+     * @param {Event} e: event invoker
+     */
     aboutLogoImageSelect: function (e) {
-      /**
-       * logo of the left panel on the about page
-       * @param {Event} e: event invoker
-       * @return {void}
-       */
-
       let reader = new FileReader()
       this.file.file = e.target.files[0]
 
@@ -750,23 +738,17 @@ export default {
 
       this.updated = true
     },
+    /**
+     * Helper function for force update while updated.
+     */
     forceUpdateWUpdated: function () {
-      /**
-       * helper function for force update while updated
-       * @param {void}
-       * @return {void}
-       */
-
       this.updated = true
       this.$forceUpdate()
     },
+    /**
+     * Add custom chip to while letting the user craft to their likings.
+     */
     addCustomChips: function () {
-      /**
-       * add custom chip to while letting the user craft to their likings
-       * @param {void}
-       * @return {void}
-       */
-
       // adding custChips
       let tmpChip = {}
 
@@ -810,24 +792,19 @@ export default {
       }).onDismiss(() => {
       })
     },
+    /**
+     * Helper function to delete the custom chip from this.data.customChips.
+     * @param {Integer} index: value of the index to be removed.
+     */
     deleteCustomChips: function (index) {
-      /**
-       * helper function to delete the custom chip from this.data.customChips
-       * @param {Integer} index: value of the index to be removed
-       * @return {void}
-       */
-
       // confirm with dialog
       this.updated = true
       this.data.customChips.splice(index, 1)
     },
+    /**
+     * Allow the admin to change the admin password.
+     */
     invokeAdminPassChange: function () {
-      /**
-       * allow the admin to change the admin password
-       * @param {void}
-       * @return {void}
-       */
-
       let tmpObj = {}
 
       this.$q.dialog({
@@ -904,7 +881,7 @@ export default {
                     this.$emit('submitting', false)
                     this.$q.notify({
                       type: 'positive',
-                      message: '<div align="center">Sucessful!<div>',
+                      message: '<div align="center">Successful!<div>',
                       html: true,
                       timeout: 750
                     })
@@ -926,7 +903,7 @@ export default {
                 this.$emit('submitting', false)
                 this.$q.dialog({
                   title: 'Error!',
-                  message: 'The password change was not sucessful!'
+                  message: 'The password change was not successful!'
                 })
               }
             }
@@ -936,23 +913,19 @@ export default {
       }).onDismiss(() => {
       })
     },
+    /**
+     * Helper function to click on the hidden file picker.
+     * @param {String} entry: key of the refs
+     */
     invokeFilePicker: function (entry) {
-      /**
-       * helper function to click on the hidden file picker
-       * @param {String} entry: key of the refs
-       * @return {void}
-       */
-
       this.$refs[entry][0].click()
     },
+    /**
+     * Fetching the file/blob url on file change.
+     * @param {String} entry: name of the refs
+     * @param  {String} key: keyword
+     */
     filePickerOnChange: function (entry, key) {
-      /**
-       * fetching the file/blob url on file change
-       * @param {String} entry: name of the refs
-       * @param  {String} key: keyword
-       * @return {void}
-       */
-
       let eventHandler = async (e, entry) => {
         if (!e.target.files[0]) {
           this.$refs[entry][0].src = this.data.extraKeywordsData[key] ||
@@ -971,15 +944,13 @@ export default {
 
       eventHandler(event, entry)
     },
+    /**
+     * https://stackoverflow.com/questions/3814231/loading-an-image-to-a-img-from-input-file
+     * Helper function to generate file/blob url of the file.
+     * @param {File} file: file to be converted to url
+     * @param {DOM} target: html component for the url
+     */
     onFileSelected: function (file, target) {
-      /**
-       * https://stackoverflow.com/questions/3814231/loading-an-image-to-a-img-from-input-file
-       * helper function to generate file/blob url of the file
-       * @param {File} file: file to be converted to url
-       * @param {DOM} target: html component for the url
-       * @return {void}
-       */
-
       let reader = new FileReader()
 
       reader.onload = (event) => {
@@ -988,14 +959,12 @@ export default {
 
       reader.readAsDataURL(file)
     },
+    /**
+     * Helper function to delete keywords;
+     * also deletes the file associated with the keyword.
+     * @param {String} key: keyword to be deleted
+     */
     keywordsDelete: function (key) {
-      /**
-       * helper function to delete keywords;
-       * also deletes the file associated with the keyword
-       * @param {String} key: keyword to be deleted
-       * @return {void}
-       */
-
       if (key in this.data.extraKeywordsData) {
         this.fileDeleteQueue.push(key)
       }
@@ -1004,13 +973,10 @@ export default {
       this.updated = true
       this.$forceUpdate()
     },
+    /**
+     * Function handler to adding keywords into the system.
+     */
     addKeywords: function () {
-      /**
-       * function handler to adding keywords into the system
-       * @param {void}
-       * @return {void}
-       */
-
       this.$q.dialog({
         title: 'Add new keyword',
         prompt: {
@@ -1030,15 +996,12 @@ export default {
         }
       })
     },
+    /**
+     * Load firebase database, storage (if applicable),
+     * amd cloud functions reference (if applicable).
+     * @return {Promise<Boolean>}
+     */
     loadFireRefs: async function () {
-      /**
-       * load firebase database reference
-       * load firebase storage reference (if applicable)
-       * load firebase cloud functions reference (if applicable)
-       * @param {void}
-       * @return {Promise<Boolean>}
-       */
-
       if (this.$q.localStorage.has('boundless_db')) {
         let sessionDb = this.$q.localStorage.getItem('boundless_db')
 
@@ -1078,13 +1041,11 @@ export default {
         }
       }
     },
+    /**
+     * Submit files, gets urls, and update session config.
+     * @return {Promise<String>}
+     */
     submit: async function () {
-      /**
-       * submit files, gets urls, and upate session config
-       * @param {void}
-       * @return {Promise<String>}
-       */
-
       // start loading
       this.$emit('submitting', true)
 
@@ -1205,13 +1166,11 @@ export default {
         return false
       }
     },
+    /**
+     * Load information from config/project of the database
+     * @return {Promise<Boolean>}
+     */
     loadInformation: async function () {
-      /**
-       * load information from config/project of the database
-       * @param {void}
-       * @return {Promise<Boolean>}
-       */
-
       try {
         let doc = await this.db.collection('config').doc('project').get()
 
@@ -1287,13 +1246,12 @@ export default {
         return false
       }
     },
+    /**
+     * Helper function to data fields inside the data.
+     * @param {String} val: camel cased field to be splitted and capitalized
+     * @return {String}
+     */
     fieldParser: function (val) {
-      /**
-       * helper function to data fields inside the data
-       * @param {String} val: camel cased field to be splitted and capitalized
-       * @return {String}
-       */
-
       if (val === 'db') {
         return 'Database'
       } else {

@@ -1,5 +1,5 @@
 <!-- ##
-## Copyright (c) 2019 Wind River Systems, Inc.
+## Copyright (c) 2020 Wind River Systems, Inc.
 ##
 ## Licensed under the Apache License, Version 2.0 (the "License");
 ## you may not use this file except in compliance with the License.
@@ -9,7 +9,7 @@
 ## under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES
 ## OR CONDITIONS OF ANY KIND, either express or implied.
 
-Name:     components/GetDataFromFirestore.vue
+Name:     components/Manage/Settings/Components/GetDataFromFirestore.vue
 Purpose:  To allow the user to export data from firestore and import data
           into firestore
 Methods:
@@ -67,10 +67,10 @@ Methods:
 </template>
 
 <script>
-import productionDb from '../firebase/init_production'
-import testingDb from '../firebase/init_testing'
+import productionDb from '../../../../firebase/init_production'
+import testingDb from '../../../../firebase/init_testing'
 
-import { dbMeta } from '../../boundless.config'
+import { dbMeta } from '../../../../../../client/boundless.config.js'
 
 export default {
   async created () {
@@ -98,15 +98,13 @@ export default {
     }
   },
   methods: {
+    /**
+      * Load firebase database, storage (if applicable)
+      * and cloud functions reference (if applicable).
+      * @param {void}
+      * @return {Promise<Boolean>}
+      */
     loadFireRefs: async function () {
-      /**
-       * load firebase database reference
-       * load firebase storage reference (if applicable)
-       * load firebase cloud functions reference (if applicable)
-       * @param {void}
-       * @return {Promise<Boolean>}
-       */
-
       if (this.$q.localStorage.has('boundless_db')) {
         let sessionDb = this.$q.localStorage.getItem('boundless_db')
 
@@ -144,13 +142,12 @@ export default {
         }
       }
     },
+    /**
+     * Importing to the database.
+     * @param {void}
+     * @return {Promise<Boolean>}
+     */
     submit: async function () {
-      /**
-       * importing to the database
-       * @param {void}
-       * @return {Promise<Boolean>}
-       */
-
       this.$q.dialog({
         title: 'Confirmation to Import',
         message: 'The old data will be overwritten!',
@@ -187,15 +184,14 @@ export default {
         }
       })
     },
+    /**
+     * https://ourcodeworld.com/articles/read/189/how-to-create-a-file-and-generate-a-download-with-javascript-in-the-browser-without-a-server
+     * exporting the data from the database into a .json file
+     * @param {String} filename: name of the file
+     * @param {String} text: data to be written on the file
+     * @return {void}
+     */
     download: function (filename, text) {
-      /**
-       * https://ourcodeworld.com/articles/read/189/how-to-create-a-file-and-generate-a-download-with-javascript-in-the-browser-without-a-server
-       * exporting the data from the database into a .json file
-       * @param {String} filename: name of the file
-       * @param {String} text: data to be written on the file
-       * @return {void}
-       */
-
       let todayDate = new Date(Date.now()).toISOString().substring(0, 19)
       let element = document.createElement('a')
 
@@ -210,13 +206,12 @@ export default {
 
       document.body.removeChild(element)
     },
+    /**
+     * Load the data from the database.
+     * @param {void}
+     * @return {Promise<Boolean>}
+     */
     loadData: async function () {
-      /**
-       * load the data from the database
-       * @param {void}
-       * @return {Promise<Boolean>}
-       */
-
       try {
         let doc = await this.db.collection(
           '--db_meta--'
@@ -257,13 +252,12 @@ export default {
         return false
       }
     },
+    /**
+     * Read the data from the file attached to the uploader.
+     * @param {void}
+     * @return {void}
+     */
     retrieveDataFromFile: function () {
-      /**
-       * read the data from the file attached to the uploader
-       * @param {void}
-       * @return {void}
-       */
-
       if (!this.$refs.file.files[0]) {
         this.attachedFile = !this.attachedFile
       } else {
