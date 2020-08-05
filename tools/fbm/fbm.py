@@ -21,6 +21,7 @@ import traceback
 import sys
 import datetime
 import zipfile
+import shutil  ## shutil.make_archive()
 ################################################################################
 #                                   OBJ                                        #
 ################################################################################
@@ -87,7 +88,7 @@ def create_parser(prog_name):
   
   return parser
 ################################################################################
-#                               FUNCTIONS                                      #
+#                               Export                                         #
 ################################################################################
 def do_export(args):
   source = args.SOURCE
@@ -96,26 +97,56 @@ def do_export(args):
   else:
     target = '{}.storage'.format(source[5:-12])
   
-  time = datetime.datetime.now()
-  time = time.strftime("%m.%d.%Y_%H_%M_%S")
+  timestamp = datetime.datetime.now()
+  ##time = time.strftime("%m.%d.%Y_%H_%M_%S")
+  timestamp = timestamp.strftime("%Y.%m.%d_%H_%M_%S")
 
-  target = "{}.{}".format(target, time)
+  target = "{}.{}".format(target, timestamp)
 
   print("intiating export...")
   print("generating: {}".format(target))
+  ###os.system(
+  ###  "mkdir {} && gsutil.cmd -m cp -R {} ./{}/".format(
+  ###    target, source, target
+  ###  )
+  ###)
+
   os.system(
     "mkdir {} && gsutil.cmd -m cp -R {} ./{}/".format(
       target, source, target
     )
   )
 
-  print("starting the zipping process...")
-  output_filename = "{}.{}".format(target, "zip")
-  make_zipfile(output_filename, target)
 
+  print("starting the zipping process...")
+  ##output_filename = "{}.{}".format(target, "zip")
+  output_filename = target
+
+  ## remove the 'gs://' from 'gs://testsystem-1.appspot.com'
+  ## subdirectory = source.replace('gs://','')
+  ### print ("target is:" + target + "/" + subdirectory)
+  ## make_zipfile(output_filename, target + "/" + subdirectory)
+
+  ## remove the 'gs://' from 'gs://testsystem-1.appspot.com'
+  dir_name = target + "/" + source.replace('gs://','')
+  print  ("dir is:" +  dir_name)
+  shutil.make_archive(output_filename, 'zip', dir_name)
+
+  ## Check to see if we should keep the temp directory.
   if not args.save:
     print("deleting the content...")
     os.system("rm -rf {}".format(target))
+
+  print ("File is: " + output_filename + ".zip")
+  if os.path.isfile(output_filename + ".zip"):
+    return output_filename + ".zip"
+  else:
+    return ""
+
+
+################################################################################
+#                               Import                                         #
+################################################################################
 
 def do_import(args):
   source = args.SOURCE
@@ -124,8 +155,17 @@ def do_import(args):
   if ".zip" not in source:
     raise Exception("ERROR: Import file must be a .zip file!")
 
-  print("unzipping the zip file...")
-  unzip(source, "./tmpFile")
+  ## Create a temporary directory name using a timestamp
+  timestamp = datetime.datetime.now()
+  timestamp = timestamp.strftime("%Y.%m.%d_%H_%M_%S")
+  tempDir = "./tmpDir/" + timestamp
+
+  print ("using temp diretory: " + tempDir)
+
+  ## print("unzipping the zip file...")
+  unzip(source, tempDir)
+
+  ## exit()
 
   # If you want to delete all objects in the bucket,
   # but not the bucket itself, this command will work:
@@ -133,12 +173,18 @@ def do_import(args):
     print("purging the storage...")
     os.system("gsutil.cmd -m rm -R {}/**".format(target))
 
-  print("initiating import...")
-  os.system(
-    "cd {} && ".format("./tmpFile/{}/*.com".format(source[:-4])) +
-    "gsutil.cmd -m cp -R . {} && ".format(target) +
-    "cd .. && cd .. && cd .. && rm -rf tmpFile/"
-  )
+  print("importing data ...")
+  ## Got to temp dir and run google cloud storage command
+  os.system("cd " + tempDir + " && gsutil.cmd -m cp -R . {}".format(target))
+  os.system("rm -rf " + tempDir)
+
+  ##os.system(
+  ##  "cd {} && ".format("./tmpFile/{}/*.com".format(source[:-4])) +
+  ##  "gsutil.cmd -m cp -R . {} && ".format(target) +
+  ##  "cd .. && cd .. && cd .. && rm -rf tmpFile/"
+  ##)
+  ## exit()
+
 ################################################################################
 #                             HELPER FUNCTIONS                                 #
 ################################################################################
@@ -167,15 +213,19 @@ def main(prog_name=os.path.basename(sys.argv[0]), args=None):
     args = sys.argv[1:]
   parser = create_parser(prog_name)
   args = parser.parse_args(args)
-
+  print (args)
   if args.command == "export":
-    do_export(args)
-    print("\nExport completed sucessfully")
-    print("The zipped file is available inside ~/tools/fbm folder!")
+    new_zip_file = do_export(args)
+    if new_zip_file == "":
+      print("\nExport function FAILED to complete.")
+    else:
+      print("\nExport completed sucessfully")
+      print("The following zip file with the content is available in directory ~/tools/fbm:")
+      print("   " + new_zip_file)
   elif args.command == "import":
     do_import(args)
     print("\nImport completed sucessfully")
-    print("The zipped file is available inside ~/tools/fbm folder!")
+    ### print("The zipped file is available inside ~/tools/fbm folder!")
   else:
     raise Exception('ERROR: Subcommand does not exist!')
   

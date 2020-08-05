@@ -15,6 +15,7 @@
 ## Methods:
 ##   * Builds the project
 ## 	 * Cleans the project
+##   * import and export file storage
 ##
 
 root_dir:=$(shell pwd)
@@ -45,13 +46,17 @@ fb_functions_deploy:
 	@cd app/server/firebase/functions && npm i && cd .. && \
 	./deploy.sh
 
-fb_export_storage:
+export_storage:
 	@cd app/server/firebase && \
 	./export.sh
 
-fb_export_storage_testing:
+export_storage_testing:
 	@cd app/server/firebase && \
 	./export.sh testing
+
+import_storage:
+	@cd app/server/firebase && \
+	./import.sh $(file)
 
 clean:
 	@rm -rf setup.o && \
@@ -60,9 +65,10 @@ clean:
 help:
 	@echo "usage: make [OPTION]" && echo && \
 	echo "Help for each options:" && \
-	echo "  fb_init		generate requried files" && \
-	echo "  run			run the software locally" && \
-	echo "  build			build the software" && \
-	echo "  fb_functions_deploy	deploys the cloud functions" && \
-	echo "  fb_export_storage	exports the storage from cloud" && \
-	echo "  clean			clear all the cache data"
+	echo "  fb_init				generate requried files" && \
+	echo "  run					run the software locally" && \
+	echo "  build					build the software" && \
+	echo "  fb_functions_deploy			deploys the cloud functions" && \
+	echo "  export_storage			exports the storage from cloud" && \
+	echo "  import_storage file=<file fullpath>   imports the storage from .zip to to firebase storage" && \
+	echo "  clean					clear all the cache data"
