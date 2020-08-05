@@ -106,11 +106,14 @@ Methods:
 
 <script>
 import { layoutConfig } from '../../../../client/boundless.config'
+import productionDb, { productionStorage } from '../../firebase/init_production'
+import testingDb, { testingStorage } from '../../firebase/init_testing'
 
 export default {
-  created () {
+  async created () {
+    this.dataLoaded = false
     if (this.$q.localStorage.has('boundless_db')) {
-      this.db = this.$q.localStorage.getItem('boundless_db')
+      this.dbName = this.$q.localStorage.getItem('boundless_db')
     }
     if (this.$q.sessionStorage.getItem('boundless_config')) {
       let cachedConfig = this.$q.sessionStorage.getItem('boundless_config')
@@ -122,33 +125,11 @@ export default {
     } else {
       this.layoutConfig = layoutConfig
     }
+    // TODO: Put this in the appropriate vuex module.
+    await this.loadFireRefs()
+    await this.loadInformation()
+    this.dataLoaded = true
   },
-  // directives: {
-  //   focus: {
-  //     /**
-  //      * Custom directive to control tab focusing. This is needed to override
-  //      * the focus based on route pathing. When navigating away and
-  //      * pressing "cancel" on a confirm leave dialog, the cancelled
-  //      * navigation will no longer cause a wrong tab focus.
-  //      *
-  //      * @param <Object>: el The element the directive is bound to. This can be used to directly manipulate the DOM.
-  //      * @param <Object>: binding An object containg the 'arg' property. 'arg'
-  //      *  is the argument passed to the directive, if any. For example in
-  //      *  v-my-directive:foo, the arg would be "foo".
-  //      * @param <Object>: vnode The virtual node produced by Vue’s compiler.
-  //      *  The 'context' property provides this component's 'this'.
-  //      */
-  //     update (el, binding, vnode) {
-  //       el.blur()
-  //       if (binding.args === vnode.context.tabSelected) {
-  //         console.log(binding.args, vnode.context.tabSelected)
-  //         el.blur()
-  //       } else {
-  //         el.blur()
-  //       }
-  //     }
-  //   }
-  // },
   computed: {
     /**
      * Returns the name of the tab selected by slicing off the path of this
@@ -162,7 +143,7 @@ export default {
      * Each router-view needs different props. Some of these props interact
      * with the data in 'ManageSettings.vue' which is why they are passed in
      * here instead of through the router. 'this' is explicitly binded
-     * to make sure each callback acts as if it was called in
+     * to be safe and make sure each callback acts as if it was called in
      * 'ManageSettings.vue' instead of in a child component.
      *
      * @param <String>: The value of 'tabSelected'.
@@ -174,7 +155,8 @@ export default {
           return {
             /*
             The 'name' property is important so that the router view doesn't try
-            to render while switching to another route.
+            to render while switching to another route. If the name does not
+            match, the router-view will be in loading state.
             */
             name: 'general',
             setUserConfig: this.setUserConfig.bind(this),
@@ -190,10 +172,15 @@ export default {
             consoleLoading: this.consoleLoading.bind(this),
             setDatabaseId: this.setDatabaseId.bind(this),
             hideDatabaseSwitch: !this.layoutConfig.switchDatabase,
-            db: this.db,
+            dbName: this.dbname,
             switchDatabase: this.switchDatabase.bind(this)
           }
         case 'projects':
+          if (!this.dataLoaded) {
+            return {
+              name: 'notLoaded'
+            }
+          }
           return {
             name: 'projects',
             keywords: this.configs.keywords,
@@ -202,6 +189,11 @@ export default {
             setProjectConfig: this.setProjectConfig.bind(this)
           }
         case 'challenges':
+          if (!this.dataLoaded) {
+            return {
+              name: 'notLoaded'
+            }
+          }
           return {
             name: 'challenges',
             keywords: this.configs.keywords,
@@ -214,18 +206,11 @@ export default {
       }
     }
   },
-  watch: {
-    $route () {
-      this.$nextTick(() => {
-        setTimeout(this.__checkActivation, 100)
-      })
-    }
-  },
   data () {
     return {
       layoutConfig: null, // <Object>: dictionary of layout values
       splitterModel: 15, // <Number>: % of vw that left splitter is located
-      db: '', // <String>: name of the database
+      dbName: '', // <String>: name of the database
       dbId: '', // <String>: project id of the firebase cred
       previewRatio: '5', // <String>: ratio for preview of imges in child
       configs: { // <Object<Object>>: configuration records of all collections
@@ -236,10 +221,148 @@ export default {
       },
       haltConsole: false, // <Boolean>: flag for loading animation
       // <String>: The path of this component and the parent path of child routes.
-      basePath: '/admin/console/settings'
+      basePath: '/admin/console/settings',
+      // -- The following are variables which should be moved into vuex. --
+      db: null,
+      storage: null,
+      data: {},
+      dataLoaded: false
+
     }
   },
   methods: {
+    // TODO: move into a new vuex module dedicated to settings.
+    loadFireRefs: async function () {
+      /**
+       * load firebase database reference
+       * load firebase storage reference (if applicable)
+       * load firebase cloud functions reference (if applicable)
+       * @param {void}
+       * @return {Promise<Boolean>}
+       */
+
+      if (this.$q.localStorage.has('boundless_db')) {
+        let sessionDb = this.$q.localStorage.getItem('boundless_db')
+
+        if (sessionDb === 'testing') {
+          this.db = testingDb
+          this.storage = testingStorage
+        } else {
+          this.db = productionDb
+          this.storage = productionStorage
+        }
+
+        return true
+      } else {
+        try {
+          let doc = await productionDb.collection('config').doc('project').get()
+
+          if (doc.exists) {
+            if (doc.data().db === 'testing') {
+              this.db = testingDb
+              this.$q.localStorage.set('boundless_db', 'testing')
+            } else {
+              this.db = productionDb
+              this.$q.localStorage.set('boundless_db', 'production')
+            }
+
+            return true
+          } else {
+            let msg = '"/config/project" path does not exists!'
+
+            throw new Error(msg)
+          }
+        } catch (error) {
+          this.db = productionDb
+          this.$q.localStorage.set('boundless_db', 'production')
+
+          throw error
+        }
+      }
+    },
+    // TODO: move into a new vuex module dedicated to settings.
+    loadInformation: async function () {
+      /**
+       * load information from config/project of the database
+       * @param {void}
+       * @return {Promise<Boolean>}
+       */
+
+      try {
+        let doc = await this.db.collection('config').doc('project').get()
+
+        if (doc.exists) {
+          this.data = doc.data()
+
+          this.data.enabledChallenges = this.data.enabledChallenges || false
+
+          let leftImg = {
+            url: '',
+            active: false,
+            visible: true
+          }
+          // dealing with about logo to bind with 'Edit About Page'
+          if (!this.data.generalConfig) {
+            this.data.generalConfig = { leftImg }
+          } else {
+            let ssRef = this.$q.sessionStorage
+            let storedConfig = ssRef.getItem('boundless_config')
+
+            if (!storedConfig.generalConfig.leftImg) {
+              this.data.generalConfig = {
+                ...storedConfig.generalConfig,
+                leftImg
+              }
+            } else if (
+              storedConfig.generalConfig.leftImg.visible === undefined
+            ) {
+              this.data.generalConfig = { ...storedConfig.generalConfig }
+
+              this.data.generalConfig.leftImg.visible = true
+            }
+          }
+
+          // dealing with 'Wiki URL'
+          if (!this.data.wikiInfo) {
+            this.data.wikiInfo = {
+              name: '',
+              url: ''
+            }
+          }
+
+          // TODO: take these out once the functions are done
+          delete this.data.db
+          delete this.data.config_version
+          delete this.data.suggestedKeywords
+          // delete this.data.keywords
+          delete this.data.chipContentType
+          delete this.data.bodyContentType
+          delete this.data.allowedDomain
+
+          this.setUserConfig(this.data.socialNetwork)
+          this.setChallengeConfig(this.data.challengesConfig)
+          this.setProjectConfig(this.data.projectsConfig)
+          this.setKeywords(this.data.keywords)
+
+          delete this.data.socialNetwork
+          delete this.data.challengesConfig
+          delete this.data.projectsConfig
+
+          // sort data via key
+          this.data = Object.fromEntries(Object.entries(this.data).sort())
+          // sort data.keywords via key
+          this.data.keywords = Object.fromEntries(
+            Object.entries(this.data.keywords).sort()
+          )
+        } else {
+          throw new Error('Config file does not exists in the database!')
+        }
+
+        return true
+      } catch (error) {
+        throw error
+      }
+    },
     /**
      * Handle page loading via child event.
      * @param {Boolean} loadVal: event emitter value to render loading
@@ -324,7 +447,7 @@ export default {
       * Switch database namespace and reload the page.
       */
     switchDatabase: function () {
-      this.$q.localStorage.set('boundless_db', this.db)
+      this.$q.localStorage.set('boundless_db', this.dbName)
 
       if (this.$q.sessionStorage.has('boundless_timeout')) {
         this.$q.sessionStorage.remove('boundless_timeout')
