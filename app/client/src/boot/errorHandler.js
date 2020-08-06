@@ -25,6 +25,20 @@ Methods:
 import DbException from './../models/DbException'
 
 /**
+ * Error codes can be found:
+ * https://firebase.google.com/docs/storage/web/handle-errors
+ */
+function isFirebaseError (error, errorCode) {
+  if (error.code && error.name === 'FirebaseError') {
+    if (errorCode !== undefined) {
+      return error.code === errorCode
+    }
+    return true
+  }
+  return false
+}
+
+/**
  * Handles errors from components. Does not catch non-vue errors nor async
  * errors that have not been fulfilled or rejected (i.e. awaited).
  * @param {Object} bootObject Passed by Quasar on boot
@@ -42,8 +56,14 @@ export default ({ Vue }) => {
       console.error('Caught in handler:', error)
       vm.$q.notify({
         type: 'negative',
-        message: 'There was an error retrieving from the database. Some' +
-          ' functionality will be limited.'
+        timeout: 1750,
+        message: 'There was an error retrieving from the database.'
+      })
+    } else if (isFirebaseError(error, 'storage/object-not-found')) {
+      vm.$q.notify({
+        type: 'negative',
+        timeout: 1750,
+        message: 'There was an error loading images or attachments.'
       })
     } else {
       throw error

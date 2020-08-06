@@ -11,9 +11,7 @@
 ## OR CONDITIONS OF ANY KIND, either express or implied.
 
 Name:     models/DbException.js
-
 Purpose:  Exception related to Firebase.
-
 Methods:  Inherits from Error and can be detected using 'instanceof'.
 
 ## */
