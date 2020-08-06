@@ -106,8 +106,9 @@ Methods:
 
 <script>
 import { layoutConfig } from '../../../../client/boundless.config'
-import productionDb, { productionStorage } from '../../firebase/init_production'
-import testingDb, { testingStorage } from '../../firebase/init_testing'
+import productionDb from '../../firebase/init_production'
+import testingDb from '../../firebase/init_testing'
+import DbException from '../../models/dbException'
 
 export default {
   async created () {
@@ -116,7 +117,7 @@ export default {
       this.dbName = this.$q.localStorage.getItem('boundless_db')
     }
     if (this.$q.sessionStorage.getItem('boundless_config')) {
-      let cachedConfig = this.$q.sessionStorage.getItem('boundless_config')
+      const cachedConfig = this.$q.sessionStorage.getItem('boundless_config')
       this.layoutConfig = layoutConfig
 
       if (typeof cachedConfig.enabledChallenges === 'boolean') {
@@ -125,7 +126,7 @@ export default {
     } else {
       this.layoutConfig = layoutConfig
     }
-    // TODO: Put this in the appropriate vuex module.
+    // Possible improvement: Put the next two calls in a vuex module or mixin.
     await this.loadFireRefs()
     await this.loadInformation()
     this.dataLoaded = true
@@ -222,41 +223,36 @@ export default {
       haltConsole: false, // <Boolean>: flag for loading animation
       // <String>: The path of this component and the parent path of child routes.
       basePath: '/admin/console/settings',
-      // -- The following are variables which should be moved into vuex. --
+      /*
+      Possible improvement: move the following variables into a new vuex module
+      dedicated to settings or into a mixin.
+      */
       db: null,
-      storage: null,
       data: {},
       dataLoaded: false
 
     }
   },
   methods: {
-    // TODO: move into a new vuex module dedicated to settings.
-    loadFireRefs: async function () {
-      /**
-       * load firebase database reference
-       * load firebase storage reference (if applicable)
-       * load firebase cloud functions reference (if applicable)
-       * @param {void}
-       * @return {Promise<Boolean>}
-       */
-
+    /**
+     * Load firebase database,
+     * and cloud functions reference (if applicable).
+     *
+     * Possible improvement: move into a new vuex module dedicated to settings
+     * or into a mixin.
+     */
+    async loadFireRefs () {
       if (this.$q.localStorage.has('boundless_db')) {
-        let sessionDb = this.$q.localStorage.getItem('boundless_db')
+        const sessionDb = this.$q.localStorage.getItem('boundless_db')
 
         if (sessionDb === 'testing') {
           this.db = testingDb
-          this.storage = testingStorage
         } else {
           this.db = productionDb
-          this.storage = productionStorage
         }
-
-        return true
       } else {
         try {
-          let doc = await productionDb.collection('config').doc('project').get()
-
+          const doc = await productionDb.collection('config').doc('project').get()
           if (doc.exists) {
             if (doc.data().db === 'testing') {
               this.db = testingDb
@@ -265,102 +261,83 @@ export default {
               this.db = productionDb
               this.$q.localStorage.set('boundless_db', 'production')
             }
-
-            return true
           } else {
-            let msg = '"/config/project" path does not exists!'
-
-            throw new Error(msg)
+            const msg = '"/config/project" path does not exists!'
+            throw new DbException(msg)
           }
         } catch (error) {
           this.db = productionDb
           this.$q.localStorage.set('boundless_db', 'production')
-
           throw error
         }
       }
     },
-    // TODO: move into a new vuex module dedicated to settings.
-    loadInformation: async function () {
-      /**
-       * load information from config/project of the database
-       * @param {void}
-       * @return {Promise<Boolean>}
-       */
+    /**
+     * Load information from config/project of the database
+     *
+     * Possible improvement: move into a new vuex module dedicated to settings
+     * or into a mixin.
+     */
+    async loadInformation () {
+      const doc = await this.db.collection('config').doc('project').get()
+      if (doc.exists) {
+        this.data = doc.data()
 
-      try {
-        let doc = await this.db.collection('config').doc('project').get()
+        this.data.enabledChallenges = this.data.enabledChallenges || false
 
-        if (doc.exists) {
-          this.data = doc.data()
-
-          this.data.enabledChallenges = this.data.enabledChallenges || false
-
-          let leftImg = {
-            url: '',
-            active: false,
-            visible: true
-          }
-          // dealing with about logo to bind with 'Edit About Page'
-          if (!this.data.generalConfig) {
-            this.data.generalConfig = { leftImg }
-          } else {
-            let ssRef = this.$q.sessionStorage
-            let storedConfig = ssRef.getItem('boundless_config')
-
-            if (!storedConfig.generalConfig.leftImg) {
-              this.data.generalConfig = {
-                ...storedConfig.generalConfig,
-                leftImg
-              }
-            } else if (
-              storedConfig.generalConfig.leftImg.visible === undefined
-            ) {
-              this.data.generalConfig = { ...storedConfig.generalConfig }
-
-              this.data.generalConfig.leftImg.visible = true
-            }
-          }
-
-          // dealing with 'Wiki URL'
-          if (!this.data.wikiInfo) {
-            this.data.wikiInfo = {
-              name: '',
-              url: ''
-            }
-          }
-
-          // TODO: take these out once the functions are done
-          delete this.data.db
-          delete this.data.config_version
-          delete this.data.suggestedKeywords
-          // delete this.data.keywords
-          delete this.data.chipContentType
-          delete this.data.bodyContentType
-          delete this.data.allowedDomain
-
-          this.setUserConfig(this.data.socialNetwork)
-          this.setChallengeConfig(this.data.challengesConfig)
-          this.setProjectConfig(this.data.projectsConfig)
-          this.setKeywords(this.data.keywords)
-
-          delete this.data.socialNetwork
-          delete this.data.challengesConfig
-          delete this.data.projectsConfig
-
-          // sort data via key
-          this.data = Object.fromEntries(Object.entries(this.data).sort())
-          // sort data.keywords via key
-          this.data.keywords = Object.fromEntries(
-            Object.entries(this.data.keywords).sort()
-          )
+        const leftImg = {
+          url: '',
+          active: false,
+          visible: true
+        }
+        // dealing with about logo to bind with 'Edit About Page'
+        if (!this.data.generalConfig) {
+          this.data.generalConfig = { leftImg }
         } else {
-          throw new Error('Config file does not exists in the database!')
+          const ssRef = this.$q.sessionStorage
+          const storedConfig = ssRef.getItem('boundless_config')
+
+          if (!storedConfig.generalConfig.leftImg) {
+            this.data.generalConfig = {
+              ...storedConfig.generalConfig,
+              leftImg
+            }
+          } else if (
+            storedConfig.generalConfig.leftImg.visible === undefined
+          ) {
+            this.data.generalConfig = { ...storedConfig.generalConfig }
+
+            this.data.generalConfig.leftImg.visible = true
+          }
         }
 
-        return true
-      } catch (error) {
-        throw error
+        // dealing with 'Wiki URL'
+        if (!this.data.wikiInfo) {
+          this.data.wikiInfo = {
+            name: '',
+            url: ''
+          }
+        }
+
+        // TODO: take these out once the functions are done
+        delete this.data.db
+        delete this.data.config_version
+        delete this.data.suggestedKeywords
+        // delete this.data.keywords
+        delete this.data.chipContentType
+        delete this.data.bodyContentType
+        delete this.data.allowedDomain
+
+        this.setUserConfig(this.data.socialNetwork)
+        this.setChallengeConfig(this.data.challengesConfig)
+        this.setProjectConfig(this.data.projectsConfig)
+        this.setKeywords(this.data.keywords)
+
+        delete this.data.socialNetwork
+        delete this.data.challengesConfig
+        delete this.data.projectsConfig
+      } else {
+        throw new DbException('Config file does not exists in the database!')
       }
     },
     /**
@@ -371,7 +348,7 @@ export default {
       this.haltConsole = loadVal
 
       if (!loadVal) {
-        let storedConfig = this.$q.sessionStorage.getItem('boundless_config')
+        const storedConfig = this.$q.sessionStorage.getItem('boundless_config')
         if (typeof storedConfig.enabledChallenges === 'boolean') {
           this.layoutConfig.challenges = storedConfig.enabledChallenges
         }
@@ -444,8 +421,8 @@ export default {
       }
     },
     /**
-      * Switch database namespace and reload the page.
-      */
+     * Switch database namespace and reload the page.
+     */
     switchDatabase: function () {
       this.$q.localStorage.set('boundless_db', this.dbName)
 

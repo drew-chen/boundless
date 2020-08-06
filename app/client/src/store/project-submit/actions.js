@@ -43,10 +43,10 @@ import { LocalStorage } from 'quasar'
  */
 export async function loadFireRefs ({ commit }) {
   if (LocalStorage.has('boundless_db')) {
-    let sessionDb = LocalStorage.getItem('boundless_db')
+    const sessionDb = LocalStorage.getItem('boundless_db')
     commit('setIsTestingDb', sessionDb === 'testing')
   } else {
-    let doc = await productionDb.collection('config').doc('project').get()
+    const doc = await productionDb.collection('config').doc('project').get()
 
     if (doc.exists) {
       if (doc.data().db === 'testing') {
@@ -59,7 +59,7 @@ export async function loadFireRefs ({ commit }) {
     } else {
       commit('setIsTestingDb', false)
       LocalStorage.set('boundless_db', 'production')
-      let msg = '"/config/project" path does not exists!'
+      const msg = '"/config/project" path does not exists!'
       throw new DbException(msg)
     }
   }
@@ -78,11 +78,11 @@ export async function loadFireRefs ({ commit }) {
   *  commit mutations and retrieve state.
   */
 export async function loadConfig ({ commit, getters }) {
-  let doc = await getters.db.collection('config').doc('project').get()
+  const doc = await getters.db.collection('config').doc('project').get()
 
   if (doc.exists) {
-    let data = doc.data()
-    let keywordOptions = []
+    const data = doc.data()
+    const keywordOptions = []
     for (let key in data['keywords']) {
       keywordOptions.push({
         label: key,
@@ -118,12 +118,12 @@ export async function loadConfig ({ commit, getters }) {
   * @param {Object} context.getters Gives access to state.
   */
 export async function loadUserList ({ commit, getters }) {
-  let doc = await getters.db.collection('users').doc('ToC').get()
+  const doc = await getters.db.collection('users').doc('ToC').get()
 
   if (doc.exists) {
-    let tocUserData = doc.data()
-    let emailToUuidMap = {}
-    let emailToNameMap = {}
+    const tocUserData = doc.data()
+    const emailToUuidMap = {}
+    const emailToNameMap = {}
     for (let uuid in tocUserData) {
       emailToUuidMap[tocUserData[uuid].email] = uuid
       emailToNameMap[tocUserData[uuid].email] = tocUserData[uuid].name
@@ -148,9 +148,9 @@ export async function loadUserList ({ commit, getters }) {
 export async function submitNewUsers ({ commit, getters }) {
   getters.projectMembers.forEach(async (member) => {
     if (!(member.email in getters.emailToUuidMap)) {
-      let timeOfSubmit = new Date(Date.now()).toISOString()
-      let userDoc = getters.db.collection('users').doc()
-      let uuid = userDoc.id
+      const timeOfSubmit = new Date(Date.now()).toISOString()
+      const userDoc = getters.db.collection('users').doc()
+      const uuid = userDoc.id
 
       let newUser = {
         uuid,
@@ -201,7 +201,7 @@ export async function submitNewUsers ({ commit, getters }) {
 export async function submitProject ({ commit, dispatch, getters }) {
   await dispatch('submitNewUsers')
 
-  let tmpMembers = []
+  const tmpMembers = []
   getters.projectMembers.forEach(member => {
     tmpMembers.push({
       uuid: getters.emailToUuidMap[member.email],
@@ -211,8 +211,8 @@ export async function submitProject ({ commit, dispatch, getters }) {
   commit('setSubmittedProjectMembers', tmpMembers)
 
   // create a reference to a new project in the db
-  let projectDoc = getters.db.collection('projects').doc()
-  let submitTime = new Date(Date.now()).toISOString()
+  const projectDoc = getters.db.collection('projects').doc()
+  const submitTime = new Date(Date.now()).toISOString()
 
   commit('setProjectUuid', projectDoc.id)
   commit('setProjectSubmitTime', submitTime)
@@ -234,8 +234,8 @@ export async function submitProject ({ commit, dispatch, getters }) {
  * @param {Object} context.getters Gives access to state.
  */
 export async function submitQuestions ({ getters }) {
-  let uuid = getters.projectUuid
-  let projectDoc = getters.db.collection('projects').doc(uuid)
+  const uuid = getters.projectUuid
+  const projectDoc = getters.db.collection('projects').doc(uuid)
   await projectDoc.update({
     customFormResponse: getters.questions
   })

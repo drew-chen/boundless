@@ -129,7 +129,7 @@ Methods:
             class="q-mt-sm"
             placeholder="a"
             :label="question.label"
-            :type="question.type"
+            :type="question.type.value"
             :value="question.response"
           />
         </div>
