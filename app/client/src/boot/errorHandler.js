@@ -25,10 +25,15 @@ Methods:
 import DbException from './../models/DbException'
 
 /**
- * Error codes can be found:
+ * Checks if a given error is an instance of FirebaseError and optionally,
+ * if that FirebaseError also has the given error code.
+ *
+ * Error codes can be found here:
  * https://firebase.google.com/docs/storage/web/handle-errors
+ * @param  {Error} error The instance being checked.
+ * @param  {String} errorCode Optional error code to also check for.
  */
-function isFirebaseError (error, errorCode) {
+export function isFirebaseError (error, errorCode) {
   if (error.code && error.name === 'FirebaseError') {
     if (errorCode !== undefined) {
       return error.code === errorCode
@@ -55,15 +60,15 @@ export default ({ Vue }) => {
     if (error instanceof DbException) {
       console.error('Caught in handler:', error)
       vm.$q.notify({
-        type: 'negative',
+        type: 'warning',
         timeout: 1750,
         message: 'There was an error retrieving from the database.'
       })
     } else if (isFirebaseError(error, 'storage/object-not-found')) {
       vm.$q.notify({
-        type: 'negative',
+        type: 'warning',
         timeout: 1750,
-        message: 'There was an error loading images or attachments.'
+        message: 'Some images or attachments are missing.'
       })
     } else {
       throw error

@@ -300,6 +300,7 @@ Methods:
 
 <script>
 import { defaultImages } from '../../boundless.config'
+import isFirebaseError from '../boot/errorHandler'
 
 import productionDb, { productionStorage } from '../firebase/init_production'
 import testingDb, { testingStorage } from '../firebase/init_testing'
@@ -654,10 +655,9 @@ export default {
                   data.extraKeywordsData[prop]
                 ).getDownloadURL()
               } catch (error) {
-                // TODO: Use class 'instanceof' instead of this method.
-                if (error.name && error.name === 'FirebaseError') {
-                  this.keywordsImage[key] = '../statics/images/other-icon.png'
+                if (isFirebaseError(error, 'storage/object-not-found')) {
                   console.error(error)
+                  this.keywordsImage[key] = '../statics/images/other-icon.png'
                 } else {
                   throw error
                 }
