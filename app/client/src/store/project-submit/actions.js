@@ -36,7 +36,6 @@ import { LocalStorage } from 'quasar'
  * and false other wise. This has been removed on 7/22/2020 since the purpose
  * of those return values were unknown.
  *
- * @export
  * @param {Object} context Exposes the same set of methods/properties on the
  *  store instance.
  * @param {Object} context.commit Allows this action to commit mutations
@@ -139,7 +138,6 @@ export async function loadUserList ({ commit, getters }) {
  * Submits the new users related to the project as the user submits
  * the project to the database.
  *
- * @export
  * @param {Object} context Exposes the same set of methods/properties on the
  *  store instance.
  * @param {Object} context.commit Allows this action to commit mutations
@@ -191,7 +189,6 @@ export async function submitNewUsers ({ commit, getters }) {
  * Unlike most other fields, the project id, submission time and users list
  * are finalized in here instead of in ProjectMainForm.vue
  *
- * @export
  * @param {Object} context Exposes the same set of methods/properties on the
  *  store instance.
  * @param {Object} context.commit Allows this action to commit mutations.
@@ -228,7 +225,6 @@ export async function submitProject ({ commit, dispatch, getters }) {
 /**
  * Save custom form responses under a field named 'createInfo'.
  *
- * @export
  * @param {Object} context Exposes the same set of methods/properties on the
  *  store instance.
  * @param {Object} context.getters Gives access to state.
@@ -244,7 +240,6 @@ export async function submitQuestions ({ getters }) {
 /**
  * Save questionTemplates to vuex and Firestore.
  *
- * @export
  * @param {Object} context Exposes the same set of methods/properties on the
  *  store instance.
  * @param {Object} context.commit Allows this action to commit mutations
@@ -265,7 +260,6 @@ export async function submitQuestionTemplates ({ commit, getters }, questionTemp
 /**
  * Save customFormEnabled to vuex and Firestore.
  *
- * @export
  * @param {Object} context Exposes the same set of methods/properties on the
  *  store instance.
  * @param {Object} context.commit Allows this action to commit mutations
@@ -286,7 +280,6 @@ export async function submitCustomFormEnabled ({ commit, getters }, customFormEn
 /**
  * Helper function which resets the vuex store to the initial state.
  *
- * @export
  * @param {Object} context Exposes the same set of methods/properties on the
  *  store instance.
  * @param {Object} context.commit Allows this action to commit mutations

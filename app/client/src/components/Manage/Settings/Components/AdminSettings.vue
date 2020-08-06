@@ -571,7 +571,7 @@ Methods:
 <script>
 import deepClone from 'lodash.clonedeep'
 import Vue from 'vue'
-import FirebaseError from 'firebase'
+import isFirebaseError from '../../../../boot/errorHandler'
 import { defaultImages } from '../../../../../../client/boundless.config'
 
 import productionDb, { productionStorage } from '../../../../firebase/init_production'
@@ -706,9 +706,7 @@ export default {
 
             this.data[property][obj].url = url
           } catch (error) {
-            // TODO: use error handler.
-            if (error.name && error.name === 'FirebaseError') {
-              console.log(FirebaseError)
+            if (isFirebaseError(error, 'storage/object-not-found')) {
               console.error(error)
               this.data[property][obj].url = ''
             } else {
