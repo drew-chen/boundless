@@ -142,7 +142,7 @@ export default {
     /**
      * Each router-view needs different props. Some of these props interact
      * with the data in 'ManageSettings.vue' which is why they are passed in
-     * here instead of through the router. 'this' is explicitly binded
+     * here instead of through the router. 'this' is explicitly bound
      * to be safe and make sure each callback acts as if it was called in
      * 'ManageSettings.vue' instead of in a child component.
      *
@@ -156,7 +156,7 @@ export default {
             /*
             The 'name' property is important so that the router view doesn't try
             to render while switching to another route. If the name does not
-            match, the router-view will be in loading state.
+            match, the router-view will not be rendered.
             */
             name: 'general',
             setUserConfig: this.setUserConfig.bind(this),
@@ -172,7 +172,7 @@ export default {
             consoleLoading: this.consoleLoading.bind(this),
             setDatabaseId: this.setDatabaseId.bind(this),
             hideDatabaseSwitch: !this.layoutConfig.switchDatabase,
-            dbName: this.dbname,
+            dbName: this.dbName,
             switchDatabase: this.switchDatabase.bind(this)
           }
         case 'projects':
@@ -408,7 +408,7 @@ export default {
       }
     },
     /**
-     * Set project configuartion from the child component and
+     * Set project configuration from the child component and
      * assign as one of the object inside this.configs var.
      * @param {Object} val: Event emitter value containing
      *                      database information.
@@ -419,7 +419,7 @@ export default {
       }
     },
     /**
-     * Set challenge configuartion from the child component and
+     * Set challenge configuration from the child component and
      * assign as one of the object inside this.configs var.
      * @param {Object} val: Event emitter value containing
      *                      database information.
@@ -430,9 +430,9 @@ export default {
       }
     },
     /**
-     * Set user configuartion from the child component and assign
+     * Set user configuration from the child component and assign
      * as one of the object inside this.configs var.
-     * @param {Object} val: Event emitter value contating database information.
+     * @param {Object} val: Event emitter value containing database information.
      */
     setUserConfig: function (val) {
       if (val) {
