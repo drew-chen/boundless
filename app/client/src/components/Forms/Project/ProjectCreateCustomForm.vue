@@ -179,13 +179,11 @@ export default {
     this.customFormEnabled = this.storeCustomFormEnabled
     this.modified = false
   },
-  /** Lets parent component it is ok to use ref. */
   mounted () {
     // Skip the first change.
     this.$nextTick(() => {
       this.dataLoaded = true
     })
-    this.$emit('mounted')
   },
   watch: {
     /**
@@ -198,6 +196,9 @@ export default {
       deep: true,
       handler (newArr, oldArr) {
         this.modified = this.dataLoaded
+        if (this.modified) {
+          this.$emit('modified')
+        }
       }
     },
     /**
@@ -205,6 +206,9 @@ export default {
      */
     customFormEnabled (val) {
       this.modified = this.dataLoaded
+      if (this.modified) {
+        this.$emit('modified')
+      }
     }
   },
   computed: {

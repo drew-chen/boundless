@@ -33,7 +33,7 @@ Methods:
       >
         <div class="float-right">
           <button-undo-and-save
-            :disabled="!canSave()"
+            :disabled="!updated"
             :save="submit"
             :undo="openResetDialog"
           />
@@ -150,7 +150,7 @@ Methods:
     <project-create-custom-form
       :type="type"
       ref="projectCreateCustomForm"
-      @mounted="setCanSave"
+      @modified="updated = true"
     />
 
     <!-- -------------------- Listing Table -------------------- -->
@@ -552,7 +552,7 @@ Methods:
     <!-- -------------------- Button -------------------- -->
     <div class="float-right">
       <button-undo-and-save
-        :disabled="!canSave()"
+        :disabled="!updated"
         :save="submit"
         :undo="openResetDialog"
       />
@@ -571,6 +571,7 @@ Methods:
 <script>
 import deepClone from 'lodash.clonedeep'
 import Vue from 'vue'
+import FirebaseError from 'firebase'
 import { defaultImages } from '../../../../../../client/boundless.config'
 
 import productionDb, { productionStorage } from '../../../../firebase/init_production'
@@ -677,8 +678,7 @@ export default {
       /**
        * <Boolean>: Flag for handling child emitted submit.
        * Describes to all updates except 'ProjectCreateCustomForm.vue' since
-       * it detects updates differently (does so by comparing with Vuex instead
-       * of on input events). Used in 'this.canSave()'.
+       * it's state is separate. Used in 'this.updated'.
        */
       updated: false,
       // <String>: Relative path of the statics directory
@@ -706,8 +706,14 @@ export default {
 
             this.data[property][obj].url = url
           } catch (error) {
-            this.data[property][obj].url = ''
-            throw error
+            // TODO: use error handler.
+            if (error.name && error.name === 'FirebaseError') {
+              console.log(FirebaseError)
+              console.error(error)
+              this.data[property][obj].url = ''
+            } else {
+              throw error
+            }
           }
         }
       }
@@ -968,21 +974,6 @@ export default {
       }
       eventHandler(event, type, field)
     },
-    /** Whether there are any changes to be saved. See setCanSave(). */
-    canSave () {
-      return this.updated
-    },
-    /**
-     * Once 'ProjectCreateCustomForm.vue' is mounted, use it's ref
-     * to know whether updates within that components have been made.
-     * This is done because 'ProjectCreateCustomForm.vue' needs to be mounted
-     * in order to use its ref.
-     */
-    setCanSave () {
-      this.canSave = () => {
-        return this.$refs.projectCreateCustomForm.modified || this.updated
-      }
-    },
     /**
      * Blocks reloading or closing the webpage if there are
      * unsaved changes.
@@ -990,7 +981,7 @@ export default {
      * @param event The event which has occured: 'beforeunload'.
      */
     confirmUnload (event) {
-      if (this.canSave()) {
+      if (this.updated) {
         // Cancel the event.
         // If you prevent default behavior in Mozilla Firefox prompt will always be shown.
         event.preventDefault()
@@ -1010,7 +1001,7 @@ export default {
     },
     /** Undo's local changes if there are changes to be saved. */
     reset () {
-      if (this.canSave()) {
+      if (this.updated) {
         this.$refs.projectCreateCustomForm.resetForm()
         Vue.set(this.$data, 'data', deepClone(this.dbData))
         this.updated = false
@@ -1035,7 +1026,7 @@ export default {
      *  This is the exact same object as 'beforeRouteLeave''s 'next' method.
      */
     openConfirmLeaveDialog (next) {
-      if (this.canSave()) {
+      if (this.updated) {
         this.$refs.dialogConfirmLeave.open(next)
       } else {
         next()
