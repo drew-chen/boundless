@@ -1,4 +1,3 @@
-
 /* ##
 ## Copyright (c) 2020 Wind River Systems, Inc.
 ##
@@ -10,7 +9,7 @@
 ## under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES
 ## OR CONDITIONS OF ANY KIND, either express or implied.
 
-Name:     models/DbException.js
+Name:     errors/DbException.js
 Purpose:  Exception related to Firebase.
 Methods:  Inherits from Error and can be detected using 'instanceof'.
 

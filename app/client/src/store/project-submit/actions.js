@@ -25,7 +25,7 @@ Methods:
 ## */
 
 import productionDb from '../../firebase/init_production'
-import DbException from '../../models/DbException'
+import DbException from '../../errors/DbException'
 import { LocalStorage } from 'quasar'
 
 /**

@@ -19,7 +19,7 @@ Methods:
   'ProjectCustomForm.vue' can display. Questions support CRUD operations
   and can be reordered through drag and dropping them. This array is
   saved in vuex and submitted to the db in a vuex action. Submission
-  is only possible when this array is diffrent the version already
+  is only possible when this array is different the version already
   in Vuex. Submission is triggered in the parent component:
   'Config.vue'.
 

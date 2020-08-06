@@ -108,7 +108,7 @@ Methods:
 import { layoutConfig } from '../../../../client/boundless.config'
 import productionDb from '../../firebase/init_production'
 import testingDb from '../../firebase/init_testing'
-import DbException from '../../models/DbException'
+import DbException from '../../errors/DbException'
 
 export default {
   async created () {
