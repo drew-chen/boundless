@@ -300,7 +300,7 @@ Methods:
 
 <script>
 import { defaultImages } from '../../boundless.config'
-import isFirebaseError from '../boot/errorHandler'
+import isFirebaseError from '../../src/errors/isFirebaseError'
 
 import productionDb, { productionStorage } from '../firebase/init_production'
 import testingDb, { testingStorage } from '../firebase/init_testing'
@@ -389,7 +389,7 @@ export default {
         {
           name: 'progress',
           align: 'center',
-          label: 'Progess',
+          label: 'Progress',
           field: row => row.progress,
           format: val => `${val}`,
           sortable: true
@@ -527,7 +527,7 @@ export default {
       /**
        * helper function to join keywords
        * @param {Array<String>} entry: string array with keywords to be
-       *                               appeneded
+       *                               appended
        * @return {String}
        */
 

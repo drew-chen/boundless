@@ -121,7 +121,7 @@ Methods:
       <!-- If there is at least one keyword - then list them w/check box -->
       <div v-if="Object.keys(keywordOptions).length">
         <dir class="text-italic text-grey">
-          You can select up to 6 keywords to diplay under the banner.
+          You can select up to 6 keywords to display under the banner.
         </dir>
         <q-option-group
           v-if="data.keywords"
@@ -571,7 +571,7 @@ Methods:
 <script>
 import deepClone from 'lodash.clonedeep'
 import Vue from 'vue'
-import isFirebaseError from '../../../../boot/errorHandler'
+import isFirebaseError from '../../../../errors/isFirebaseError'
 import { defaultImages } from '../../../../../../client/boundless.config'
 
 import productionDb, { productionStorage } from '../../../../firebase/init_production'

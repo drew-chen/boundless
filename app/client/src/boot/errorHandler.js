@@ -22,26 +22,8 @@ Methods:
 
 ## */
 
-import DbException from './../models/DbException'
-
-/**
- * Checks if a given error is an instance of FirebaseError and optionally,
- * if that FirebaseError also has the given error code.
- *
- * Error codes can be found here:
- * https://firebase.google.com/docs/storage/web/handle-errors
- * @param  {Error} error The instance being checked.
- * @param  {String} errorCode Optional error code to also check for.
- */
-export function isFirebaseError (error, errorCode) {
-  if (error.code && error.name === 'FirebaseError') {
-    if (errorCode !== undefined) {
-      return error.code === errorCode
-    }
-    return true
-  }
-  return false
-}
+import DbException from './../errors/DbException'
+import isFirebaseError from './../errors/isFirebaseError'
 
 /**
  * Handles errors from components. Does not catch non-vue errors nor async
@@ -58,13 +40,14 @@ export default ({ Vue }) => {
    */
   Vue.config.errorHandler = (error, vm, info) => {
     if (error instanceof DbException) {
-      console.error('Caught in handler:', error)
+      console.error(error)
       vm.$q.notify({
         type: 'warning',
         timeout: 1750,
         message: 'There was an error retrieving from the database.'
       })
     } else if (isFirebaseError(error, 'storage/object-not-found')) {
+      console.error(error)
       vm.$q.notify({
         type: 'warning',
         timeout: 1750,
