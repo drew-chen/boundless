@@ -398,7 +398,7 @@ export default {
      */
     loadFireRefs: async function () {
       if (this.$q.localStorage.has('boundless_db')) {
-        let sessionDb = this.$q.localStorage.getItem('boundless_db')
+        const sessionDb = this.$q.localStorage.getItem('boundless_db')
 
         if (sessionDb === 'testing') {
           this.db = testingDb
@@ -411,7 +411,7 @@ export default {
         return true
       } else {
         try {
-          let doc = await productionDb.collection('config').doc('project').get()
+          const doc = await productionDb.collection('config').doc('project').get()
 
           if (doc.exists) {
             if (doc.data().db === 'testing') {
@@ -426,7 +426,7 @@ export default {
 
             return true
           } else {
-            let msg = '"/config/project" path does not exists!'
+            const msg = '"/config/project" path does not exists!'
 
             throw new Error(msg)
           }
@@ -445,16 +445,16 @@ export default {
      */
     loadConfig: async function () {
       if (this.$q.sessionStorage.has('boundless_config')) {
-        let cachedConfig = this.$q.sessionStorage.getItem('boundless_config')
+        const cachedConfig = this.$q.sessionStorage.getItem('boundless_config')
 
         this.pagination.rowsPerPage = cachedConfig.pagination
       }
       if (this.rowType !== 'user') {
         try {
-          let doc = await this.db.collection('config').doc('project').get()
+          const doc = await this.db.collection('config').doc('project').get()
 
           if (doc.exists) {
-            let data = doc.data()
+            const data = doc.data()
 
             for (let key in data['keywords']) {
               this.popkeywords.push({
@@ -478,10 +478,10 @@ export default {
      */
     loadAllRows: async function () {
       try {
-        let doc = await this.db.collection(`${this.rowType}s`).doc('ToC').get()
+        const doc = await this.db.collection(`${this.rowType}s`).doc('ToC').get()
 
         if (doc.exists) {
-          let tocAllRowData = doc.data()
+          const tocAllRowData = doc.data()
           let row = null
           for (let rowUuid in tocAllRowData) {
             if (rowUuid !== 'alias') {
@@ -515,8 +515,8 @@ export default {
           message: 'Nothing to remove!'
         })
       } else if (this.selected.length === 1) {
-        let deletedRow = this.selected[0]
-        let rowId = deletedRow.uuid || deletedRow[this.rowKey]
+        const deletedRow = this.selected[0]
+        const rowId = deletedRow.uuid || deletedRow[this.rowKey]
         this.$q.dialog({
           title: 'Confirmation to Delete',
           message: `Delete ${rowId}${this.formatProperty(deletedRow, this.middleColumn)}?`,
@@ -562,10 +562,10 @@ export default {
 
             this.$q.notify({
               type: 'positive',
-              message: `Deleted sucessfully!`
+              message: `Deleted successfully!`
             })
 
-            let updates = {}
+            const updates = {}
             updates[entry] = firebase.firestore.FieldValue.delete()
 
             if (typeof removedMiddleEntry !== 'undefined') {
@@ -576,7 +576,7 @@ export default {
             await this.db.collection(`${this.rowType}s`).doc('ToC')
               .update(updates)
 
-            let tmpRowList = []
+            const tmpRowList = []
 
             this.rowList.forEach(row => {
               if (row[this.rowKey] !== entry && row.uuid !== entry) {
@@ -628,7 +628,7 @@ export default {
         this.uuid = uuid
         uuidAssigned = true
       } else if (this.selected.length === 1) {
-        let row = this.selected[0]
+        const row = this.selected[0]
         this.uuid = row.uuid || row[this.rowKey]
         uuidAssigned = true
       }
@@ -683,10 +683,10 @@ export default {
       }
     },
     /**
-     * Capitlizes the first character of a string.
+     * Capitalizes the first character of a string.
      * Used for rowType for certain imports or labels.
-     * @param {String} str The string to be capitlized.
-     * @return {String} The captilized string
+     * @param {String} str The string to be capitalized.
+     * @return {String} The capitalized string
      */
     capitalizeFirst (str) {
       if (typeof str !== 'string') return ''

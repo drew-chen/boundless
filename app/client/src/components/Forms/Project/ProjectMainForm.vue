@@ -688,7 +688,7 @@ export default {
         if (this.chosenKeywords.length === 0) {
           this.chosenKeywords.push('tbd')
         }
-        let newProject = {
+        const newProject = {
           uuid: null,
           project: this.projectName,
           description: this.projectDescription,
@@ -773,7 +773,7 @@ export default {
             data = data.toLowerCase()
             if (data !== indexEmail) {
               this.$q.notify({
-                message: 'The emails must be indentical.',
+                message: 'The emails must be identical.',
                 color: 'negative'
               })
               this.projectMembers[index].email = ''
@@ -793,7 +793,7 @@ export default {
      * @param {Integer} index: index of the input DOM
      */
     capitalizeFirstChar: function (index) {
-      let nameToken = this.projectMembers[index].name.split(' ')
+      const nameToken = this.projectMembers[index].name.split(' ')
 
       if (nameToken.length < 2 && nameToken[0] !== '') {
         this.$q.notify({
