@@ -40,7 +40,6 @@ Methods:
       class="table"
     >
       <template v-slot:top-left>
-
         <div class="row">
           <q-btn
             rounded
@@ -527,8 +526,8 @@ export default {
       }
     },
     /**
-     * Deletes projects, challenges, or users from the database and stroage;
-     * notifies the user of the status when compeleted. Works by getting a reference
+     * Deletes projects, challenges, or users from the database and storage;
+     * notifies the user of the status when completed. Works by getting a reference
      * to the field being deleted then removes (by updating) the field in the document.
      *
      * @param {String} entry: uid of the projects, challenges, or users to be removed
@@ -694,16 +693,19 @@ export default {
   cursor: pointer
 
 .left-column
-  min-width: 600px
+  width: 40%
+  white-space: normal
 
 .middle-column
-  min-width: 600px
+  width: 35%
+  white-space: normal
 
 .right-column
-  min-width: 300px
+  width: 15%
+  white-space: normal
 
 .table-header
-  font-size: 18px
+  font-size: 1.1rem
   font-weight: normal
   position: sticky !important
   top: 0
