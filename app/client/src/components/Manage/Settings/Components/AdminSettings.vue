@@ -612,48 +612,42 @@ export default {
    * 'this.dbData' to the same initial values as 'this.data'.
    */
   async created () {
-    try {
-      setTimeout(() => {
-        this.loading = false
-      }, 100)
-      // data fetching goes here
-      await this.loadFireRefs()
-      this.data = this.$q.sessionStorage.getItem('boundless_config')
-      this.data = this.data[`${this.type}Config`]
+    setTimeout(() => {
+      this.loading = false
+    }, 100)
+    // data fetching goes here
+    await this.loadFireRefs()
+    this.data = this.$q.sessionStorage.getItem('boundless_config')
+    this.data = this.data[`${this.type}Config`]
 
-      // help instantiate this.data.progressBar if not found in config
-      if (
-        this.type === 'projects' &&
-        typeof this.data.progressBar === 'undefined'
-      ) {
-        this.data.progressBar = {
-          tags: ['Idea', 'PoC', 'Value'],
-          half: true
-        }
+    // help instantiate this.data.progressBar if not found in config
+    if (
+      this.type === 'projects' &&
+      typeof this.data.progressBar === 'undefined'
+    ) {
+      this.data.progressBar = {
+        tags: ['Idea', 'PoC', 'Value'],
+        half: true
       }
-
-      for (let key in this.keywords) {
-        this.keywordOptions.push({
-          label: key,
-          value: this.keywords[key]
-        })
-      }
-
-      this.data.keywords = this.data.keywords.filter(
-        v => Object.values(this.keywords).includes(v)
-      )
-      // this.data.listingTable.bannerImg.url
-      // this.data.webpage.bannerImg.url
-      // this.data.webpage.mainImg.url
-      await this.storageUrlFetcher('listingTable', 'bannerImg')
-      await this.storageUrlFetcher('webpage', 'bannerImg')
-      await this.storageUrlFetcher('webpage', 'mainImg')
-
-      this.dbData = deepClone(this.data)
-      window.addEventListener('beforeunload', this.confirmUnload)
-    } catch (error) {
-      throw error
     }
+
+    for (let key in this.keywords) {
+      this.keywordOptions.push({
+        label: key,
+        value: this.keywords[key]
+      })
+    }
+
+    this.data.keywords = this.data.keywords.filter(
+      v => Object.values(this.keywords).includes(v)
+    )
+
+    await this.storageUrlFetcher('listingTable', 'bannerImg')
+    await this.storageUrlFetcher('webpage', 'bannerImg')
+    await this.storageUrlFetcher('webpage', 'mainImg')
+
+    this.dbData = deepClone(this.data)
+    window.addEventListener('beforeunload', this.confirmUnload)
   },
   destroyed () {
     window.removeEventListener('beforeunload', this.confirmUnload)
@@ -669,10 +663,10 @@ export default {
       keywordOptions: [],
       // data <Object>: config information of either project or challenge
       data: {},
-      // <Object>: Unmodified data from the databaseused to reset 'this.data'.
+      // <Object>: Unmodified data from the database used to reset 'this.data'.
       dbData: {},
       recoveryPath: {}, // <Object>: record for paths to be recovered
-      counter: 0, // <Integer>: couter to track promises
+      counter: 0, // <Integer>: Counter to track promises
       endCounter: 0, // <Integer>: counter to end the promise calls
       selectedStyle: { // <Object>: style of the dom once selected
         // boxShadow <String>: css property box-shadow
@@ -696,7 +690,6 @@ export default {
      * Helper function to fetch the absolute url given relative
      * @param {String} property: name of the property inside config
      * @param {String} obj: name of the field inside the property
-     * @return {Promise<Boolean>} Whether or not there was an error.
      */
     async storageUrlFetcher (property, obj) {
       if (
@@ -712,19 +705,12 @@ export default {
             ).getDownloadURL()
 
             this.data[property][obj].url = url
-
-            return true
           } catch (error) {
             this.data[property][obj].url = ''
-
-            return false
+            throw error
           }
         }
-
-        return true
       }
-
-      return false
     },
     /**
      * Helper function to add new tab on the progress
@@ -768,20 +754,16 @@ export default {
             color: 'negative'
           })
         }
-      }).onCancel(() => {
-      }).onDismiss(() => {
       })
     },
     /**
      * Helper function deletes the progress tag when invoked
      * and notifies the user on failure.
      * @param {Integer} index: of the tag to be deleted
-     * @return {void}
      */
     deleteProgressTag (index) {
       if (this.data.progressBar.tags.length > 1) {
         this.data.progressBar.tags.splice(index, 1)
-
         this.forceUpdate()
       } else {
         this.$q.notify({
@@ -794,8 +776,6 @@ export default {
     /**
      * Updates the vue component by force once called and
      * sets true to this.updated.
-     * @param {void}
-     * @return {void}
      */
     forceUpdate () {
       this.updated = true
@@ -811,10 +791,9 @@ export default {
           color: 'negative',
           icon: 'warning',
           position: 'bottom',
-          message: 'Maximun of 6 keywords only.',
+          message: 'Maximum of 6 keywords only.',
           timeout: 500
         })
-
         keywords.pop()
         this.data.keywords = keywords
       } else {
@@ -830,53 +809,46 @@ export default {
      *                      inside firebase storage.
      */
     async getBlobAndSubmitFromURL (url, property, obj) {
-      try {
-        let res = await fetch(url)
-        res = await res.blob()
+      let res = await fetch(url)
+      res = await res.blob()
 
-        let storageRef = this.storage.ref().child(
-          `configs/${this.type}/${property}/${obj}.png`
-        )
-        // let ss = await storageRef.put(res)
-        // let dlURL = await ss.ref.getDownloadURL()
-        await storageRef.put(res)
-        let dlURL = `configs/${this.type}/${property}/${obj}.png`
+      let storageRef = this.storage.ref().child(
+        `configs/${this.type}/${property}/${obj}.png`
+      )
+      await storageRef.put(res)
+      let dlURL = `configs/${this.type}/${property}/${obj}.png`
 
-        URL.revokeObjectURL(url)
-        this.data[property][obj].url = dlURL
-        delete this.data[property][obj].prev
-        this.counter = this.counter + 1
+      URL.revokeObjectURL(url)
+      this.data[property][obj].url = dlURL
+      delete this.data[property][obj].prev
+      this.counter = this.counter + 1
 
-        if (this.counter === this.endCounter) {
-          await this.db.collection('config').doc('project').set({
-            [`${this.type}Config`]: this.data
-          }, { merge: true })
+      if (this.counter === this.endCounter) {
+        await this.db.collection('config').doc('project').set({
+          [`${this.type}Config`]: this.data
+        }, { merge: true })
 
-          if (this.$q.sessionStorage.has('boundless_config')) {
-            let dbConfig = this.$q.sessionStorage.getItem('boundless_config')
-            dbConfig[`${this.type}Config`] = this.data
+        if (this.$q.sessionStorage.has('boundless_config')) {
+          let dbConfig = this.$q.sessionStorage.getItem('boundless_config')
+          dbConfig[`${this.type}Config`] = this.data
 
-            this.$q.sessionStorage.set('boundless_config', dbConfig)
-          }
-
-          await this.storageUrlFetcher('listingTable', 'bannerImg')
-          await this.storageUrlFetcher('webpage', 'bannerImg')
-          await this.storageUrlFetcher('webpage', 'mainImg')
-
-          this.dbData = (this.data)
-          this.counter = 0
-          this.updated = false
-          this.$emit('submitting', false)
-          this.$emit('submitted', this.data)
+          this.$q.sessionStorage.set('boundless_config', dbConfig)
         }
-      } catch (error) {
-        throw error
+
+        await this.storageUrlFetcher('listingTable', 'bannerImg')
+        await this.storageUrlFetcher('webpage', 'bannerImg')
+        await this.storageUrlFetcher('webpage', 'mainImg')
+
+        this.dbData = (this.data)
+        this.counter = 0
+        this.updated = false
+        this.$emit('submitting', false)
+        this.$emit('submitted', this.data)
       }
     },
     /**
-     * Load Firebase database referencem storage reference (if applicable)
+     * Load Firebase database, storage (if applicable),
      * and cloud functions reference (if applicable).
-     * @return {Promise<Blob>} Whether or not there was an error.
      */
     async loadFireRefs () {
       if (this.$q.localStorage.has('boundless_db')) {
@@ -889,29 +861,21 @@ export default {
           this.db = productionDb
           this.storage = productionStorage
         }
-
-        return true
       } else {
-        try {
-          let doc = await productionDb.collection('config').doc('project').get()
+        let doc = await productionDb.collection('config').doc('project').get()
 
-          if (doc.exists) {
-            if (doc.data().db === 'testing') {
-              this.db = testingDb
-              this.$q.localStorage.set('boundless_db', 'testing')
-            } else {
-              this.db = productionDb
-              this.$q.localStorage.set('boundless_db', 'production')
-            }
-
-            return true
+        if (doc.exists) {
+          if (doc.data().db === 'testing') {
+            this.db = testingDb
+            this.$q.localStorage.set('boundless_db', 'testing')
           } else {
-            let msg = '"/config/project" path does not exists!'
-
-            throw new Error(msg)
+            this.db = productionDb
+            this.$q.localStorage.set('boundless_db', 'production')
           }
-        } catch (error) {
-          return false
+        } else {
+          let msg = '"/config/project" path does not exists!'
+
+          throw new Error(msg)
         }
       }
     },
@@ -924,61 +888,57 @@ export default {
 
       let blobFlag = false
 
-      try {
-        for (let property in this.data) {
-          for (let obj in this.data[property]) {
-            let blobURL = this.data[property][obj].url
+      for (let property in this.data) {
+        for (let obj in this.data[property]) {
+          let blobURL = this.data[property][obj].url
 
-            if (blobURL && blobURL.split(':')[0] === 'blob') {
-              blobFlag = true
-              this.endCounter = this.endCounter + 1
-              this.getBlobAndSubmitFromURL(blobURL, property, obj)
-            }
+          if (blobURL && blobURL.split(':')[0] === 'blob') {
+            blobFlag = true
+            this.endCounter = this.endCounter + 1
+            this.getBlobAndSubmitFromURL(blobURL, property, obj)
+          }
+        }
+      }
+
+      if (!blobFlag) {
+        // this.data.listingTable.bannerImg.url
+        // this.data.webpage.bannerImg.url
+        // this.data.webpage.mainImg.url
+        for (let key in this.recoveryPath) {
+          let val = this.recoveryPath[key]
+
+          key = key.split('.')
+
+          this.data[key[0]][key[1]].url = val
+          if (this.data[key[0]][key[1]].prev) {
+            delete this.data[key[0]][key[1]].prev
           }
         }
 
-        if (!blobFlag) {
-          // this.data.listingTable.bannerImg.url
-          // this.data.webpage.bannerImg.url
-          // this.data.webpage.mainImg.url
-          for (let key in this.recoveryPath) {
-            let val = this.recoveryPath[key]
+        await this.db.collection('config').doc('project').set({
+          [`${this.type}Config`]: this.data
+        }, { merge: true })
 
-            key = key.split('.')
+        if (this.$q.sessionStorage.has('boundless_config')) {
+          let dbConfig = this.$q.sessionStorage.getItem('boundless_config')
+          dbConfig[`${this.type}Config`] = this.data
 
-            this.data[key[0]][key[1]].url = val
-            if (this.data[key[0]][key[1]].prev) {
-              delete this.data[key[0]][key[1]].prev
-            }
-          }
-
-          await this.db.collection('config').doc('project').set({
-            [`${this.type}Config`]: this.data
-          }, { merge: true })
-
-          if (this.$q.sessionStorage.has('boundless_config')) {
-            let dbConfig = this.$q.sessionStorage.getItem('boundless_config')
-            dbConfig[`${this.type}Config`] = this.data
-
-            this.$q.sessionStorage.set('boundless_config', dbConfig)
-          }
-
-          await this.storageUrlFetcher('listingTable', 'bannerImg')
-          await this.storageUrlFetcher('webpage', 'bannerImg')
-          await this.storageUrlFetcher('webpage', 'mainImg')
-          if (this.type === 'projects') {
-            this.$refs.projectCreateCustomForm.saveForm()
-          }
-          this.dbData = deepClone(this.data)
-          setTimeout(() => {
-            this.updated = false
-
-            this.$emit('submitting', false)
-            this.$emit('submitted', this.data)
-          }, 300)
+          this.$q.sessionStorage.set('boundless_config', dbConfig)
         }
-      } catch (error) {
-        throw error
+
+        await this.storageUrlFetcher('listingTable', 'bannerImg')
+        await this.storageUrlFetcher('webpage', 'bannerImg')
+        await this.storageUrlFetcher('webpage', 'mainImg')
+        if (this.type === 'projects') {
+          this.$refs.projectCreateCustomForm.saveForm()
+        }
+        this.dbData = deepClone(this.data)
+        setTimeout(() => {
+          this.updated = false
+
+          this.$emit('submitting', false)
+          this.$emit('submitted', this.data)
+        }, 300)
       }
     },
     /**
@@ -989,7 +949,7 @@ export default {
     filePickerOnChange (type, field) {
       const eventHandler = (e, type, field) => {
         const file = e.target.files[0]
-        let fToken = field.split('.')
+        const fToken = field.split('.')
 
         if (file) {
           this.data[fToken[0]][fToken[1]].prev = this.data[fToken[0]][fToken[1]].url
@@ -1006,7 +966,6 @@ export default {
           }
         }
       }
-
       eventHandler(event, type, field)
     },
     /** Whether there are any changes to be saved. See setCanSave(). */

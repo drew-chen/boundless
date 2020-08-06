@@ -307,14 +307,10 @@ export default {
    * Fetches row of rowType (project, challenges, or users) and config from db
    */
   async created () {
-    try {
-      await this.loadFireRefs()
-      await this.loadAllRows()
-      if (this.useLoadConfig) {
-        await this.loadConfig()
-      }
-    } catch (error) {
-      throw error
+    await this.loadFireRefs()
+    await this.loadAllRows()
+    if (this.useLoadConfig) {
+      await this.loadConfig()
     }
   },
   data () {
@@ -394,7 +390,6 @@ export default {
     /**
      * Load firebase database reference, storage reference (if applicable)
      * and cloud functions reference (if applicable).
-     * @return {Promise<Boolean>} Whether or not there was an error.
      */
     loadFireRefs: async function () {
       if (this.$q.localStorage.has('boundless_db')) {
@@ -407,8 +402,6 @@ export default {
           this.db = productionDb
           this.cloudFunctions = proAppCall.httpsCallable('appCall')
         }
-
-        return true
       } else {
         try {
           const doc = await productionDb.collection('config').doc('project').get()
@@ -423,8 +416,6 @@ export default {
               this.cloudFunctions = proAppCall.httpsCallable('appCall')
               this.$q.localStorage.set('boundless_db', 'production')
             }
-
-            return true
           } else {
             const msg = '"/config/project" path does not exists!'
 
@@ -435,13 +426,12 @@ export default {
           this.cloudFunctions = proAppCall.httpsCallable('appCall')
           this.$q.localStorage.set('boundless_db', 'production')
 
-          return false
+          throw error
         }
       }
     },
     /**
      * Load keywords into this.popkeywords by converting to fit q-option.
-     * @return {Promise<Boolean>} Whether or not there was an error.
      */
     loadConfig: async function () {
       if (this.$q.sessionStorage.has('boundless_config')) {
@@ -450,25 +440,19 @@ export default {
         this.pagination.rowsPerPage = cachedConfig.pagination
       }
       if (this.rowType !== 'user') {
-        try {
-          const doc = await this.db.collection('config').doc('project').get()
+        const doc = await this.db.collection('config').doc('project').get()
 
-          if (doc.exists) {
-            const data = doc.data()
+        if (doc.exists) {
+          const data = doc.data()
 
-            for (let key in data['keywords']) {
-              this.popkeywords.push({
-                label: key,
-                value: data['keywords'][key]
-              })
-            }
-
-            return true
-          } else {
-            throw new Error('"config/project" not found!')
+          for (let key in data['keywords']) {
+            this.popkeywords.push({
+              label: key,
+              value: data['keywords'][key]
+            })
           }
-        } catch (error) {
-          return false
+        } else {
+          throw new Error('"config/project" not found!')
         }
       }
     },
@@ -502,6 +486,7 @@ export default {
         }, 300)
       } catch (error) {
         this.loading = false
+        throw error
       }
     },
     /**
@@ -557,39 +542,36 @@ export default {
         })
       } else {
         if (this.uuidList.includes(entry)) {
-          try {
-            await this.db.collection(`${this.rowType}s`).doc(entry).delete()
+          await this.db.collection(`${this.rowType}s`).doc(entry).delete()
 
-            this.$q.notify({
-              type: 'positive',
-              message: `Deleted successfully!`
-            })
+          this.$q.notify({
+            type: 'positive',
+            message: `Deleted successfully!`
+          })
 
-            const updates = {}
-            updates[entry] = firebase.firestore.FieldValue.delete()
+          const updates = {}
+          updates[entry] = firebase.firestore.FieldValue.delete()
 
-            if (typeof removedMiddleEntry !== 'undefined') {
-              if (removedMiddleEntry !== '') {
-                updates[`${this.middleColumn}.${removedMiddleEntry}`] = firebase.firestore.FieldValue.delete()
-              }
+          if (typeof removedMiddleEntry !== 'undefined') {
+            if (removedMiddleEntry !== '') {
+              updates[`${this.middleColumn}.${removedMiddleEntry}`] = firebase.firestore.FieldValue.delete()
             }
-            await this.db.collection(`${this.rowType}s`).doc('ToC')
-              .update(updates)
-
-            const tmpRowList = []
-
-            this.rowList.forEach(row => {
-              if (row[this.rowKey] !== entry && row.uuid !== entry) {
-                tmpRowList.push(row)
-              }
-            })
-
-            this.rowList = tmpRowList
-
-            // delete the storage dir from the storage
-            await this.cloudFunctions({ folder: `${this.rowType}s/${entry}` })
-          } catch (error) {
           }
+          await this.db.collection(`${this.rowType}s`).doc('ToC')
+            .update(updates)
+
+          const tmpRowList = []
+
+          this.rowList.forEach(row => {
+            if (row[this.rowKey] !== entry && row.uuid !== entry) {
+              tmpRowList.push(row)
+            }
+          })
+
+          this.rowList = tmpRowList
+
+          // delete the storage dir from the storage
+          await this.cloudFunctions({ folder: `${this.rowType}s/${entry}` })
         } else {
           this.$q.dialog({
             title: 'Error',

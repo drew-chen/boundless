@@ -566,7 +566,7 @@ export default {
   },
   async created () {
     try {
-      // fectches required data
+      // fetches required data
       await this.loadFireRefs()
       await this.loadInformation()
 

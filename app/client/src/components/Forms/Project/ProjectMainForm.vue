@@ -684,28 +684,24 @@ export default {
      * the user on both success and failure.
      */
     saveToVuex () {
-      try {
-        if (this.chosenKeywords.length === 0) {
-          this.chosenKeywords.push('tbd')
-        }
-        const newProject = {
-          uuid: null,
-          project: this.projectName,
-          description: this.projectDescription,
-          members: [],
-          keywords: this.chosenKeywords,
-          timestamp: null,
-          created: null,
-          progress: 0,
-          hidden: false,
-          alias: ''
-        }
-        this.setProjectMembers(cloneDeep(this.projectMembers))
-        this.setWebpage(cloneDeep(this.webpage))
-        this.setProject(cloneDeep(newProject))
-      } catch (error) {
-        throw error
+      if (this.chosenKeywords.length === 0) {
+        this.chosenKeywords.push('tbd')
       }
+      const newProject = {
+        uuid: null,
+        project: this.projectName,
+        description: this.projectDescription,
+        members: [],
+        keywords: this.chosenKeywords,
+        timestamp: null,
+        created: null,
+        progress: 0,
+        hidden: false,
+        alias: ''
+      }
+      this.setProjectMembers(cloneDeep(this.projectMembers))
+      this.setWebpage(cloneDeep(this.webpage))
+      this.setProject(cloneDeep(newProject))
     },
     /**
       * When all form inputs are valid and when submit button is clicked,
