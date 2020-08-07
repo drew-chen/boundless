@@ -28,11 +28,21 @@ Methods:
           <q-separator color="secondary" />
         </div>
 
-        <input
+        <q-input
+          outlined dense
           class="q-pb-md q-pt-sm"
-          type="file" ref="file" accept=".json"
+          type="file"
+          ref="form"
+          accept=".json"
           @change="retrieveDataFromFile"
         >
+          <q-btn
+            flat
+            size="sm"
+            icon="clear"
+            @click.stop="reset"
+          />
+        </q-input>
 
         <q-form @submit="submit">
           <div class="">
@@ -142,7 +152,6 @@ export default {
     /**
      * Importing to the database. Dialog is wrapped in a promise so that this
      * function can be awaited.
-     * @return {Promise<Boolean>}
      */
     async submit () {
       const promisedDialog = await new Promise(resolve => {
@@ -246,11 +255,11 @@ export default {
      * Read the data from the file attached to the uploader.
      */
     retrieveDataFromFile: function () {
-      if (!this.$refs.file.files[0]) {
+      if (!this.$refs.form.files[0]) {
         this.attachedFile = !this.attachedFile
       } else {
         let fr = new FileReader()
-        fr.readAsText(this.$refs.file.files[0])
+        fr.readAsText(this.$refs.form.files[0])
         fr.onload = () => {
           this.importDataField = JSON.parse(fr.result)
 
@@ -260,14 +269,11 @@ export default {
     },
     /**
      * Removes uploaded file. Does NOT reset the database imported.
-     * Since input's 'FileList' is read only, the only way to reset data is to
-     * reload the component. In order to reload this component, it must NOT
-     * be wrapped by Vue's <keep-alive></keep-alive>.
      */
     reset () {
       this.importDataField = ''
       this.attachedFile = false
-      this.$forceUpdate()
+      this.$refs.form.value = ''
     },
     /**
      * Helper function for parent component's 'beforeRouteLeave' method. The
@@ -290,5 +296,8 @@ export default {
 </script>
 
 <style lang="stylus">
+
+.q-input
+  width: 300px
 
 </style>

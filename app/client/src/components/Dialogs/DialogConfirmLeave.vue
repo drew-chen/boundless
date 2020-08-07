@@ -90,7 +90,7 @@ export default {
   /** Accessed via refs in parent. */
   methods: {
     /**
-     * Main method of interaction. Opens the dialog and initializes 'leave'.
+     * Main method of interaction. Opens the dialog and initializes methods.
      * @param {Function} next This function must be called to resolve the hook.
      *  In other words, this is the function controlling routing. See
      *  https://router.vuejs.org/guide/advanced/navigation-guards.html.
@@ -99,6 +99,10 @@ export default {
       this.leave = () => {
         this.onLeave()
         next()
+      }
+      this.onCancel = () => {
+        this.dialogOpen = false
+        next(false)
       }
       this.dialogOpen = true
     },
@@ -117,13 +121,11 @@ export default {
     },
     /**
      * Method for when the "Cancel" button is clicked. Note: when cancelling,
-     * the page is not left.
+     * the page is not left. Initialized when dialog is opened.
      */
     onCancel () {
-      this.dialogOpen = false
-      this.next(false)
     },
-    /** Method run for leaving. Initialized in created hook. */
+    /** Method run for leaving. Initialized when dialog is opened. */
     leave () {
     }
   }
