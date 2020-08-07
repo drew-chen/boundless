@@ -98,7 +98,7 @@ Methods:
                   @click.stop=""
                   filled clearable
                   clear-icon="close"
-                  class="q-mx-sm col-5"
+                  class="q-mx-sm col-3 col-md-5"
                   label="Question Label"
                   v-model="questionTemplate.label"
                   placeholder="Untitled Question"
@@ -131,10 +131,10 @@ Methods:
                   v-model="questionTemplate.required"
                   color="secondary"
                   label="required"
-                  class="col-2"
+                  class="col-2 col-sm-auto"
                   :disable="!customFormEnabled"
                 />
-                <div class="col-1">
+                <div class="q-mx-sm col-1">
                   <q-btn
                     round flat
                     @click="deleteQuestionTemplate(index)"
