@@ -9,7 +9,7 @@
 ## under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES
 ## OR CONDITIONS OF ANY KIND, either express or implied.
 
-Name:     components/LimitedLenPopup.vue
+Name:     components/Popups/PopupInputLimitedLen.vue
 Purpose:  Input popup that limits the length of the input by a custom length.
 Methods:  Configurations are done through props and validation through Vuelidate.
 
@@ -62,7 +62,7 @@ export default {
   },
   data () {
     return {
-      inputVal: this.initialValue // <String>: Temporary name for submission
+      inputVal: this.initialValue // <String>: Temporary value for submission.
     }
   },
   validations () {
@@ -74,7 +74,7 @@ export default {
     }
   },
   methods: {
-    /** Fires an event with the new saved value. */
+    /** Fires an event with the value to be saved. */
     save () {
       this.$emit('save', this.inputVal)
     },
@@ -90,7 +90,7 @@ export default {
     /**
      * Validation for the input value.
      * @param {String} val Dummy, unused variable for the QPopupEdit API
-     * @return {Boolean}
+     * @return {Boolean} Whether or not inputVal's validator is falsey.
      */
     validateInput (val) {
       return !this.$v.inputVal.$invalid

@@ -62,7 +62,7 @@ Methods:
             <div class="col">
               <strong>{{ k }}:</strong> {{ curData[k].key }}
 
-              <limited-len-input-popup
+              <popup-input-limited-len
                 :initialValue="curData[k].key"
                 :lenLimit="30"
                 :label="k"
@@ -115,11 +115,11 @@ Methods:
 import productionDb, { productionStorage } from '../firebase/init_production'
 import testingDb, { testingStorage } from '../firebase/init_testing'
 
-import LimitedLenInputPopup from '../components/LimitedLenInputPopup.vue'
+import PopupInputLimitedLen from '../components/Popups/PopupInputLimitedLen.vue'
 
 export default {
   components: {
-    LimitedLenInputPopup
+    PopupInputLimitedLen
   },
   props: {
     uid: String,

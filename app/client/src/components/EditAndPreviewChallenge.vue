@@ -411,11 +411,11 @@ Methods:
                                 <q-icon
                                   size=".8em" color="accent" name="edit"
                                 />
-                                  <limited-len-input-popup
-                                  title="Edit Challenge Name"
-                                  :lenLimit="60"
-                                  :initialValue="curData.challenge"
-                                  @save="saveEditedName($event)"
+                                  <popup-input-limited-len
+                                    title="Edit Challenge Name"
+                                    :lenLimit="60"
+                                    :initialValue="curData.challenge"
+                                    @save="saveEditedName($event)"
                                 />
                               </div>
                               <q-separator color="secondary" />
@@ -2030,7 +2030,7 @@ import testingDb, { testingStorage } from '../firebase/init_testing'
 import UploadGUI from '../components/Upload'
 import ProjectTable from '../components/Tables/ProjectTable'
 import AddUser from '../components/SubmitUserAdminConsole'
-import LimitedLenInputPopup from '../components/LimitedLenInputPopup.vue'
+import PopupInputLimitedLen from '../components/Popups/PopupInputLimitedLen.vue'
 
 import MarkdownTranslator from './MarkdownTranslator'
 
@@ -2040,7 +2040,7 @@ export default {
     ProjectTable,
     AddUser,
     MarkdownTranslator,
-    LimitedLenInputPopup
+    PopupInputLimitedLen
   },
   props: {
     uuid: String,
