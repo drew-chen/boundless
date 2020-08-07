@@ -20,7 +20,7 @@ Methods:
 
 <template>
   <div class="q-px-sm full-width">
-    <q-card flat class="">
+    <q-card flat>
       <!-- IMPORT DATABASE -->
       <div class="">
         <div>
@@ -28,21 +28,25 @@ Methods:
           <q-separator color="secondary" />
         </div>
 
-        <q-input
-          outlined dense
-          class="q-pb-md q-pt-sm"
-          type="file"
-          ref="form"
-          accept=".json"
-          @change="retrieveDataFromFile"
+        <q-card
+          flat bordered
+          class="q-my-md q-pa-sm input-field row"
         >
+          <input
+            class="col-10"
+            type="file"
+            ref="form"
+            accept=".json"
+            @change="retrieveDataFromFile"
+          >
           <q-btn
             flat
+            class="col-2"
             size="sm"
             icon="clear"
             @click.stop="reset"
           />
-        </q-input>
+        </q-card>
 
         <q-form @submit="submit">
           <div class="">
@@ -255,7 +259,7 @@ export default {
      * Read the data from the file attached to the uploader.
      */
     retrieveDataFromFile: function () {
-      if (!this.$refs.form.files[0]) {
+      if (!this.$refs.form.files || !this.$refs.form.files[0]) {
         this.attachedFile = !this.attachedFile
       } else {
         let fr = new FileReader()
@@ -297,7 +301,7 @@ export default {
 
 <style lang="stylus">
 
-.q-input
+.input-field
   width: 300px
 
 </style>

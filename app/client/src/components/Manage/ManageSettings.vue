@@ -195,9 +195,9 @@ export default {
           }
         default:
           /*
-          The default case is to load general settings. This works well
-          with keeping the parent's (currently 'AdminPage.vue') router-view
-          alive so that general settings is loaded in the background
+          The default case is to load general settings. This works with
+          keeping the parent's (currently 'AdminPage.vue') router-view
+          with alive so that general settings is loaded in the background.
           */
           return {
             name: 'general',
