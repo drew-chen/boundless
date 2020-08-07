@@ -18,6 +18,9 @@ Methods:
   'ManageSettings.vue' can pass different props and listen to different events
   depending on the route.
 
+  Unlike other settings, there is no explicit "save" button. "unsaved changes"
+  here means uploading a file to import to the database and not importing.
+
 ## -->
 
 <template>
@@ -35,6 +38,7 @@ Methods:
       <get-data-from-firestore
         @importingToDB="settingProps.consoleLoading"
         @databaseId="settingProps.setDatabaseId"
+        ref="getDataFromFirestore"
       />
       <div
         class="q-px-sm q-mt-lg"
@@ -68,6 +72,23 @@ export default {
     settingProps: {
       type: Object,
       required: true
+    }
+  },
+  /**
+   * Block leaving with persistent dialog if files have been uploaded but not
+   * imported.
+   * View specifics on navigation guards at:
+   * https://router.vuejs.org/guide/advanced/navigation-guards.html#global-before-guards
+   *
+   * @param {Object} to The target Route Object being navigated to.
+   * @param {Object} from The current route being navigated away from.
+   * @param {Function} next This function must be called to resolve the hook.
+   */
+  beforeRouteLeave (to, from, next) {
+    if (this.settingProps.name === 'database') {
+      this.$refs.getDataFromFirestore.openConfirmLeaveDialog(next)
+    } else {
+      next()
     }
   },
   components: {
