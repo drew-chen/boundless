@@ -737,8 +737,6 @@ export default {
             icon: 'report_problem'
           })
         }
-      }).onCancel(() => {
-      }).onDismiss(() => {
       })
     },
     loadFireRefs: async function () {

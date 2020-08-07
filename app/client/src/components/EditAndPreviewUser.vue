@@ -530,8 +530,6 @@ export default {
             icon: 'warning'
           })
         }
-      }).onCancel(() => {
-      }).onDismiss(() => {
       })
     },
     getMainPhoto: function () {

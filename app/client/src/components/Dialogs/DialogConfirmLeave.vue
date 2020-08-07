@@ -106,7 +106,10 @@ export default {
       }
       this.dialogOpen = true
     },
-    /** Method for when the "Save" button is clicked. */
+    /**
+     * Method for when the "Save" button is clicked. Note: be careful with
+     * set timeout in any async save function.
+     */
     async onSave () {
       this.dialogOpen = false
       await this.save()

@@ -514,8 +514,6 @@ export default {
             alert('User does not exists!')
           }, 300)
         }
-      }).onCancel(() => {
-      }).onDismiss(() => {
       })
     },
     cookieCheck: function () {

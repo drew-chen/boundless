@@ -787,8 +787,6 @@ export default {
           })
         } else {
         }
-      }).onCancel(() => {
-      }).onDismiss(() => {
       })
     },
     /**
@@ -908,8 +906,6 @@ export default {
             }
           })
         })
-      }).onCancel(() => {
-      }).onDismiss(() => {
       })
     },
     /**
