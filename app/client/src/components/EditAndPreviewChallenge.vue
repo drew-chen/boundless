@@ -3001,8 +3001,6 @@ export default {
             icon: 'report_problem'
           })
         }
-      }).onCancel(() => {
-      }).onDismiss(() => {
       })
     },
     addLog: function (index) {
@@ -3049,8 +3047,6 @@ export default {
             icon: 'report_problem'
           })
         }
-      }).onCancel(() => {
-      }).onDismiss(() => {
       })
     },
     deleteLog: function (index, parent) {
@@ -3109,8 +3105,6 @@ export default {
             icon: 'report_problem'
           })
         }
-      }).onCancel(() => {
-      }).onDismiss(() => {
       })
     },
     addCustomField: function () {

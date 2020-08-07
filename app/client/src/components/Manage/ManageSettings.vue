@@ -78,13 +78,11 @@ Methods:
             appear
             :duration="160"
           >
-            <keep-alive>
-              <!-- See ./Settings directory for components. -->
-              <router-view
-                :settingProps="settingProps"
-              >
-              </router-view>
-            </keep-alive>
+            <!-- See ./Settings directory for components. -->
+            <router-view
+              :settingProps="settingProps"
+            >
+            </router-view>
           </transition>
         </q-tab-panel>
       </template>
@@ -151,6 +149,7 @@ export default {
      * @returns <Object> An object where each property is a prop.
      */
     settingProps () {
+      console.log(this.tabSelected)
       switch (this.tabSelected) {
         case 'database':
           /*
@@ -349,7 +348,6 @@ export default {
      */
     consoleLoading: function (loadVal) {
       this.haltConsole = loadVal
-
       if (!loadVal) {
         const storedConfig = this.$q.sessionStorage.getItem('boundless_config')
         if (typeof storedConfig.enabledChallenges === 'boolean') {

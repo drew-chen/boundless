@@ -937,12 +937,9 @@ export default {
           this.$refs.projectCreateCustomForm.submit()
         }
         this.dbData = deepClone(this.data)
-        setTimeout(() => {
-          this.updated = false
-
-          this.$emit('submitting', false)
-          this.$emit('submitted', this.data)
-        }, 300)
+        this.updated = false
+        this.$emit('submitting', false)
+        this.$emit('submitted', this.data)
       }
     },
     /**
