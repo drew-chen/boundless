@@ -25,19 +25,21 @@ Methods:
 
 <template>
   <div :hidden="loading">
+
+    <div class="float-right">
+      <button-undo-and-save
+        :disabled="!updated"
+        :save="submit"
+        :undo="openResetDialog"
+      />
+    </div>
+
     <!-- -------------------- Progress Bar -------------------- -->
     <div v-if="data.progressBar">
       <div
         v-if="type === 'projects'"
         class="q-my-sm"
       >
-        <div class="float-right">
-          <button-undo-and-save
-            :disabled="!updated"
-            :save="submit"
-            :undo="openResetDialog"
-          />
-        </div>
 
         <div class="text-h4 q-my-sm">Project Progress Bar</div>
 
@@ -91,22 +93,9 @@ Methods:
     <div>
       <div
         v-if="type === 'challenges'"
-        class="text-h4 q-mb-md"
+        class="q-my-sm"
       >
-        <div class="row">
-          Challenge Keywords
-          <q-space />
-
-          <div class="q-mb-xs">
-            <q-btn
-              :disabled="!updated"
-              no-caps
-              label="Save"
-              :color="!updated ? 'accent' : 'secondary'"
-              @click="submit"
-            />
-          </div>
-        </div>
+        <div class="text-h4 q-my-sm">Challenge Keywords</div>
         <q-separator color="secondary" />
       </div>
 
@@ -549,7 +538,6 @@ Methods:
       </div>
     </div>
 
-    <!-- -------------------- Button -------------------- -->
     <div class="float-right">
       <button-undo-and-save
         :disabled="!updated"
@@ -997,7 +985,9 @@ export default {
     /** Undo's local changes if there are changes to be saved. */
     reset () {
       if (this.updated) {
-        this.$refs.projectCreateCustomForm.reset()
+        if (this.type === 'projects') {
+          this.$refs.projectCreateCustomForm.reset()
+        }
         Vue.set(this.$data, 'data', deepClone(this.dbData))
         this.updated = false
       }
