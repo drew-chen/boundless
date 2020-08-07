@@ -9,12 +9,9 @@
 ## under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES
 ## OR CONDITIONS OF ANY KIND, either express or implied.
 
-Name:     components/GetDataFromFirestore.vue
-Purpose:  To allow the user to export data from firestore and import data
-          into firestore
-Methods:
-  * Allows user to edit a string, usually a name. Defers two way binding until
-  * validated and submitted.
+Name:     components/LimitedLenPopup.vue
+Purpose:  Input popup that limits the length of the input by a custom length.
+Methods:  Configurations are done through props and validation through Vuelidate.
 
 ## -->
 
@@ -22,19 +19,19 @@ Methods:
   <q-popup-edit
     buttons
     :title="title"
-    v-model="editedName"
-    :validate="validateName"
+    v-model="inputVal"
+    :validate="validateInput"
     @save="save"
   >
     <q-input
       dense autofocus filled hide-bottom-space
       clearable
       :label="label"
-      :value="editedName"
-      @input="updateEditedName($event)"
+      :value="inputVal"
+      @input="setInputVal($event)"
       :rules="[
-        val => $v.editedName.required || 'Field is required',
-        val => $v.editedName.maxLength || `Max length is ${lenLimit} characters`
+        val => $v.inputVal.required || 'Field is required',
+        val => $v.inputVal.maxLength || `Max length is ${lenLimit} characters`
       ]"
     />
   </q-popup-edit>
@@ -65,37 +62,38 @@ export default {
   },
   data () {
     return {
-      editedName: this.initialValue // <String>: Temporary name for submission
+      inputVal: this.initialValue // <String>: Temporary name for submission
     }
   },
   validations () {
     return {
-      editedName: {
+      inputVal: {
         required,
         maxLength: maxLength(this.lenLimit)
       }
     }
   },
   methods: {
+    /** Fires an event with the new saved value. */
     save () {
-      this.$emit('save', this.editedName)
+      this.$emit('save', this.inputVal)
     },
-    updateEditedName (inputValue) {
-      /**
-       * Sets this.editName then notifies Vuelidate.
-       * @param {String} inputValue New value for this.editName.
-       * @return {Promise<Boolean>}
-      */
-      this.editedName = inputValue
-      this.$v.editedName.$touch()
+    /**
+     * Sets the input value then notifies Vuelidate.
+     * @param {String} inputValue New value for this.editName.
+     * @return {Boolean}
+     */
+    setInputVal (inputValue) {
+      this.inputVal = inputValue
+      this.$v.inputVal.$touch()
     },
-    validateName (val) {
-      /**
-       * Validation for the challenge name: editedName.
-       * @param {String} val Dummy, unused variable for the QPopupEdit API
-       * @return {Promise<Boolean>}
-       */
-      return !this.$v.editedName.$invalid
+    /**
+     * Validation for the input value.
+     * @param {String} val Dummy, unused variable for the QPopupEdit API
+     * @return {Boolean}
+     */
+    validateInput (val) {
+      return !this.$v.inputVal.$invalid
     }
   }
 }
