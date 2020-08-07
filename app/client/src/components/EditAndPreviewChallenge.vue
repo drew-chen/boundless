@@ -411,7 +411,7 @@ Methods:
                                 <q-icon
                                   size=".8em" color="accent" name="edit"
                                 />
-                                  <popup-input-limited-len
+                                  <popup-input-limit-len
                                     title="Edit Challenge Name"
                                     :lenLimit="60"
                                     :initialValue="curData.challenge"
@@ -544,8 +544,7 @@ Methods:
 
                           <div class="q-mt-sm">
                             <q-knob
-                              show-value
-                              readonly
+                              show-value readonly
                               :angle="225"
                               :max="360"
                               :thickness="0.4"
@@ -979,7 +978,7 @@ Methods:
                                       v-if="!bodyContent.content.text"
                                       class="q-mt-sm"
                                     >
-                                      BODY TEXT IS REQUIED!
+                                      BODY TEXT IS REQUIRED!
                                     </p>
 
                                     <MarkdownTranslator
@@ -2030,7 +2029,7 @@ import testingDb, { testingStorage } from '../firebase/init_testing'
 import UploadGUI from '../components/Upload'
 import ProjectTable from '../components/Tables/ProjectTable'
 import AddUser from '../components/SubmitUserAdminConsole'
-import PopupInputLimitedLen from '../components/Popups/PopupInputLimitedLen.vue'
+import PopupInputLimitLen from '../components/Popups/PopupInputLimitLen.vue'
 
 import MarkdownTranslator from './MarkdownTranslator'
 
@@ -2040,7 +2039,7 @@ export default {
     ProjectTable,
     AddUser,
     MarkdownTranslator,
-    PopupInputLimitedLen
+    PopupInputLimitLen
   },
   props: {
     uuid: String,
@@ -2051,7 +2050,7 @@ export default {
   },
   async created () {
     try {
-      // fetech data from database
+      // fetch data from database
       await this.loadFireRefs()
       await this.loadInformation()
       await this.loadConfig()
@@ -2072,7 +2071,7 @@ export default {
         message: '' // <String>: error message
       },
       advancedDialog: false, // <Boolean>: flag to pop-up advanced dialog
-      oldAdvancedSettings: {}, // <Object>: old settings to reasign on cancel
+      oldAdvancedSettings: {}, // <Object>: old settings to reassign on cancel
       fileAttachmentDialog: {
         visible: false // <Boolean>: flag to pop-up file upload
       },
@@ -2089,7 +2088,7 @@ export default {
       configData: {}, // <Object>: object storing configs of the application
       chipType: '', // <String>: type of the chip that the admin is inserting
       bodyType: '', // <String>: type of the body that the admin is inserting
-      // keywordsOptions <Array<Object>>: { value, lable } object to
+      // keywordsOptions <Array<Object>>: { value,label } object to
       //                                  fit q-option
       keywordsOptions: [],
       addedTeam: false, // <Boolean>: flag for added member
@@ -2132,7 +2131,7 @@ export default {
       },
       // extraSponsorInfo <Object>: extra information associated with sponsors
       extraSponsorInfo: {
-        img: {} // <Object>: dictionary of sponsor uid to avater image
+        img: {} // <Object>: dictionary of sponsor uid to avatar image
       }
     }
   },
@@ -2140,7 +2139,7 @@ export default {
     deleteAttachment: async function (key, pathToFile, type) {
       /**
        * prompt a confirmation dialog on delete
-       * @param {String} key: alais of the file
+       * @param {String} key: alias of the file
        * @param {String} pathToFile: path of file inside storage
        * @param {String} type: name of the collection
        * @return {Promise<Boolean>}
@@ -2409,7 +2408,7 @@ export default {
     },
     updateAttachments: function (data) {
       /**
-       * helper funciton to handle file attachment and its alias
+       * helper function to handle file attachment and its alias
        * @param {Object} data: record containing files
        * @return {void}
        */
@@ -2440,7 +2439,7 @@ export default {
     },
     updateAtHide: function (entry) {
       /**
-       * update while hidding the reply log
+       * update while hiding the reply log
        * @param {String} entry: property to be edit
        * @return {void}
        */
@@ -2564,7 +2563,7 @@ export default {
 
           this.$q.notify({
             type: 'positive',
-            message: '<div align="center">Sucessful!<div>',
+            message: '<div align="center">Successful!<div>',
             html: true,
             timeout: 500
           })
@@ -2730,7 +2729,7 @@ export default {
         this.childMode = this.mode
         this.data = {} // to save memory
 
-        // calling 3rd promise is okay here since not binded to data var
+        // calling 3rd promise is okay here since not bound to data var
         this.projectList.toc = res[2].data()
 
         for (let objField in this.projectList.toc) {
@@ -2891,7 +2890,7 @@ export default {
 
       this.$q.notify({
         type: 'positive',
-        message: 'Submitted sucessfully!'
+        message: 'Submitted successfully!'
       })
 
       this.emitAdded()
@@ -2910,7 +2909,7 @@ export default {
     aliasValidation: function (val) {
       /**
        * helper function to help validate alias string
-       * @param {String} val: name to be validiated
+       * @param {String} val: name to be validated
        * @return {Boolean}
        */
 
@@ -3072,14 +3071,14 @@ export default {
       /**
        * helper function to reply to a log inside a thread
        * @param {Integer} familyIndex: index of the log inside the log thread
-       * @param {Object} responseObj: reponse object
+       * @param {Object} responseObj: response object
        * @return {void}
        */
 
       this.$q.dialog({
         dark: true,
         title: 'Response...',
-        message: '<strong>Please enter your response.</strong><br><br><p class="text-red">Note: Your reponse cannot be empty!</p>',
+        message: '<strong>Please enter your response.</strong><br><br><p class="text-red">Note: Your response cannot be empty!</p>',
         html: true,
         prompt: {
           model: '',
@@ -3090,7 +3089,7 @@ export default {
       }).onOk(data => {
         if (data) {
           let tmpLog = {
-            title: `In respones to: "${responseObj.title}"!`,
+            title: `In response to: "${responseObj.title}"!`,
             date: Date(),
             description: `>>>>>>>>>>\n${responseObj.description}\n>>>>>>>>>>\n${data}`,
             hidden: false
@@ -3453,7 +3452,7 @@ export default {
     },
     notifyError: function () {
       /**
-       * helper function to notify error has occured
+       * helper function to notify error has occurred
        * @param {void}
        * @return {String}
        */

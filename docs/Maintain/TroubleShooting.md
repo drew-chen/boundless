@@ -92,7 +92,7 @@ generating: boundless-d7c8e.storage.06.24.2020_22_28_48
 starting the zipping process...
 deleting the content...
 
-Export completed sucessfully
+Export completed successfully
 The zipped file is available inside ~/tools/fbm folder!
 ```
 

@@ -361,7 +361,7 @@ Methods:
                             name="edit" size=".8em" color="accent"
                           />
 
-                          <popup-input-limited-len
+                          <popup-input-limit-len
                             title="Edit Project Name"
                             :lenLimit="60"
                             :initialValue="curData.project"
@@ -1897,7 +1897,7 @@ import testingDb, { testingStorage } from '../firebase/init_testing'
 import UploadGUI from '../components/Upload'
 import ProgressBar from '../components/ProgressBar'
 import AddUser from '../components/SubmitUserAdminConsole'
-import PopupInputLimitedLen from '../components/Popups/PopupInputLimitedLen.vue'
+import PopupInputLimitLen from '../components/Popups/PopupInputLimitLen.vue'
 import MarkdownTranslator from './MarkdownTranslator'
 
 export default {
@@ -1906,7 +1906,7 @@ export default {
     ProgressBar,
     AddUser,
     MarkdownTranslator,
-    PopupInputLimitedLen
+    PopupInputLimitLen
   },
   props: {
     uuid: String,
@@ -1917,7 +1917,7 @@ export default {
   },
   async created () {
     try {
-      // fetech data from database
+      // fetch data from database
       await this.loadFireRefs()
       await this.loadInformation()
       await this.loadConfig()
@@ -1960,7 +1960,7 @@ export default {
       configData: {}, // <Object>: object storing configs of the application
       chipType: '', // <String>: type of the chip that the admin is inserting
       bodyType: '', // <String>: type of the body that the admin is inserting
-      // keywordsOptions <Array<Object>>: { value, lable } object to
+      // keywordsOptions <Array<Object>>: { value,label } object to
       //                                  fit q-option
       keywordsOptions: [],
       addedChip: false, // <Boolean>: flag for added chip
@@ -1998,7 +1998,7 @@ export default {
     deleteAttachment: async function (key, pathToFile, type) {
       /**
        * prompt a confirmation dialog on delete
-       * @param {String} key: alais of the file
+       * @param {String} key: alias of the file
        * @param {String} pathToFile: path of file inside storage
        * @param {String} type: name of the collection
        * @return {Promise<Boolean>}
@@ -2415,7 +2415,7 @@ export default {
 
         this.$q.notify({
           type: 'positive',
-          message: '<div align="center">Sucessful!<div>',
+          message: '<div align="center">successful!<div>',
           html: true,
           timeout: 500
         })
@@ -2711,7 +2711,7 @@ export default {
 
         this.$q.notify({
           type: 'positive',
-          message: 'Submitted sucessfully!'
+          message: 'Submitted successfully!'
         })
 
         this.emitAdded()
@@ -2912,7 +2912,7 @@ export default {
       this.$q.dialog({
         dark: true,
         title: 'Response...',
-        message: '<strong>Please enter your response.</strong><br><br><p class="text-red">Note: Your reponse cannot be empty!</p>',
+        message: '<strong>Please enter your response.</strong><br><br><p class="text-red">Note: Your response cannot be empty!</p>',
         html: true,
         prompt: {
           model: '',
@@ -2923,7 +2923,7 @@ export default {
       }).onOk(data => {
         if (data) {
           let tmpLog = {
-            title: `In respones to: "${responseObj.title}"!`,
+            title: `In response to: "${responseObj.title}"!`,
             date: Date(),
             description: `>>>>>>>>>>\n${responseObj.description}\n>>>>>>>>>>\n${data}`,
             hidden: false

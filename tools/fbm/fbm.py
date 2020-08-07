@@ -219,12 +219,12 @@ def main(prog_name=os.path.basename(sys.argv[0]), args=None):
     if new_zip_file == "":
       print("\nExport function FAILED to complete.")
     else:
-      print("\nExport completed sucessfully")
+      print("\nExport completed successfully")
       print("The following zip file with the content is available in directory ~/tools/fbm:")
       print("   " + new_zip_file)
   elif args.command == "import":
     do_import(args)
-    print("\nImport completed sucessfully")
+    print("\nImport completed successfully")
     ### print("The zipped file is available inside ~/tools/fbm folder!")
   else:
     raise Exception('ERROR: Subcommand does not exist!')

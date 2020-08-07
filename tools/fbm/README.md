@@ -49,7 +49,7 @@ Label: Runing '-h' or '--help' with export subcommand
 $ python fbm.py export gs://<bucket>
 ...
 ...
-Export completed sucessfully
+Export completed successfully
 ```
 Label: Running a default export function without any flag
 * **Note:** By default, the zip file generated will be named
@@ -62,7 +62,7 @@ filename and still keep date element.
 $ python fbm.py export gs://<bucket> -t {TARGET}
 ...
 ...
-Export completed sucessfully
+Export completed successfully
 ```
 Label: Running with '-t' and {TARGET} should be replaced with the name of the
 file that the user wishes to be zipped in
@@ -96,7 +96,7 @@ Label: Running '-h' or '--help' with import subcommand
 $ python fbm.py import {SOURCE}.zip gs://<bucket>
 ...
 ...
-Import completed sucessfully
+Import completed successfully
 ```
 Label: Running a default import function without any flag
 **NOTE:** By default, the import function will update the existing files with
@@ -108,6 +108,6 @@ the source file.
 $ python fbm.py import {SOURCE}.zip gs://<bucket> -p
 ...
 ...
-Import completed sucessfully
+Import completed successfully
 ```
 Label: Running the import subcommand with '-p' or '--purge' option

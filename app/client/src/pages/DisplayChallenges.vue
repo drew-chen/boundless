@@ -324,7 +324,7 @@ export default {
     Banner
   },
   async created () {
-    // fetech data from database
+    // fetch data from database
     try {
       await this.loadFireRefs()
       await this.loadConfig()
