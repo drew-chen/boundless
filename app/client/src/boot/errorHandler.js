@@ -56,6 +56,5 @@ export default ({ Vue }) => {
     } else {
       throw error
     }
-    // TODO: Perform any custom logic or log to server
   }
 }

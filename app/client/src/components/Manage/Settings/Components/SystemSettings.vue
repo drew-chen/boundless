@@ -33,7 +33,7 @@ Methods:
           <q-btn
             :disabled="!updated" no-caps
             class="float-right"
-            label="Submit"
+            label="Save"
             :color="!updated ? 'accent' : 'secondary'"
             @click="submit"
           />
@@ -411,7 +411,7 @@ Methods:
           <q-btn
             :disabled="!updated" no-caps
             class="float-right"
-            label="Submit"
+            label="Save"
             :color="!updated ? 'accent' : 'secondary'"
             @click="submit"
           />
@@ -533,7 +533,7 @@ Methods:
             <q-btn v-close-popup outline color="primary" label="Cancel" />
             <q-btn
               v-close-popup outline
-              color="primary" label="Submit"
+              color="primary" label="Save"
               @click="wikiSubmit"
             />
           </q-card-actions>
@@ -595,13 +595,13 @@ export default {
       data: {}, // <Object>: data of the component
       aboutDialog: { // <Object>: information regarding the about dialog
         dialog: false, // <Boolean>: flag for about dialog
-        // maximizedToggle <Boolean>: flag for about dialog to be fullscreen
+        // <Boolean>: flag for about dialog to be fullscreen
         maximizedToggle: true
       },
       wikiDialog: { // <Object>: information regarding the wiki dialog
         dialog: false // <Boolean>: flag for wiki dialog
       },
-      file: { // <Object>: informaion regarding current and previous file
+      file: { // <Object>: information regarding current and previous file
         file: '', // <File>: current file
         prev: '', // <String or File>: url or file of the previous blob
         url: '' // <String>: url of the file or blob
@@ -610,8 +610,7 @@ export default {
         boxShadow: '0px 0px 0px 3px orange inset',
         borderRadius: '3px'
       },
-      updated: false, // <Boolean>: flag to track updated
-      submitted: false // <Boolean>: flag to track submitted
+      updated: false // <Boolean>: flag to track updated
     }
   },
   methods: {
@@ -1157,7 +1156,6 @@ export default {
         await this.storageUrlFetcher()
 
         // finish loading
-        this.submitted = true
         this.$emit('submitting', false)
         this.updated = false
 
@@ -1270,7 +1268,7 @@ export default {
      *  This is the exact same object as 'beforeRouteLeave''s 'next' method.
      */
     openConfirmLeaveDialog (next) {
-      if (!this.submitted && this.updated) {
+      if (this.updated) {
         this.$refs.dialogConfirmLeave.open(next)
       } else {
         next()

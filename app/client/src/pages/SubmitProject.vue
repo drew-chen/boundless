@@ -14,7 +14,8 @@ Purpose:  Wrapper for project submission forms.
 Methods:
 
   Manages the view and submission trigger of multiple child component
-  forms.
+  forms. Child forms are displayed in a slide and each child form is submitted
+  once the form is valid and the user advances to the next form.
 
 ## -->
 

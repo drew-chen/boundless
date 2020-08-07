@@ -10,18 +10,14 @@
 ## OR CONDITIONS OF ANY KIND, either express or implied.
 
 Name:     components/Forms/Project/ProjectCreateCustomForm.vue
-
 Purpose:  Form configures 'ProjectCustomForm.vue'.
-
 Methods:
 
   Admin goes through this form which creates an array that
   'ProjectCustomForm.vue' can display. Questions support CRUD operations
   and can be reordered through drag and dropping them. This array is
-  saved in vuex and submitted to the db in a vuex action. Submission
-  is only possible when this array is different the version already
-  in Vuex. Submission is triggered in the parent component:
-  'Config.vue'.
+  saved in Vuex and submitted to the db in a Vuex action. Submission is
+  triggered in the parent component via a ref.
 
 ## -->
 
@@ -285,7 +281,7 @@ export default {
       'submitCustomFormEnabled'
     ]),
     /** Submits questionTemplates to vuex and to the db. */
-    async saveForm () {
+    async submit () {
       if (this.modified) {
         try {
           this.updateQuestionOrder()
@@ -341,7 +337,7 @@ export default {
     /**
      * Reactively sets local questionTemplates to same state in Vuex store.
      */
-    resetForm () {
+    reset () {
       this.dataLoaded = false
       Vue.set(this.$data, 'questionTemplates', cloneDeep(this.storeQuestionTemplates))
       Vue.set(this.$data, 'customFormEnabled', this.storeCustomFormEnabled)

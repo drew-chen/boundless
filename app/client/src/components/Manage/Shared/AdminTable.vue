@@ -10,7 +10,7 @@
 ## OR CONDITIONS OF ANY KIND, either express or implied.
 
 Name:     components/Manage/Shared/AdminTable.vue
-Purpose:  Display, edit, add, and delete challenge from the admin console.
+Purpose:  Display, edit, add, and delete challenges from the admin console.
 Methods:
 
   Allows projects, challenges, or users to be added, deleted, or edited.
