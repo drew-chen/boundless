@@ -478,7 +478,7 @@ export default {
                   this.$router.go()
                 } else {
                   setTimeout(() => {
-                    alert('Unsucessful log in!')
+                    alert('Unsuccessful log in!')
                   }, 300)
                 }
               } else {
@@ -502,7 +502,7 @@ export default {
                   this.$router.go()
                 } else {
                   setTimeout(() => {
-                    alert('Unsucessful log in!')
+                    alert('Unsuccessful log in!')
                   }, 300)
                 }
               }

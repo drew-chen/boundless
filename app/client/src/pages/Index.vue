@@ -16,7 +16,7 @@ Methods:
   * Shows quick count of projects
   * Shows quick count of innovators
   * Shows quick count of challenges (if enabled)
-  * Shows quick coount of sponsors (if enabled)
+  * Shows quick count of sponsors (if enabled)
 
 ## -->
 

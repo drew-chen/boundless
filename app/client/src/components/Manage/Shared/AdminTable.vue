@@ -239,12 +239,12 @@ Methods:
 import firebase from 'firebase/app'
 import 'firebase/firestore'
 
-import addChallenge from '../../../components/SubmitChallengeAdminConsole'
-import editChallenge from '../../../components/EditAndPreviewChallenge'
-import addProject from '../../../components/SubmitProjectAdminConsole'
-import editProject from '../../../components/EditAndPreviewProject'
-import addUser from '../../../components/SubmitUserAdminConsole'
-import editUser from '../../../components/EditUser'
+import AddProject from '../../../components/SubmitProjectAdminConsole.vue'
+import AddChallenge from '../../../components/SubmitChallengeAdminConsole.vue'
+import AddUser from '../../../components/SubmitUserAdminConsole.vue'
+import EditProject from '../../../components/EditAndPreviewProject.vue'
+import EditChallenge from '../../../components/EditAndPreviewChallenge.vue'
+import EditUser from '../../../components/EditAndPreviewUser.vue'
 
 import productionDb, { proAppCall } from '../../../firebase/init_production'
 import testingDb, { testAppCall } from '../../../firebase/init_testing'
@@ -279,12 +279,12 @@ export default {
     }
   },
   components: {
-    addChallenge,
-    addProject,
-    addUser,
-    editChallenge,
-    editProject,
-    editUser
+    AddChallenge,
+    AddProject,
+    AddUser,
+    EditChallenge,
+    EditProject,
+    EditUser
   },
   computed: {
     /**
@@ -292,14 +292,14 @@ export default {
      * @return {String} The component name
      */
     getAddRowComponent () {
-      return `add${this.capitalizeFirst(this.rowType)}`
+      return `Add${this.capitalizeFirst(this.rowType)}`
     },
     /**
      * Gets the name of the imported component which edits a row of the admin table.
      * @return {String} The component name
      */
     getEditRowComponent () {
-      return `edit${this.capitalizeFirst(this.rowType)}`
+      return `Edit${this.capitalizeFirst(this.rowType)}`
     }
   },
   /**

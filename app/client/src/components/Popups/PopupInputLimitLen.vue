@@ -9,7 +9,7 @@
 ## under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES
 ## OR CONDITIONS OF ANY KIND, either express or implied.
 
-Name:     components/Popups/PopupInputLimitedLen.vue
+Name:     components/Popups/PopupInputLimitLen.vue
 Purpose:  Input popup that limits the length of the input by a custom length.
 Methods:  Configurations are done through props and validation through Vuelidate.
 
@@ -26,6 +26,7 @@ Methods:  Configurations are done through props and validation through Vuelidate
     <q-input
       dense autofocus filled hide-bottom-space
       clearable
+      clear-icon="close"
       :label="label"
       :value="inputVal"
       @input="setInputVal($event)"
@@ -99,6 +100,8 @@ export default {
 }
 </script>
 
-<style>
+<style lang="stylus">
 
+.q-popup-edit
+  max-width: 200px
 </style>

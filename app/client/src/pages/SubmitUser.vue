@@ -196,7 +196,7 @@ export default {
     onReset: function () {
       /**
        * helper function which resets the input fields of the form and
-       * emits 'added' event when the component is a child componenet
+       * emits 'added' event when the component is a child component
        * @param {void}
        * @return {void}
        */
@@ -207,7 +207,7 @@ export default {
 
       this.$q.notify({
         type: 'positive',
-        message: 'Submitted sucessfully!'
+        message: 'Submitted successfully!'
       })
 
       this.loading = false

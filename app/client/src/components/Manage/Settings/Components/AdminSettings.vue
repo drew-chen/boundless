@@ -976,7 +976,7 @@ export default {
      * Blocks reloading or closing the webpage if there are
      * unsaved changes.
      *
-     * @param event The event which has occured: 'beforeunload'.
+     * @param event The event which has occurred: 'beforeunload'.
      */
     confirmUnload (event) {
       if (this.updated) {

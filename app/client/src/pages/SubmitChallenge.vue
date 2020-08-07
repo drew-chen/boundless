@@ -97,7 +97,7 @@ Methods:
           autogrow
           ref="challengeRationale"
           v-model="challengeRationale"
-          placeholder="Please give 2-5 sentences on why and how this impact the company or the orgnization. (Grows automatically.)"
+          placeholder="Please give 2-5 sentences on why and how this impact the company or the organization. (Grows automatically.)"
           label="Business Rationale"
           type="textarea"
         >
@@ -912,7 +912,7 @@ export default {
     onReset: function () {
       /**
        * helper function which resets the input fields of the form and
-       * emits 'added' event when the component is a child componenet
+       * emits 'added' event when the component is a child component
        * @param {void}
        * @return {void}
        */
@@ -937,7 +937,7 @@ export default {
 
       this.$q.notify({
         type: 'positive',
-        message: 'Submitted sucessfully!'
+        message: 'Submitted successfully!'
       })
 
       this.$emit('added')
@@ -1042,7 +1042,7 @@ export default {
             data = data.toLowerCase()
             if (data !== indexEmail) {
               this.$q.notify({
-                message: 'The emails must be indentical.',
+                message: 'The emails must be identical.',
                 color: 'negative'
               })
               this.sponsors[index].email = ''
@@ -1058,7 +1058,7 @@ export default {
     },
     capitalizeFirstChar: function (index) {
       /**
-       * healper function to help capitalize first character of
+       * helper function to help capitalize first character of
        * the input at a given index and notifies the user on fail
        * @param {Integer} index: index of the input DOM
        * @return {void}

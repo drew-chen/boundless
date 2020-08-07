@@ -220,7 +220,7 @@ export default {
 
         this.$q.notify({
           color: 'green',
-          message: '<div align="center">Sucessful!<div>',
+          message: '<div align="center">successful!<div>',
           html: true,
           timeout: 750
         })

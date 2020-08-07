@@ -62,7 +62,7 @@ Methods:
             <div class="col">
               <strong>{{ k }}:</strong> {{ curData[k].key }}
 
-              <popup-input-limited-len
+              <popup-input-limit-len
                 :initialValue="curData[k].key"
                 :lenLimit="30"
                 :label="k"
@@ -115,18 +115,18 @@ Methods:
 import productionDb, { productionStorage } from '../firebase/init_production'
 import testingDb, { testingStorage } from '../firebase/init_testing'
 
-import PopupInputLimitedLen from '../components/Popups/PopupInputLimitedLen.vue'
+import PopupInputLimitLen from '../components/Popups/PopupInputLimitLen.vue'
 
 export default {
   components: {
-    PopupInputLimitedLen
+    PopupInputLimitLen
   },
   props: {
     uid: String,
     type: String
   },
   created () {
-    // will never be here without boudless_db being selected
+    // will never be here without boundless_db being selected
     if (this.$q.localStorage.has('boundless_db')) {
       let sessionDb = this.$q.localStorage.getItem('boundless_db')
 
@@ -179,7 +179,7 @@ export default {
     onSubmit: function () {
       /**
        * submit function which uploads files to storage and keep a record of
-       * the uploaded files inside webpage of the respective prorjects
+       * the uploaded files inside webpage of the respective projects
        * @param {void}
        * @return {void}
        */
@@ -292,7 +292,7 @@ export default {
 
         this.$q.notify({
           type: 'positive',
-          message: 'Uploaded sucessfully!'
+          message: 'Uploaded successfully!'
         })
         this.$emit('close', this.curData)
 

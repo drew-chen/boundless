@@ -561,7 +561,7 @@ export default {
   },
   async created () {
     try {
-      // fetech data from database
+      // fetch data from database
       await this.loadFireRefs()
       // TODO: work on loadInformation last
       await this.loadInformation()
@@ -743,14 +743,14 @@ export default {
       /**
        * allow the user to reply to a log and notifies user on fail
        * @param {Integer} familyIndex: index number on the log list
-       * @param {Object} reponseObj: the targetted reponse
+       * @param {Object} responseObj: the targetted response
        * @return {void}
        */
 
       this.$q.dialog({
         dark: true,
         title: 'Response...',
-        message: '<strong>Please enter your response.</strong><br><br><p class="text-red">Note: Your reponse cannot be empty!</p>',
+        message: '<strong>Please enter your response.</strong><br><br><p class="text-red">Note: Your response cannot be empty!</p>',
         html: true,
         prompt: {
           model: '',
@@ -761,7 +761,7 @@ export default {
       }).onOk(data => {
         if (data) {
           let tmpLog = {
-            title: `In respones to: "${responseObj.title}"!`,
+            title: `In response to: "${responseObj.title}"!`,
             date: Date(),
             description: `>>>>>>>>>>\n${responseObj.description}\n>>>>>>>>>>\n${data}`,
             hidden: false

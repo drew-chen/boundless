@@ -189,7 +189,7 @@ export default {
      * Blocks reloading the webpage or closing the browser if there are
      * unsaved changes. Quasar dialog
      *
-     * @param event {Object} The event which has occured: 'beforeunload'.
+     * @param event {Object} The event which has occurred: 'beforeunload'.
      */
     confirmUnload (event) {
       if (this.$refs.projectMainForm.modified) {

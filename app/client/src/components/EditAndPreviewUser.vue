@@ -230,7 +230,7 @@ Methods:
                       <div>
                         <div class="row q-px-md">
                           <strong style="fontSize: 20px;">
-                            Addtional Information
+                            Additional Information
                           </strong>
                           <q-separator class="q-mx-sm q-mt-md" color="secondary" />
                           <q-btn
@@ -428,13 +428,13 @@ export default {
   methods: {
     popUpReset: function () {
       /**
-       * restting error message
+       * resetting error message
        * @param {void}
        * @return {void}
        */
 
       this.errorObj.error = false
-      this.errorObj.messsage = ''
+      this.errorObj.message = ''
     },
     popUpEmailValidation: function (val) {
       /**
@@ -445,7 +445,7 @@ export default {
 
       if (val === undefined) {
         this.errorObj.error = false
-        this.errorObj.messsage = ''
+        this.errorObj.message = ''
         return true
       }
 
@@ -465,7 +465,7 @@ export default {
 
       // successful call
       this.errorObj.error = false
-      this.errorObj.messsage = ''
+      this.errorObj.message = ''
       return true
     },
     validateEmailFormat: function (entry) {
