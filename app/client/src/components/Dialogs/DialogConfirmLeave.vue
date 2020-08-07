@@ -9,13 +9,17 @@
 ## under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES
 ## OR CONDITIONS OF ANY KIND, either express or implied.
 
-Name:     components/Dialog/SubmitProject.vue
-Purpose:  Wrapper for project submission forms.
+Name:     components/Dialog/DialogConfirmLeave.vue
+Purpose:
+
+  When a user leaves a page with unsaved changes, this dialog asks the
+  user whether or not to save or don't save the changes before leaving.
+  Additionally, this dialog gives the option to cancel leaving the page.
+
 Methods:
 
-  Manages the view and submission trigger of multiple child component
-  forms. In order to add routing functionality, routing objects accessed in
-  the parent's routing guards can be passed to any method using $refs.
+  To function, the component calls the appropriate saving and/or
+  routing methods that are either given as props, or function parameters.
 
 ## -->
 
@@ -66,7 +70,7 @@ export default {
       type: Function,
       required: true
     },
-    // Additonal method to be run while leaving.
+    // Additional method to be run while leaving.
     onLeave: {
       type: Function,
       default: () => {}
@@ -86,8 +90,10 @@ export default {
   /** Accessed via refs in parent. */
   methods: {
     /**
-     * Opens the dialog and initializes 'leave'.
+     * Main method of interaction. Opens the dialog and initializes 'leave'.
      * @param {Function} next This function must be called to resolve the hook.
+     *  In other words, this is the function controlling routing. See
+     *  https://router.vuejs.org/guide/advanced/navigation-guards.html.
      */
     open (next) {
       this.leave = () => {
@@ -97,16 +103,16 @@ export default {
       this.dialogOpen = true
     },
     /** Method for when the "Save" button is clicked. */
-    onSave () {
-      this.save()
-      // Sets the dialogOpen flag in parent to false.
+    async onSave () {
       this.dialogOpen = false
+      await this.save()
+      // Sets the dialogOpen flag in parent to false.
       this.leave()
     },
     /** Method for when the "Don't Save" button is clicked. */
     onNoSave () {
-      this.undo()
       this.dialogOpen = false
+      this.undo()
       this.leave()
     },
     /**
