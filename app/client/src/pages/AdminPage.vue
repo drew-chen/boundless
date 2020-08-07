@@ -75,7 +75,9 @@ Methods:
 
         </q-tabs>
         <div class="q-pa-xs console-content-tab">
-          <router-view></router-view>
+          <keep-alive>
+            <router-view></router-view>
+          </keep-alive>
         </div>
       </div>
     </q-card>

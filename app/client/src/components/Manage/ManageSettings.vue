@@ -18,8 +18,8 @@ Purpose:
 Methods:
 
   Functionality is provided by child components. This component provides
-  navigation through routing tabs. In addition, this component sets up the
-  props needed for the child components.
+  navigation through routing tabs. In addition, this component dynamically
+  sets up the props needed for the child components.
 
 ## -->
 
@@ -152,21 +152,12 @@ export default {
      */
     settingProps () {
       switch (this.tabSelected) {
-        case 'general':
-          return {
-            /*
-            The 'name' property is important so that the router view doesn't try
-            to render while switching to another route. If the name does not
-            match, the router-view will not be rendered.
-            */
-            name: 'general',
-            setUserConfig: this.setUserConfig.bind(this),
-            setChallengeConfig: this.setChallengeConfig.bind(this),
-            setProjectConfig: this.setProjectConfig.bind(this),
-            setKeywords: this.setKeywords.bind(this),
-            consoleLoading: this.consoleLoading.bind(this)
-          }
         case 'database':
+          /*
+          The 'name' property is important so that the router view doesn't try
+          to render while switching to another route. If the name does not
+          match, the router-view will not be rendered.
+          */
           return {
             name: 'database',
             dbId: this.dbId,
@@ -203,7 +194,19 @@ export default {
             setChallengeConfig: this.setChallengeConfig.bind(this)
           }
         default:
-          return {}
+          /*
+          The default case is to load general settings. This works well
+          with keeping the parent's (currently 'AdminPage.vue') router-view
+          alive so that general settings is loaded in the background
+          */
+          return {
+            name: 'general',
+            setUserConfig: this.setUserConfig.bind(this),
+            setChallengeConfig: this.setChallengeConfig.bind(this),
+            setProjectConfig: this.setProjectConfig.bind(this),
+            setKeywords: this.setKeywords.bind(this),
+            consoleLoading: this.consoleLoading.bind(this)
+          }
       }
     }
   },
