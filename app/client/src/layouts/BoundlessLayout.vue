@@ -101,7 +101,7 @@ Methods:
       </q-tabs>
     </q-header>
 
-    <q-page-container style="min-height: 67.5vh;">
+    <q-page-container>
       <router-view />
     </q-page-container>
 

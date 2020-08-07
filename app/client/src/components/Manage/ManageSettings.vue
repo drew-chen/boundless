@@ -90,7 +90,7 @@ Methods:
       </template>
 
         <!-- Previously, there was commented out code regarding user settings.
-        Code can be reffered to at this commit at 'Config.vue'.
+        Code can be referred to at this commit at 'Config.vue'.
         "commit 4ce535e8b372ec9d30792999da13c3e89f84ec1f
         Author: Htut <phyo.htut@windriver.com>
         Date:   Wed May 20 17:36:06 2020 -0700
@@ -213,7 +213,7 @@ export default {
       splitterModel: 15, // <Number>: % of vw that left splitter is located
       dbName: '', // <String>: name of the database
       dbId: '', // <String>: project id of the firebase cred
-      previewRatio: '5', // <String>: ratio for preview of imges in child
+      previewRatio: '5', // <String>: ratio for preview of images in child
       configs: { // <Object<Object>>: configuration records of all collections
         users: {}, // <Object>: configuration record for users
         projects: {}, // <Object>: configuration record for projects

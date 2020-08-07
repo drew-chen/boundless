@@ -21,11 +21,11 @@ Methods:
 ## -->
 
 <template>
-  <q-page flat>
+  <div>
     <!-- -------------------- Main Content -------------------- -->
 
     <q-table
-      flat wrap-cells binary-state-sort virtual-scroll
+      flat wrap-cells binary-state-sort virtual-scroll dense
       color="secondary"
       :row-key="rowKey"
       :data="rowList"
@@ -45,7 +45,7 @@ Methods:
             rounded
             color="accent"
             icon="add"
-            :label="`Add ${capitalizeFirst(rowType)}`"
+            :label="`Add ${rowType}`"
             @click="dialog = true; dialogOption = 'add'"
           />
           <transition name="fade">
@@ -232,7 +232,7 @@ Methods:
       </q-card>
     </q-dialog>
 
-  </q-page>
+  </div>
 </template>
 
 <script>
@@ -691,6 +691,9 @@ export default {
 
 .body-table-row
   cursor: pointer
+
+.q-td
+  height: 4px
 
 .left-column
   width: 40%
