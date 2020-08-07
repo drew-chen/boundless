@@ -63,6 +63,11 @@ Methods:
         </div>
       </div>
     </q-card>
+      <!-- -------------------- Dialog -------------------- -->
+    <dialog-confirm-leave
+      ref="dialogConfirmLeave"
+      :save="submit"
+    />
   </div>
 </template>
 
@@ -72,7 +77,12 @@ import testingDb from '../../../../firebase/init_testing'
 
 import { dbMeta } from '../../../../../../client/boundless.config.js'
 
+import DialogConfirmLeave from '../../../Dialogs/DialogConfirmLeave.vue'
+
 export default {
+  components: {
+    DialogConfirmLeave
+  },
   async created () {
     try {
       await this.loadFireRefs()
@@ -101,7 +111,6 @@ export default {
     /**
       * Load firebase database, storage (if applicable)
       * and cloud functions reference (if applicable).
-      * @param {void}
       * @return {Promise<Boolean>}
       */
     loadFireRefs: async function () {
@@ -144,7 +153,6 @@ export default {
     },
     /**
      * Importing to the database.
-     * @param {void}
      * @return {Promise<Boolean>}
      */
     submit: async function () {
@@ -189,7 +197,6 @@ export default {
      * exporting the data from the database into a .json file
      * @param {String} filename: name of the file
      * @param {String} text: data to be written on the file
-     * @return {void}
      */
     download: function (filename, text) {
       let todayDate = new Date(Date.now()).toISOString().substring(0, 19)
@@ -208,7 +215,6 @@ export default {
     },
     /**
      * Load the data from the database.
-     * @param {void}
      * @return {Promise<Boolean>}
      */
     loadData: async function () {
@@ -254,8 +260,6 @@ export default {
     },
     /**
      * Read the data from the file attached to the uploader.
-     * @param {void}
-     * @return {void}
      */
     retrieveDataFromFile: function () {
       if (!this.$refs.file.files[0]) {
@@ -268,6 +272,22 @@ export default {
 
           this.attachedFile = !this.attachedFile
         }
+      }
+    },
+    /**
+     * Helper function for parent component's 'beforeRouteLeave' method. The
+     * dialog opens if changes have been made. Clicking save here will open
+     * another dialog to confirm importing to the database since this operation
+     * cannot be reversed.
+     *
+     * @param {Function} next This function must be called to resolve the hook.
+     *  This is the exact same object as 'beforeRouteLeave''s 'next' method.
+     */
+    openConfirmLeaveDialog (next) {
+      if (this.attachedFile) {
+        this.$refs.dialogConfirmLeave.open(next)
+      } else {
+        next()
       }
     }
   }
