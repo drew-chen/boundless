@@ -31,7 +31,7 @@ Methods:
     >
       <!-- Main form review. -->
       <q-input
-        filled readonly
+        filled readonly stack-label
         label="Project Name"
         :value="projectName"
       >
@@ -41,7 +41,7 @@ Methods:
       </q-input>
 
       <q-input
-        filled autogrow readonly
+        filled autogrow readonly stack-label
         class="q-my-sm"
         label="Description/Overview"
         type="textarea"
@@ -58,7 +58,7 @@ Methods:
         <p class="col-4 header">Keywords:</p>
 
         <q-option-group
-          dense inline disable
+          dense inline disable stack-label
           class="col" type="checkbox"
           :options="keywordOptions"
           :value="projectKeywords"
@@ -80,7 +80,7 @@ Methods:
           class="row q-mb-xs"
         >
           <q-input
-            filled readonly
+            filled readonly stack-label
             class="col q-pr-xs"
             label="Contributor's Email" type="email"
             :value="projectMembers[index].email"
@@ -91,7 +91,7 @@ Methods:
           </q-input>
 
           <q-input
-            filled readonly
+            filled readonly stack-label
             class="col q-pl-xs"
             label="Contributor's Full Name"
             :value="projectMembers[index].name"
@@ -124,10 +124,9 @@ Methods:
           :key="question.label"
         >
           <q-input
-            filled readonly
+            filled readonly stack-label
             class="q-mt-sm"
-            placeholder="a"
-            :label="question.label"
+            :label="question.label ? question.label : 'Untitled'"
             :type="question.type.value"
             :value="question.response"
           />
