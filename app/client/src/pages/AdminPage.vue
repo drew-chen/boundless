@@ -28,14 +28,12 @@ Methods:
 
   <!-- -------------------- Admin Page Content -------------------- -->
   <q-page v-else class="q-pa-sm q-mt-md">
-    <q-card class="q-pa-md console-page">
+    <q-card class="q-px-md q-py-sm console-page">
       <!-- -------------------- Page Header -------------------- -->
-      <div>
-        <p align="center" style="font-size: 18px;" >
-          <strong>Admin Console</strong>
-        </p>
-        <q-separator class="q-mb-sm" color="secondary" />
-      </div>
+      <h6>
+        Admin Console
+      </h6>
+      <q-separator />
 
       <!-- -------------------- Content Tabs -------------------- -->
       <div>
@@ -77,9 +75,7 @@ Methods:
 
         </q-tabs>
         <div class="q-pa-xs console-content-tab">
-          <keep-alive>
-            <router-view></router-view>
-          </keep-alive>
+          <router-view></router-view>
         </div>
       </div>
     </q-card>
@@ -132,6 +128,11 @@ export default {
 </script>
 
 <style lang="stylus" scoped>
+
+h6
+  text-align: center
+  margin: 5px 0
+  font-weight: strong
 // console-page page loadout
 
 .console-page {
