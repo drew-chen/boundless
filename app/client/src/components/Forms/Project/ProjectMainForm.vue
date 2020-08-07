@@ -19,13 +19,13 @@ Purpose:
 
 Methods:
 
-  First, some initial data, such as keyword options, are loaded. Then,
+  First, some initial data, such as keyword options, are loaded from Vuex. Then,
   the user fills out the project form. Unlike 'ProjectCustomForm.vue',
-  some of the input fields here are always mandatory. Input is stored
-  as local component level data until validated and submitted to Vuex
-  when the user continues to the next form. The forms don't have a
+  some of the input fields here are always mandatory. Input is first stored
+  locally and does not immediately sync with Vuex. Only when validated and
+  submitted, is a copy of the data synced to Vuex. The forms don't have a
   two-way binding with Vuex state to prevent mutations that were not
-  caused by Vuex.
+  caused by Vuex. Submission is triggered in the parent component via a ref.
 
 ## -->
 

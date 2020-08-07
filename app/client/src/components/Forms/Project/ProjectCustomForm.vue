@@ -17,9 +17,10 @@ Purpose:
 
 Methods:
 
-  Displays the template saved in Vuex. The user inputs their responses
-  which are initially only saved locally. When the user moves onto the
-  next form and the data is valid, it is saved to Vuex.
+  Displays the template saved in Vuex (if there are any). The user inputs their
+  responses which are initially only saved locally. When the user moves onto the
+  next form through the parent component and the data is valid, this form is
+  saved to Vuex.
 
 ## -->
 

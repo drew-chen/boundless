@@ -101,7 +101,7 @@ Methods:
             <q-btn
               :disabled="!updated"
               no-caps
-              label="Submit"
+              label="Save"
               :color="!updated ? 'accent' : 'secondary'"
               @click="submit"
             />
@@ -934,7 +934,7 @@ export default {
         await this.storageUrlFetcher('webpage', 'bannerImg')
         await this.storageUrlFetcher('webpage', 'mainImg')
         if (this.type === 'projects') {
-          this.$refs.projectCreateCustomForm.saveForm()
+          this.$refs.projectCreateCustomForm.submit()
         }
         this.dbData = deepClone(this.data)
         setTimeout(() => {
@@ -1000,11 +1000,16 @@ export default {
     /** Undo's local changes if there are changes to be saved. */
     reset () {
       if (this.updated) {
-        this.$refs.projectCreateCustomForm.resetForm()
+        this.$refs.projectCreateCustomForm.reset()
         Vue.set(this.$data, 'data', deepClone(this.dbData))
         this.updated = false
       }
     },
+    /**
+     * When leaving the page, this function is called since we will no longer
+     * use previously created URL objects. This is passed as a prop to
+     * 'DialogConfirmLeave.vue'.
+     */
     revokeUrls () {
       if (this.data.listingTable.bannerImg.url) {
         URL.revokeObjectURL(this.data.listingTable.bannerImg.url)

@@ -10,9 +10,7 @@
 ## OR CONDITIONS OF ANY KIND, either express or implied.
 
 Name:     components/Buttons/ButtonUndoAndSave.vue
-
 Purpose:  Groups together undo and submit buttons so that they are consistent.
-
 Methods:  Created like normal buttons except functionality is passed through
           props.
 
