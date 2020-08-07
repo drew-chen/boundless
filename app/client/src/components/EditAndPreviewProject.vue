@@ -361,7 +361,7 @@ Methods:
                             name="edit" size=".8em" color="accent"
                           />
 
-                          <limited-len-input-popup
+                          <popup-input-limited-len
                             title="Edit Project Name"
                             :lenLimit="60"
                             :initialValue="curData.project"
@@ -1897,7 +1897,7 @@ import testingDb, { testingStorage } from '../firebase/init_testing'
 import UploadGUI from '../components/Upload'
 import ProgressBar from '../components/ProgressBar'
 import AddUser from '../components/SubmitUserAdminConsole'
-import LimitedLenInputPopup from '../components/LimitedLenInputPopup'
+import PopupInputLimitedLen from '../components/Popups/PopupInputLimitedLen.vue'
 import MarkdownTranslator from './MarkdownTranslator'
 
 export default {
@@ -1906,7 +1906,7 @@ export default {
     ProgressBar,
     AddUser,
     MarkdownTranslator,
-    LimitedLenInputPopup
+    PopupInputLimitedLen
   },
   props: {
     uuid: String,

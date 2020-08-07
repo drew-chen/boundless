@@ -9,7 +9,7 @@
 ## under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES
 ## OR CONDITIONS OF ANY KIND, either express or implied.
 
-Name:     components/EditUser.vue
+Name:     components/EditAndPreviewUser.vue
 Purpose:  The user interface to allow the admin to edit and preview the
           resulting edits of the user before submitting
 Methods:
@@ -161,10 +161,10 @@ Methods:
                         </strong>
                         {{ curTocData.name }}
 
-                        <limited-len-input-popup
+                        <popup-input-limit-len
+                          title="Edit User Name"
                           :initialValue="curTocData.name"
                           :lenLimit="60"
-                          :label="name"
                           @save="saveEditedName"
                         />
 
@@ -379,8 +379,8 @@ import 'firebase/firestore'
 import productionDb, { productionStorage } from '../firebase/init_production'
 import testingDb, { testingStorage } from '../firebase/init_testing'
 
-import LimitedLenInputPopup from '../components/LimitedLenInputPopup'
-import ProjectTable from '../components/Tables/ProjectTable'
+import PopupInputLimitLen from '../components/Popups/PopupInputLimitLen.vue'
+import ProjectTable from '../components/Tables/ProjectTable.vue'
 
 export default {
   props: {
@@ -390,11 +390,11 @@ export default {
   components: {
     // uploadGUI
     ProjectTable,
-    LimitedLenInputPopup
+    PopupInputLimitLen
   },
   async created () {
     try {
-      // fetech data from database
+      // fetch data from database
       await this.loadFireRefs()
       await this.loadInformation()
     } catch (error) {
@@ -463,7 +463,7 @@ export default {
         return false
       }
 
-      // sucessful call
+      // successful call
       this.errorObj.error = false
       this.errorObj.messsage = ''
       return true
@@ -577,7 +577,7 @@ export default {
     capitalizeKeys: function (entry) {
       /**
        * helper function to capitalize the first character of the field
-       * @param {String} entry: field string to be capitalzied
+       * @param {String} entry: field string to be capitalized
        * @return {String}
        */
 
