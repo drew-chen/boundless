@@ -569,6 +569,7 @@ import ProjectCreateCustomForm from '../../../Forms/Project/ProjectCreateCustomF
 import ButtonUndoAndSave from '../../../Buttons/ButtonUndoAndSave.vue'
 import DialogConfirmLeave from '../../../Dialogs/DialogConfirmLeave.vue'
 
+import settingsMixin from '../Mixins/settingsMixin'
 export default {
   props: {
     // Dictionary containing keywords
@@ -596,6 +597,7 @@ export default {
     ButtonUndoAndSave,
     DialogConfirmLeave
   },
+  mixins: [settingsMixin],
   /**
    * Fetches data and add page leaving event listener. Also initializes
    * 'this.dbData' to the same initial values as 'this.data'.
@@ -636,10 +638,6 @@ export default {
     await this.storageUrlFetcher('webpage', 'mainImg')
 
     this.dbData = deepClone(this.data)
-    window.addEventListener('beforeunload', this.confirmUnload)
-  },
-  destroyed () {
-    window.removeEventListener('beforeunload', this.confirmUnload)
   },
   data () {
     return {
@@ -956,21 +954,6 @@ export default {
         }
       }
       eventHandler(event, type, field)
-    },
-    /**
-     * Blocks reloading or closing the webpage if there are
-     * unsaved changes.
-     *
-     * @param event The event which has occurred: 'beforeunload'.
-     */
-    confirmUnload (event) {
-      if (this.updated) {
-        // Cancel the event.
-        // If you prevent default behavior in Mozilla Firefox prompt will always be shown.
-        event.preventDefault()
-        // Chrome requires returnValue to be set.
-        event.returnValue = 'You should keep this page open.'
-      }
     },
     /** Opens confirmation to undo unsaved changes. */
     openResetDialog () {
