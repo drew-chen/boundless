@@ -559,11 +559,15 @@ import sha256 from 'sha256'
 import Markdown from '../../../../components/Markdown.vue'
 import DialogConfirmLeave from '../../../../components/Dialogs/DialogConfirmLeave.vue'
 
+import mixinConfirmUnload from '../../../../mixins/mixinConfirmUnload'
+
 export default {
   components: {
     Markdown,
     DialogConfirmLeave
   },
+  // Requires 'this.updated' in data.
+  mixins: [mixinConfirmUnload],
   async created () {
     // fetches required data
     await this.loadFireRefs()

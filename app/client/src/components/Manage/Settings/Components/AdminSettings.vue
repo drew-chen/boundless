@@ -569,7 +569,8 @@ import ProjectCreateCustomForm from '../../../Forms/Project/ProjectCreateCustomF
 import ButtonUndoAndSave from '../../../Buttons/ButtonUndoAndSave.vue'
 import DialogConfirmLeave from '../../../Dialogs/DialogConfirmLeave.vue'
 
-import settingsMixin from '../Mixins/settingsMixin'
+import mixinConfirmUnload from '../../../../mixins/mixinConfirmUnload'
+
 export default {
   props: {
     // Dictionary containing keywords
@@ -597,7 +598,8 @@ export default {
     ButtonUndoAndSave,
     DialogConfirmLeave
   },
-  mixins: [settingsMixin],
+  // Requires 'this.updated' in data.
+  mixins: [mixinConfirmUnload],
   /**
    * Fetches data and add page leaving event listener. Also initializes
    * 'this.dbData' to the same initial values as 'this.data'.
