@@ -93,6 +93,8 @@ import ProjectMainForm from '../components/Forms/Project/ProjectMainForm.vue'
 import ProjectCustomForm from '../components/Forms/Project/ProjectCustomForm.vue'
 import ProjectReviewForm from '../components/Forms/Project/ProjectReviewForm.vue'
 
+import mixinConfirmUnload from '../mixins/mixinConfirmUnload'
+
 import { createNamespacedHelpers } from 'vuex'
 const { mapActions, mapGetters } = createNamespacedHelpers('projectSubmit')
 
@@ -102,25 +104,31 @@ export default {
     ProjectCustomForm,
     ProjectReviewForm
   },
-  created () {
-    window.addEventListener('beforeunload', this.confirmUnload)
-  },
-  destroyed () {
-    window.removeEventListener('beforeunload', this.confirmUnload)
-  },
+  mixins: [mixinConfirmUnload],
   computed: {
     ...mapGetters([
       'project',
       'customFormEnabled'
-    ])
+    ]),
+    /*
+    <Boolean>: Whether or not the first child's form, hence this entire form, has been
+    modified in any way. The ref is only available at mount time. Furthermore,
+    the form cannot be modified before it is mounted. Used with the mixin.
+    */
+    updated () {
+      return this.mounted && this.$refs.projectMainForm.modified
+    }
+  },
+  mounted () {
+    this.mounted = true
   },
   data () {
     return {
       step: 1, // <Integer> Progress counter representing current panel.
-      submitting: false // <Boolean> Whether data is being submitted.
+      submitting: false, // <Boolean> Whether data is being submitted.
+      mounted: false // <Boolean>: Whether this component has been mounted.
     }
   },
-
   methods: {
     ...mapActions([
       'submitProject',
@@ -183,20 +191,6 @@ export default {
         this.$refs.stepper.goTo(1)
       } else {
         this.$refs.stepper.previous()
-      }
-    },
-    /**
-     * Blocks reloading the webpage or closing the browser if there are
-     * unsaved changes. Quasar dialog
-     *
-     * @param event {Object} The event which has occurred: 'beforeunload'.
-     */
-    confirmUnload (event) {
-      if (this.$refs.projectMainForm.modified) {
-        // Cancel the event
-        event.preventDefault() // If you prevent default behavior in Mozilla Firefox prompt will always be shown
-        // Chrome requires returnValue to be set
-        event.returnValue = 'You should keep this page open.'
       }
     }
   }
