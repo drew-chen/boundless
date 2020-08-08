@@ -550,7 +550,7 @@ Methods:
 </template>
 
 <script>
-
+// import deepClone from 'lodash.clonedeep'
 import productionDb, { productionStorage } from '../../../../firebase/init_production.js'
 import testingDb, { testingStorage } from '../../../../firebase/init_testing'
 import { layoutConfig } from '../../../../../../client/boundless.config'
@@ -565,26 +565,22 @@ export default {
     DialogConfirmLeave
   },
   async created () {
-    try {
-      // fetches required data
-      await this.loadFireRefs()
-      await this.loadInformation()
+    // fetches required data
+    await this.loadFireRefs()
+    await this.loadInformation()
 
-      if (this.$q.sessionStorage.getItem('boundless_config')) {
-        let cachedConfig = this.$q.sessionStorage.getItem('boundless_config')
-        this.layoutConfig = layoutConfig
+    if (this.$q.sessionStorage.getItem('boundless_config')) {
+      let cachedConfig = this.$q.sessionStorage.getItem('boundless_config')
+      this.layoutConfig = layoutConfig
 
-        if (typeof cachedConfig.enabledChallenges === 'boolean') {
-          this.layoutConfig.challenges = cachedConfig.enabledChallenges
-        }
-      } else {
-        this.layoutConfig = layoutConfig
+      if (typeof cachedConfig.enabledChallenges === 'boolean') {
+        this.layoutConfig.challenges = cachedConfig.enabledChallenges
       }
-
-      await this.storageUrlFetcher()
-    } catch (error) {
-      throw error
+    } else {
+      this.layoutConfig = layoutConfig
     }
+
+    await this.storageUrlFetcher()
   },
   data () {
     return {

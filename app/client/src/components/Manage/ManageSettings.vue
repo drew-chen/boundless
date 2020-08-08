@@ -149,7 +149,6 @@ export default {
      * @returns <Object> An object where each property is a prop.
      */
     settingProps () {
-      console.log(this.tabSelected)
       switch (this.tabSelected) {
         case 'database':
           /*
