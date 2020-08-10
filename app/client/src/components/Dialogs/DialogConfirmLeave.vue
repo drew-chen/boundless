@@ -39,20 +39,20 @@ Methods:
         <q-card-actions align="right">
           <q-btn
             no-caps
-            @click="onSave"
+            @click="saveBtnAction"
             color="secondary"
           >
             Save
           </q-btn>
           <q-btn
             flat no-caps
-            @click="onNoSave"
+            @click="noSaveBtnAction"
           >
             Don't Save
           </q-btn>
           <q-btn
             flat no-caps
-            @click="onCancel"
+            @click="cancelBtnAction"
           >
             Cancel
           </q-btn>
@@ -72,6 +72,11 @@ export default {
     },
     // Additional method to be run while leaving.
     onLeave: {
+      type: Function,
+      default: () => {}
+    },
+    // Additional method to be run while cancelling.
+    onCancel: {
       type: Function,
       default: () => {}
     },
@@ -100,8 +105,9 @@ export default {
         this.onLeave()
         next()
       }
-      this.onCancel = () => {
+      this.cancelBtnAction = () => {
         this.dialogOpen = false
+        this.onCancel()
         next(false)
       }
       this.dialogOpen = true
@@ -110,14 +116,14 @@ export default {
      * Method for when the "Save" button is clicked. Note: be careful with
      * set timeout in any async save function.
      */
-    async onSave () {
+    async saveBtnAction () {
       this.dialogOpen = false
       await this.save()
       // Sets the dialogOpen flag in parent to false.
       this.leave()
     },
     /** Method for when the "Don't Save" button is clicked. */
-    onNoSave () {
+    noSaveBtnAction () {
       this.dialogOpen = false
       this.undo()
       this.leave()
@@ -126,7 +132,7 @@ export default {
      * Method for when the "Cancel" button is clicked. Note: when cancelling,
      * the page is not left. Initialized when dialog is opened.
      */
-    onCancel () {
+    cancelBtnAction () {
     },
     /** Method run for leaving. Initialized when dialog is opened. */
     leave () {
