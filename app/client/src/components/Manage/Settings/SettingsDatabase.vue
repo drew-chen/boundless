@@ -38,7 +38,7 @@ Methods:
       <get-data-from-firestore
         @importingToDB="settingProps.consoleLoading"
         @databaseId="settingProps.setDatabaseId"
-        ref="getDataFromFirestore"
+        ref="settings"
       />
       <div
         class="q-px-sm q-mt-lg"
@@ -65,8 +65,10 @@ Methods:
 
 <script>
 import GetDataFromFirestore from './Components/GetDataFromFirestore.vue'
+import mixinSettingNavGuard from '../../../mixins/mixinSettingNavGuard'
 
 export default {
+  mixins: [mixinSettingNavGuard('database')],
   props: {
     // Object containing all custom props. See structure in 'ManageSettings.vue'.
     settingProps: {
@@ -75,23 +77,6 @@ export default {
       validator (prop) {
         return prop.hasOwnProperty('name')
       }
-    }
-  },
-  /**
-   * Block leaving with persistent dialog if files have been uploaded but not
-   * imported.
-   * View specifics on navigation guards at:
-   * https://router.vuejs.org/guide/advanced/navigation-guards.html#global-before-guards
-   *
-   * @param {Object} to The target Route Object being navigated to.
-   * @param {Object} from The current route being navigated away from.
-   * @param {Function} next This function must be called to resolve the hook.
-   */
-  beforeRouteLeave (to, from, next) {
-    if (this.settingProps.name === 'database') {
-      this.$refs.getDataFromFirestore.openConfirmLeaveDialog(next)
-    } else {
-      next()
     }
   },
   components: {

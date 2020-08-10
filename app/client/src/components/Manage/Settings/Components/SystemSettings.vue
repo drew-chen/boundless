@@ -1275,20 +1275,6 @@ export default {
         Vue.set(this.$data, 'fileDeleteQueue', [])
         this.updated = false
       }
-    },
-    /**
-     * Helper function for parent component's 'beforeRouteLeave' method. The
-     * dialog opens if changes have been made.
-     *
-     * @param {Function} next This function must be called to resolve the hook.
-     *  This is the exact same object as 'beforeRouteLeave''s 'next' method.
-     */
-    openConfirmLeaveDialog (next) {
-      if (this.updated) {
-        this.$refs.dialogConfirmLeave.open(next)
-      } else {
-        next()
-      }
     }
   }
 }

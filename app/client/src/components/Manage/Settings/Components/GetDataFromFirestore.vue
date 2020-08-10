@@ -105,6 +105,12 @@ export default {
     this.dbId = this.db.XT.bT.ci.projectId
     this.$emit('databaseId', this.dbId)
   },
+  computed: {
+    // <Boolean>: Tells mixinSettingNavGuard.js when to open the dialog.
+    updated () {
+      return this.attachedFile
+    }
+  },
   data () {
     return {
       db: null, // <Object>: firebase object referencing the database
@@ -278,22 +284,6 @@ export default {
       this.importDataField = ''
       this.attachedFile = false
       this.$refs.form.value = ''
-    },
-    /**
-     * Helper function for parent component's 'beforeRouteLeave' method. The
-     * dialog opens if changes have been made. Clicking save here will open
-     * another dialog to confirm importing to the database since this operation
-     * cannot be reversed.
-     *
-     * @param {Function} next This function must be called to resolve the hook.
-     *  This is the exact same object as 'beforeRouteLeave''s 'next' method.
-     */
-    openConfirmLeaveDialog (next) {
-      if (this.attachedFile) {
-        this.$refs.dialogConfirmLeave.open(next)
-      } else {
-        next()
-      }
     }
   }
 }
