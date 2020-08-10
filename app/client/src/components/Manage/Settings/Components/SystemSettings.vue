@@ -23,40 +23,33 @@ Methods:
 
 <template>
   <div>
-    <div>
-      <div class="row text-h4">
-        General
+    <div class="float-right">
+      <button-undo-and-save
+        :disabled="!updated"
+        :save="submit"
+        :undo="openResetDialog"
+      />
+    </div>
+    <div class="text-h4 q-my-sm">
+      General
+    </div>
 
-        <q-space />
+    <q-separator color="secondary" />
 
-        <div class="q-mb-xs">
-          <q-btn
-            :disabled="!updated" no-caps
-            class="float-right"
-            label="Save"
-            :color="!updated ? 'accent' : 'secondary'"
-            @click="submit"
-          />
-        </div>
-      </div>
-
-      <q-separator color="secondary" />
-
-      <div
-        v-if="$q.sessionStorage.has('boundless_config')"
-        class="q-ml-md"
-      >
-        {{
-          $q.sessionStorage.has('boundless_config')
-          ? ($q.sessionStorage.getItem(
-            'boundless_config'
-          ).config_version
-          ? `(v ${$q.sessionStorage.getItem(
-            'boundless_config'
-          ).config_version})` : '')
-          : ''
-        }}
-      </div>
+    <div
+      v-if="$q.sessionStorage.has('boundless_config')"
+      class="q-ml-md"
+    >
+      {{
+        $q.sessionStorage.has('boundless_config')
+        ? ($q.sessionStorage.getItem(
+          'boundless_config'
+        ).config_version
+        ? `(v ${$q.sessionStorage.getItem(
+          'boundless_config'
+        ).config_version})` : '')
+        : ''
+      }}
     </div>
 
     <div class="q-pa-sm full-width">
@@ -409,14 +402,6 @@ Methods:
 
         <div class="q-pa-md q-gutter-sm">
           <q-btn
-            :disabled="!updated" no-caps
-            class="float-right"
-            label="Save"
-            :color="!updated ? 'accent' : 'secondary'"
-            @click="submit"
-          />
-
-          <q-btn
             v-if="$q.sessionStorage.has('admin_token')"
             no-caps outline
             label="Edit About Page"
@@ -541,35 +526,48 @@ Methods:
       </q-dialog>
     </div>
 
+    <div class="float-right">
+      <button-undo-and-save
+        :disabled="!updated"
+        :save="submit"
+        :undo="openResetDialog"
+      />
+    </div>
+
     <!-- -------------------- Dialog -------------------- -->
     <dialog-confirm-leave
       ref="dialogConfirmLeave"
       :save="submit"
+      :undo="reset"
     />
   </div>
 </template>
 
 <script>
-// import deepClone from 'lodash.clonedeep'
+import deepClone from 'lodash.clonedeep'
+import Vue from 'vue'
+import sha256 from 'sha256'
+
 import productionDb, { productionStorage } from '../../../../firebase/init_production.js'
 import testingDb, { testingStorage } from '../../../../firebase/init_testing'
 import { layoutConfig } from '../../../../../../client/boundless.config'
 
-import sha256 from 'sha256'
 import Markdown from '../../../../components/Markdown.vue'
 import DialogConfirmLeave from '../../../../components/Dialogs/DialogConfirmLeave.vue'
+import ButtonUndoAndSave from '../../../Buttons/ButtonUndoAndSave.vue'
 
 import mixinConfirmUnload from '../../../../mixins/mixinConfirmUnload'
 
 export default {
   components: {
     Markdown,
-    DialogConfirmLeave
+    DialogConfirmLeave,
+    ButtonUndoAndSave
   },
   // Requires 'this.updated' in data.
   mixins: [mixinConfirmUnload],
+  /** Fetches data and initializes 'dbData' to the same initial values as 'data'. */
   async created () {
-    // fetches required data
     await this.loadFireRefs()
     await this.loadInformation()
 
@@ -583,8 +581,9 @@ export default {
     } else {
       this.layoutConfig = layoutConfig
     }
-
     await this.storageUrlFetcher()
+
+    this.dbData = deepClone(this.data)
   },
   data () {
     return {
@@ -593,6 +592,8 @@ export default {
       layoutConfig: null, // <Object>: configurations related to layout
       fileDeleteQueue: [], // <Array<File>>: list of files to be deleted
       data: {}, // <Object>: data of the component
+      // <Object>: Unmodified data from the database used to reset 'this.data'.
+      dbData: {},
       aboutDialog: { // <Object>: information regarding the about dialog
         dialog: false, // <Boolean>: flag for about dialog
         // <Boolean>: flag for about dialog to be fullscreen
@@ -1152,6 +1153,7 @@ export default {
         await this.storageUrlFetcher()
 
         // finish loading
+        this.dbData = deepClone(this.data)
         this.$emit('submitting', false)
         this.updated = false
 
@@ -1254,6 +1256,24 @@ export default {
           strTokens[i] = strTokens[i][0].toUpperCase() + strTokens[i].slice(1).toLowerCase()
         }
         return strTokens.join(' ')
+      }
+    },
+    /** Opens confirmation to undo unsaved changes. */
+    openResetDialog () {
+      this.$q.dialog({
+        title: 'Confirm',
+        message: 'Would you like undo all unsaved changes?',
+        cancel: true
+      }).onOk(() => {
+        this.reset()
+      })
+    },
+    /** Undo's local changes if there are changes to be saved. */
+    reset () {
+      if (this.updated) {
+        Vue.set(this.$data, 'data', deepClone(this.dbData))
+        Vue.set(this.$data, 'fileDeleteQueue', [])
+        this.updated = false
       }
     },
     /**

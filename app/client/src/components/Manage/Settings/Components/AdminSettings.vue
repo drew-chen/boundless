@@ -600,10 +600,7 @@ export default {
   },
   // Requires 'this.updated' in data.
   mixins: [mixinConfirmUnload],
-  /**
-   * Fetches data and add page leaving event listener. Also initializes
-   * 'this.dbData' to the same initial values as 'this.data'.
-   */
+  /** Fetches data and initializes 'dbData' to the same initial values as 'data'. */
   async created () {
     setTimeout(() => {
       this.loading = false
