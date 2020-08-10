@@ -23,7 +23,6 @@ Methods:
 ## -->
 
 <template>
-    <!-- -------------------- Page Loader -------------------- -->
   <div>
     <h5>Review</h5>
     <div

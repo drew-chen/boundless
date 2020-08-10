@@ -29,6 +29,9 @@ Methods:
         color="primary"
         align="center"
       >
+
+        <!-- Main Form -->
+
         <q-step
           :name="1"
           title="Main Info"
@@ -40,6 +43,8 @@ Methods:
             @submittedSuccessfully="navigateForward"
           />
         </q-step>
+
+        <!-- Custom Form -->
 
         <q-step
           v-if="customFormEnabled"
@@ -53,6 +58,9 @@ Methods:
             @submittedSuccessfully="navigateForward"
           />
         </q-step>
+
+        <!-- Review Form -->
+
         <q-step
           :name="3"
           title="Review"
@@ -62,6 +70,8 @@ Methods:
             ref="projectReviewForm"
           />
         </q-step>
+
+        <!-- Navigation Buttons -->
 
         <template v-slot:navigation>
           <q-stepper-navigation>
@@ -136,6 +146,7 @@ export default {
       'resetProject'
     ]),
     /**
+     * Each case represents which page.
      * On the first two pages, submit the form to vuex. On the third and final
      * page, submit the forms to Firestore then return to the first page.
      */
@@ -155,11 +166,12 @@ export default {
 
             this.resetProject()
             this.$refs.projectMainForm.reset()
-            // If disabled, this ref does not exist.
+            // If the custom form is not enabled, this ref does not exist.
             if (this.customFormEnabled) {
               this.$refs.projectCustomForm.reset()
             }
             this.submitting = false
+            // Notifies when the project is submitted without error.
             this.$q.notify({
               type: 'positive',
               message: 'Submitted successfully!'
@@ -167,6 +179,7 @@ export default {
 
             this.$refs.stepper.goTo(1)
           } catch (error) {
+            // Notifies if there is an error during project submission.
             this.$q.notify({
               type: 'negative',
               message: 'Unable to submit new project.'

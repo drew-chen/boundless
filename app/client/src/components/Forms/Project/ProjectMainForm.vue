@@ -699,6 +699,7 @@ export default {
         hidden: false,
         alias: ''
       }
+      // Copies variables to avoid mutating values in Vuex.
       this.setProjectMembers(cloneDeep(this.projectMembers))
       this.setWebpage(cloneDeep(this.webpage))
       this.setProject(cloneDeep(newProject))
@@ -924,6 +925,7 @@ export default {
       })
     },
     /**
+     * Basically sets values as if the page were first loaded.
      * Helper function which resets the input fields of the form and
      * emits 'added' event when the component is a child component.
      */
