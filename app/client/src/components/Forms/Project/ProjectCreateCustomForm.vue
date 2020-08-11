@@ -34,7 +34,10 @@ Methods:
         flat bordered
         class="q-ma-sm"
       >
-        <q-form class="q-ma-lg">
+        <q-form
+          class="q-ma-lg"
+          ref="form"
+        >
           <div class="q-mb-md">
             <q-toggle
               v-model="customFormEnabled"
@@ -62,6 +65,9 @@ Methods:
           <div v-if="!Array.isArray(questionTemplates) || !questionTemplates.length">
             No custom questions configured.
           </div>
+
+          <!-- List of draggable question templates -->
+
           <!-- Native drag and drop API is disabled to prevent flickering issues. -->
           <draggable
             v-else
@@ -83,6 +89,7 @@ Methods:
                 v-for="(questionTemplate, index) in questionTemplates"
                 :key="questionTemplate.order"
               >
+                <!-- Drag handle -->
                 <q-icon
                   class="handle col-1"
                   size="sm"
@@ -90,16 +97,18 @@ Methods:
                   name="drag_indicator"
                   :disabled="!customFormEnabled"
                 />
+                <!-- Question label -->
                 <q-input
-                  @click.stop=""
                   filled clearable
                   clear-icon="close"
-                  class="q-mx-sm col-3 col-md-5"
+                  class="q-mx-sm col-3 col-md-5 question-template-label-centering"
                   label="Question Label"
                   v-model="questionTemplate.label"
                   placeholder="Untitled Question"
                   :disable="!customFormEnabled"
+                  :rules="[val => !!val || 'Field is required']"
                 />
+                <!-- Response type -->
                 <q-select
                   filled
                   v-model="questionTemplate.type"
@@ -176,7 +185,7 @@ export default {
     this.modified = false
   },
   mounted () {
-    // Skip the first change.
+    // Skip the first change so that the watcher isn't triggered by initialization.
     this.$nextTick(() => {
       this.dataLoaded = true
     })
@@ -254,7 +263,7 @@ export default {
         }
       ],
       questionTemplates: [], // <Array<Object> List of question templates.
-      newQuestionTemplate: {
+      newQuestionTemplate: { // <Object>: Question to be added to question templates.
         label: '', // <String>: Name of the question.
         type: { // <Object>: Question type which is same as an element of 'options'.
           value: 'text',
@@ -283,22 +292,26 @@ export default {
     /** Submits questionTemplates to vuex and to the db. */
     async submit () {
       if (this.modified) {
-        try {
-          this.updateQuestionOrder()
-          await this.submitQuestionTemplates(cloneDeep(this.questionTemplates))
-          await this.submitCustomFormEnabled(this.customFormEnabled)
-          this.modified = false
-          this.$q.notify({
-            type: 'positive',
-            message: 'Saved custom question templates.'
+        this.$refs.form.validate()
+          .then(async success => {
+            if (success) {
+              this.updateQuestionOrder()
+              await this.submitQuestionTemplates(cloneDeep(this.questionTemplates))
+              await this.submitCustomFormEnabled(this.customFormEnabled)
+              this.modified = false
+            } else {
+              this.$q.notify({
+                type: 'negative',
+                message: 'Did not submit question templates due to untitled questions.'
+              })
+            }
+          }).catch(error => {
+            this.$q.notify({
+              type: 'negative',
+              message: 'Unable to submit question templates.'
+            })
+            throw error
           })
-        } catch (error) {
-          this.$q.notify({
-            type: 'negative',
-            message: 'Unable to submit question templates.'
-          })
-          throw error
-        }
       }
     },
     /** Creates another question. */
@@ -356,13 +369,23 @@ export default {
   max-width: 1050px
 
 /*
-Handle also define row height. This is done so the cursor can stay
-consistent near the handle, instead of swapping back and forth.
+Handle also defines row height, since it is currently the tallest element in the
+row. This means the handle is 100% of the row height. This is done so the cursor
+can stay consistent near the handle, instead of swapping back and forth.
 */
 .handle
   cursor: move
   height: 80px
   width: 40px
+
+/*
+This input has an extra element underneath it where form validation messages
+are shown. This raises the input box above other input boxes on the same row.
+In order to align this input with others, it is pushed down.
+*/
+.question-template-label-centering
+  top: 10px
+  position: relative
 
 // During drag and drop movement, this class is used.
 .ghost-question

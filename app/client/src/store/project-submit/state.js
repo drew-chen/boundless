@@ -18,6 +18,10 @@ Methods:
     2) This field needs to be synced with Firebase, and
     3) This field is related to project submission.
 
+  To access or modify state, us getters, actions, or mutations. Do not modify
+  directly when using Vuex. To avoid unwanted mutations, make non-primitive
+  types are copied when accessed and copied when set.
+
 ## */
 
 /*
