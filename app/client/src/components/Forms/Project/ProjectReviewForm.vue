@@ -136,20 +136,44 @@ Methods:
 </template>
 
 <script>
-import { createNamespacedHelpers } from 'vuex'
-const { mapGetters } = createNamespacedHelpers('projectSubmit')
 
 export default {
-  computed: {
-    ...mapGetters([
-      'projectName',
-      'projectDescription',
-      'projectMembers',
-      'keywordOptions',
-      'projectKeywords',
-      'questions',
-      'customFormEnabled'
-    ])
+  props: {
+    // The name of the project.
+    projectName: {
+      type: String,
+      required: true
+    },
+    // Description of project.
+    projectDescription: {
+      type: String,
+      required: true
+    },
+    //  List of project member/s.
+    projectMembers: {
+      type: Array,
+      required: true
+    },
+    // List of keywords from database.
+    keywordOptions: {
+      type: Array,
+      required: true
+    },
+    // Chosen subset of keywordOptions for the project.
+    projectKeywords: {
+      type: Array,
+      required: true
+    },
+    // Each element is an object with a custom question and its response.
+    questions: {
+      type: Array,
+      required: true
+    },
+    // Whether or not the custom form should be displayed or not.
+    customFormEnabled: {
+      type: Boolean,
+      required: true
+    }
   }
 }
 </script>

@@ -90,6 +90,13 @@ Methods:
               />
 
               <q-separator />
+
+              <q-tab
+                no-caps
+                name="formResponses" icon="list" label="Form Responses"
+              />
+
+              <q-separator />
             </q-tabs>
           </template>
 
@@ -1559,6 +1566,12 @@ Methods:
                   </li>
                 </div>
               </q-tab-panel>
+
+              <!-- -------------------- Form Responses -------------------- -->
+              <q-tab-panel name="formResponse">
+                <project-review-form>
+                </project-review-form>
+              </q-tab-panel>
             </q-tab-panels>
           </template>
 
@@ -1894,11 +1907,12 @@ import 'firebase/firestore'
 import productionDb, { productionStorage } from '../firebase/init_production'
 import testingDb, { testingStorage } from '../firebase/init_testing'
 
-import UploadGUI from '../components/Upload'
-import ProgressBar from '../components/ProgressBar'
-import AddUser from '../components/SubmitUserAdminConsole'
+import UploadGUI from '../components/Upload.vue'
+import ProgressBar from '../components/ProgressBar.vue'
+import AddUser from '../components/SubmitUserAdminConsole.vue'
 import PopupInputLimitLen from '../components/Popups/PopupInputLimitLen.vue'
-import MarkdownTranslator from './MarkdownTranslator'
+import MarkdownTranslator from './MarkdownTranslator.vue'
+import ProjectReviewForm from '../components/Forms/Project/ProjectReviewForm.vue'
 
 export default {
   components: {
@@ -1906,7 +1920,8 @@ export default {
     ProgressBar,
     AddUser,
     MarkdownTranslator,
-    PopupInputLimitLen
+    PopupInputLimitLen,
+    ProjectReviewForm
   },
   props: {
     uuid: String,

@@ -20,7 +20,7 @@ Methods:
   First, this mixin is initialized with a parameter: the setting name. This is so
   it only activates when the route (hence parameter) is correct.
 
-  This mixin relies heavily on the data() and the refs of the mixed in component.
+  This mixin relies heavily on the data() and the refs of the mixed in component
   and on navigation guards. For details, see the method JS doc).
 
 ## */
@@ -39,6 +39,7 @@ const mixinSettingNavGuard = settingName => ({
    * @param {Object} to The target Route Object being navigated to.
    * @param {Object} from The current route being navigated away from.
    * @param {Function} next This function must be called to resolve the hook.
+   *  In other words, this is the function controlling routing.
    */
   beforeRouteLeave (to, from, next) {
     if (settingName === this.settingProps.name) {

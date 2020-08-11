@@ -38,6 +38,8 @@ Methods:
           class="q-ma-lg"
           ref="form"
         >
+          <!-- -------------------- Form controls -------------------- -->
+
           <div class="q-mb-md">
             <q-toggle
               v-model="customFormEnabled"
@@ -65,10 +67,9 @@ Methods:
           <div v-if="!Array.isArray(questionTemplates) || !questionTemplates.length">
             No custom questions configured.
           </div>
+          <!-- -------------------- List of question templates -------------------- -->
 
-          <!-- List of draggable question templates -->
-
-          <!-- Native drag and drop API is disabled to prevent flickering issues. -->
+          <!-- Native drag and drop API is disabled to prevent flickering issues (force-fallback). -->
           <draggable
             v-else
             v-model="questionTemplates"

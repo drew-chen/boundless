@@ -68,6 +68,13 @@ Methods:
         >
           <project-review-form
             ref="projectReviewForm"
+            :projectName="projectName"
+            :projectDescription="projectDescription"
+            :projectMembers="projectMembers"
+            :keywordOptions="keywordOptions"
+            :projectKeywords="projectKeywords"
+            :questions="questions"
+            :customFormEnabled="customFormEnabled"
           />
         </q-step>
 
@@ -118,7 +125,13 @@ export default {
   computed: {
     ...mapGetters([
       'project',
-      'customFormEnabled'
+      'customFormEnabled',
+      'projectName',
+      'projectDescription',
+      'projectMembers',
+      'keywordOptions',
+      'projectKeywords',
+      'questions'
     ]),
     /*
     <Boolean>: Whether or not the first child's form, hence this entire form, has been

@@ -32,6 +32,7 @@ export default function () {
   return {
     project: {
       uuid: null, // <String> Uuid is assigned upon submission in action.
+      project: '', // <String> The name of the project.
       description: '', // <String> Description of project.
       members: [], // <Array<Object>>: Exact members submitted to the database.
       keywords: [], // <Array<Object>>: Chosen subset of keywordOptions
