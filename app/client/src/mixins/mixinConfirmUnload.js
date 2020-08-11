@@ -33,7 +33,8 @@ export default {
     /**
      * Blocks reloading or closing the webpage only if there are
      * unsaved changes. If 'this.updated' is undefined, then this method does
-     * nothing.
+     * nothing. Quasar components/plugins aren't used here since they don't
+     * block reloading and the default dialog is clear enough.
      *
      * @param event The event which has occurred: 'beforeunload'.
      */

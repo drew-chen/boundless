@@ -76,18 +76,18 @@ Methods:
         <template v-slot:navigation>
           <q-stepper-navigation>
             <q-btn
-              no-caps
-              @click="submit"
-              color="secondary"
-              :label="step === 3 ? 'Submit' : 'Continue'"
-            />
-            <q-btn
               v-if="step > 1"
               flat
               color="primary"
               @click="navigateBackward"
               label="Back"
-              class="q-ml-sm"
+              class="q-mr-sm"
+            />
+            <q-btn
+              no-caps
+              @click="submit"
+              color="secondary"
+              :label="step === 3 ? 'Submit' : 'Continue'"
             />
           </q-stepper-navigation>
         </template>

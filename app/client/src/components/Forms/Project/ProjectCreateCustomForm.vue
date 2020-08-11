@@ -308,7 +308,7 @@ export default {
           }).catch(error => {
             this.$q.notify({
               type: 'negative',
-              message: 'Unable to submit question templates.'
+              message: 'Error: unable to submit question templates.'
             })
             throw error
           })
