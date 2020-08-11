@@ -93,7 +93,7 @@ Methods:
 
               <q-tab
                 no-caps
-                name="formResponses" icon="list" label="Form Responses"
+                name="formResponse" icon="list" label="Form Response"
               />
 
               <q-separator />
@@ -109,17 +109,13 @@ Methods:
             >
               <!-- -------------------- Main -------------------- -->
               <q-tab-panel name="main">
-                <div v-if="curData">
+                <div
+                  v-if="curData"
+                  class="tab-content shadow-2"
+                >
                   <!-- ------------------- Project Layout ------------------ -->
                   <div
-                    align="center"
                     class="shadow-2"
-                    style="
-                      margin: auto;
-                      max-width: 1000px;
-                      min-width: 800px;
-                      border-radius: 3px;
-                    "
                   >
                     <!-- ----------------- Preview Project ----------------- -->
                     <div v-if="childMode === 'preview'">
@@ -166,7 +162,7 @@ Methods:
                               </div>
 
                               <!-- -------------- Description -------------- -->
-                              <div class="col overviewCSS">
+                              <div class="col overview">
 
                                 <div class="q-pa-sm">
                                   <pre>{{ curData.description }}</pre>
@@ -183,7 +179,7 @@ Methods:
                               <q-separator color="secondary" />
                             </div>
 
-                            <div class="overviewCSS">
+                            <div class="overview">
                               <q-list dense>
                                 <q-item
                                   v-for="(teamMember, index) in curData.members"
@@ -456,7 +452,7 @@ Methods:
                               </div>
 
                               <!-- ------------- Description --------------- -->
-                              <div class="col overviewCSS">
+                              <div class="col overview">
 
                                 <q-input
                                   filled autogrow
@@ -493,7 +489,7 @@ Methods:
                             </div>
 
                             <div
-                              class="overviewCSS q-mt-sm"
+                              class="overview q-mt-sm"
                               style="overflow-x: hidden; padding: 2px 2px;"
                             >
                               <q-list dense>
@@ -604,7 +600,7 @@ Methods:
                             dense inline
                             class="col" type="checkbox"
                             v-model="curData.keywords"
-                            :options="keywordsOptions"
+                            :options="keywordOptions"
                             @input="updated = true"
                           />
                         </div>
@@ -1239,17 +1235,12 @@ Methods:
               </q-tab-panel>
 
               <!-- -------------------- Logs -------------------- -->
+              <!-- This panel is hidden since the tab to select it is commented out. -->
               <q-tab-panel name="logs">
                 <div
                   v-if="curData"
                   align="center"
-                  class="shadow-2"
-                  style="
-                    margin: auto;
-                    max-width: 1000px;
-                    min-width: 800px;
-                    border-radius: 3px;
-                  "
+                  class="tab-content shadow-2"
                 >
                   <!-- -------------------- Preview Log -------------------- -->
                   <div v-if="childMode === 'preview'">
@@ -1567,10 +1558,19 @@ Methods:
                 </div>
               </q-tab-panel>
 
-              <!-- -------------------- Form Responses -------------------- -->
+              <!-- -------------------- Form Response -------------------- -->
               <q-tab-panel name="formResponse">
-                <project-review-form>
-                </project-review-form>
+                <div>
+                  <project-review-form
+                    :projectName="curData.project"
+                    :projectDescription="curData.description"
+                    :projectMembers="curData.members"
+                    :keywordOptions="keywordOptions"
+                    :projectKeywords="curData.keywords"
+                    :customFormQuestions="curData.questions || []"
+                    :customFormEnabled="true"
+                  />
+                </div>
               </q-tab-panel>
             </q-tab-panels>
           </template>
@@ -1975,9 +1975,9 @@ export default {
       configData: {}, // <Object>: object storing configs of the application
       chipType: '', // <String>: type of the chip that the admin is inserting
       bodyType: '', // <String>: type of the body that the admin is inserting
-      // keywordsOptions <Array<Object>>: { value,label } object to
+      // keywordOptions <Array<Object>>: { value,label } object to
       //                                  fit q-option
-      keywordsOptions: [],
+      keywordOptions: [],
       addedChip: false, // <Boolean>: flag for added chip
       addedContent: false, // <Boolean>: flag for added content
       childMode: '', // <String>: keep tracks of view mode ['Edit', 'Preview']
@@ -2504,7 +2504,7 @@ export default {
           let data = doc.data()
 
           for (let key in data['keywords']) {
-            this.keywordsOptions.push({
+            this.keywordOptions.push({
               label: key,
               value: data['keywords'][key]
             })
@@ -2846,10 +2846,6 @@ export default {
             icon: 'report_problem'
           })
         }
-      }).onCancel(() => {
-        // nothing goes here
-      }).onDismiss(() => {
-        // nothing goes here
       })
     },
     addLog: function (index) {
@@ -3350,19 +3346,24 @@ export default {
 </script>
 
 <style lang="stylus" scoped>
-.project-img {
-  border: 3px solid #ddd;
-  border-radius: 4px;
+
+.q-tab-panel > div.tab-content
+  margin auto
+  max-width 1000px
+  min-width 800px
+  border-radius 3px
+  text-align center
+
+.project-img
+  border: 3px solid #ddd
+  border-radius: 4px
   padding: 5px
-}
 
-.overviewCSS {
-  max-height: 240px;
-  overflow: auto;
-}
+.overview
+  max-height 240px
+  overflow auto
 
-.toggle-label {
-  margin-top: 5px;
-  font-size: 10.5px;
-}
+.toggle-label
+  margin-top 5px
+  font-size 10.5px
 </style>

@@ -118,17 +118,22 @@ Methods:
       <!-- Custom form review. -->
 
       <div v-if="customFormEnabled">
-        <div
-          v-for="question in questions"
-          :key="question.label"
-        >
-          <q-input
-            filled readonly stack-label
-            class="q-mt-sm"
-            :label="question.label ? question.label : 'Untitled'"
-            :type="question.type.value"
-            :value="question.response"
-          />
+        <div v-if="customFormQuestions && customFormQuestions.length > 0">
+          <div
+            v-for="question in customFormQuestions"
+            :key="question.label"
+          >
+            <q-input
+              filled readonly stack-label
+              class="q-mt-sm"
+              :label="question.label ? question.label : 'Untitled'"
+              :type="question.type.value"
+              :value="question.response"
+            />
+          </div>
+        </div>
+        <div v-else>
+          <p>(No custom form questions for this project.)</p>
         </div>
       </div>
     </div>
@@ -165,7 +170,7 @@ export default {
       required: true
     },
     // Each element is an object with a custom question and its response.
-    questions: {
+    customFormQuestions: {
       type: Array,
       required: true
     },
