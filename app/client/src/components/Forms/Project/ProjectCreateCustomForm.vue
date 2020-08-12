@@ -298,12 +298,17 @@ export default {
       if (this.modified) {
         this.$refs.form.validate()
           .then(async success => {
+            await this.submitCustomFormEnabled(this.customFormEnabled)
             if (success) {
               this.updateQuestionOrder()
               await this.submitQuestionTemplates(cloneDeep(this.questionTemplates))
-              await this.submitCustomFormEnabled(this.customFormEnabled)
               this.modified = false
             } else {
+              const titledQuestions = this.questionTemplates.filter(question => {
+                return question.label && question.label !== ''
+              })
+              await this.submitQuestionTemplates(cloneDeep(titledQuestions))
+              this.modified = false
               this.$q.notify({
                 type: 'negative',
                 message: 'Saved all questions except untitled questions.'
