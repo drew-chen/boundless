@@ -79,6 +79,7 @@ Methods:
             :duration="160"
           >
             <!-- See ./Settings directory for components. -->
+            <!-- Passes in dynamic props, depending on the route. -->
             <router-view
               :settingProps="settingProps"
             >
@@ -168,6 +169,7 @@ export default {
         case 'projects':
           if (!this.dataLoaded) {
             return {
+              // Must be unique from a setting component name.
               name: 'notLoaded'
             }
           }
@@ -231,7 +233,6 @@ export default {
       db: null,
       data: {},
       dataLoaded: false
-
     }
   },
   methods: {
@@ -416,7 +417,6 @@ export default {
         val.list = val.list.sort(
           (a, b) => a.value < b.value ? -1 : 1
         )
-
         this.configs.users.socialNetwork = val
       }
     },
@@ -425,12 +425,10 @@ export default {
      */
     switchDatabase: function () {
       this.$q.localStorage.set('boundless_db', this.dbName)
-
       if (this.$q.sessionStorage.has('boundless_timeout')) {
         this.$q.sessionStorage.remove('boundless_timeout')
         this.$q.sessionStorage.remove('boundless_config')
       }
-
       this.$router.go()
     }
   }

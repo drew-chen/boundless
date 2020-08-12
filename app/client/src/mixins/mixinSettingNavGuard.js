@@ -20,13 +20,19 @@ Methods:
   First, this mixin is initialized with a parameter: the setting name. This is so
   it only activates when the route (hence parameter) is correct.
 
-  This mixin relies heavily on the data() and the refs of the mixed in component
-  and on navigation guards. For details, see the method JS doc).
+  This mixin is designed to work with settings components and relies heavily on
+  the data() and the refs of the mixed in component. It works by blocking the
+  navigation of the setting component. When there are unsaved changes, it
+  opens the setting component's 'DialogConfirmLeave' component.
+  For details, see the method JS doc).
 
 ## */
 
 /**
- * Returns a mixin that blocks navigation.
+ * Returns a mixin that blocks navigation. If the name of the setting and
+ * setting name passed in as a prop (settingProps.name) do not match, then
+ * navigation is not blocked.
+ *
  * @param {String} The name of the setting, ie, 'challenges' or 'general'.
  * @returns {Object} Mixin object.
  */
@@ -42,7 +48,12 @@ const mixinSettingNavGuard = settingName => ({
    *  In other words, this is the function controlling routing.
    */
   beforeRouteLeave (to, from, next) {
+    /*
+    Note: this.settingProps.name is set to 'notLoaded' when in 'ManageSettings.vue'
+    when data is not yet loaded.
+    */
     if (settingName === this.settingProps.name) {
+      // Opens dialog if there are unsaved changes.
       if (this.$refs.settings.updated) {
         this.$refs.settings.$refs.dialogConfirmLeave.open(next)
       } else {

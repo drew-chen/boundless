@@ -19,7 +19,11 @@ Purpose:
 Methods:
 
   To function, the component calls the appropriate saving and/or
-  routing methods that are either given as props, or function parameters.
+  routing methods that are either given as props, or function parameters. Used
+  with 'mixinSettingNavGuard.js'.
+
+  To use, place this component in the component that has a saving method. Pass
+  the necessary props. To open, use the 'open' method.
 
 ## -->
 
@@ -119,7 +123,6 @@ export default {
     async saveBtnAction () {
       this.dialogOpen = false
       await this.save()
-      // Sets the dialogOpen flag in parent to false.
       this.leave()
     },
     /** Method for when the "Don't Save" button is clicked. */

@@ -546,7 +546,7 @@ Methods:
       />
     </div>
 
-    <!-- -------------------- Dialog -------------------- -->
+    <!-- -------------------- Dialog to confirm leaving with unsaved changes. -------------------- -->
     <dialog-confirm-leave
       ref="dialogConfirmLeave"
       :save="submit"

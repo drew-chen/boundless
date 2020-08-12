@@ -27,9 +27,12 @@ Methods:
       v-if="type === 'projects'"
     >
       <div class="text-h4 q-mb-md">
-        Project custom form template
+        Project Custom Questions Form
       </div>
       <q-separator color="secondary" />
+      <p class="q-ma-sm">
+        This allows the admin to create an additional set of questions to be answered upon project submission.
+      </p>
       <q-card
         flat bordered
         class="q-ma-sm"
@@ -107,7 +110,7 @@ Methods:
                   v-model="questionTemplate.label"
                   placeholder="Untitled Question"
                   :disable="!customFormEnabled"
-                  :rules="[val => !!val || 'Field is required']"
+                  :rules="[val => !!val || 'Question labels cannot be blank.']"
                 />
                 <!-- Response type -->
                 <q-select
