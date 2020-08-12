@@ -306,7 +306,7 @@ export default {
             } else {
               this.$q.notify({
                 type: 'negative',
-                message: 'Did not submit question templates due to untitled questions.'
+                message: 'Saved all questions except untitled questions.'
               })
             }
           }).catch(error => {

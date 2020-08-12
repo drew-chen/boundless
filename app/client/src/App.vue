@@ -237,13 +237,11 @@ h4 {
   padding: 10px;
 }
 
-h5 {
-  margin: 10px
-}
+h5
+  margin 10px
 
-h6 {
-  margin: 0
-}
+h6
+  margin 0
 
 .header {
   font-size: 16px;
@@ -277,7 +275,12 @@ pre {
 }
 // Normalize Font Awesome icons to be similar to Material icons.
 .fas
-  font-size: 17px !important
-  left: 3px
+  font-size 17px !important
+  left 3px
+
+// This styles the notification that appears when input is not valid.
+.q-field__bottom
+  // Ensures that the error message isn't hidden under other elements.
+  z-index 1
 
 </style>
