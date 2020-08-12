@@ -1891,6 +1891,7 @@ Methods:
 <script>
 import firebase from 'firebase/app'
 import 'firebase/firestore'
+import cloneDeep from 'lodash.clonedeep'
 
 import productionDb, { productionStorage } from '../firebase/init_production'
 import testingDb, { testingStorage } from '../firebase/init_testing'
@@ -2457,7 +2458,7 @@ export default {
             })
           }
 
-          this.configData = this.deepObjCopy(data)
+          this.configData = cloneDeep(data)
 
           this.configData.customChips = this.configData.customChips || []
 
@@ -2537,7 +2538,7 @@ export default {
         this.sortBody()
         this.sortChip()
 
-        this.curData = this.deepObjCopy(this.data)
+        this.curData = cloneDeep(this.data)
         this.childMode = this.mode
         this.data = {} // to save memory
 
@@ -2814,10 +2815,6 @@ export default {
             icon: 'report_problem'
           })
         }
-      }).onCancel(() => {
-        // nothing goes here
-      }).onDismiss(() => {
-        // nothing goes here
       })
     },
     /**
@@ -2826,7 +2823,6 @@ export default {
      * @param {String} parent: name of the thread
      */
     deleteLog: function (index, parent) {
-
       this.curData.logs[parent].data.splice(index, 1)
 
       this.updated = true
@@ -2873,10 +2869,6 @@ export default {
             icon: 'report_problem'
           })
         }
-      }).onCancel(() => {
-        // nothing goes here
-      }).onDismiss(() => {
-        // nothing goes here
       })
     },
     /**
@@ -2884,7 +2876,6 @@ export default {
      * @return {Boolean}
      */
     projectNameValidation: function () {
-
       if (this.$v.curData.project.maxLength && this.$v.curData.project.required) {
         console.log(this.$v)
         return true
@@ -3183,27 +3174,6 @@ export default {
      */
     openNewTab: function (url) {
       window.open(url, '_blank', 'noopener')
-    },
-    deepObjCopy: function (aObject) {
-      /**
-       * https://stackoverflow.com/questions/4459928/how-to-deep-clone-in-javascript/34624648#34624648
-       * creates a deep copy of the input
-       * @param {Object} aObject: the object to be cloned
-       * @return {Object}
-       */
-
-      if (!aObject) {
-        return aObject
-      }
-
-      let v
-      let bObject = Array.isArray(aObject) ? [] : {}
-      for (const k in aObject) {
-        v = aObject[k]
-        bObject[k] = (typeof v === 'object') ? this.deepObjCopy(v) : v
-      }
-
-      return bObject
     },
     /**
      * helper function to display notfiy
