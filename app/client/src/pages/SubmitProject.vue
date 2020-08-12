@@ -226,20 +226,20 @@ export default {
 <style lang="stylus" scoped>
 
 .q-page
-  margin-top: 10px
+  margin-top 10px
 
 .main
-  width: 1000px
-  margin: auto
+  width 1000px
+  margin auto
 
 // select child component
 /deep/ .container
-  max-height: 64vh
-  overflow: auto
+  max-height 64vh
+  overflow auto
 
 /deep/ .container > *
-  max-width: 80%
+  max-width 80%
 
 /deep/ h5
-  margin: 10px 0
+  margin 10px 0
 </style>

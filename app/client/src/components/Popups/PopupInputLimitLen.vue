@@ -103,5 +103,5 @@ export default {
 <style lang="stylus">
 
 .q-popup-edit
-  max-width: 200px
+  max-width 200px
 </style>

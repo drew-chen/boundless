@@ -441,15 +441,15 @@ export default {
 
 // Affects .q-route-tab
 .q-tab
-  justify-content: left
+  justify-content left
 
 // left-tab loadout
 .console-content-tab
-  border-radius: 3px
-  overflow: hidden
+  border-radius 3px
+  overflow hidden
 
 .ap-left-panel
-  border: solid $grey-5 1px
-  border-radius: 3px
+  border solid $grey-5 1px
+  border-radius 3px
 
 </style>

@@ -144,6 +144,6 @@ export default {
 <style lang="stylus" scoped>
 
 .q-card__section
-  min-width: 500px
+  min-width 500px
 
 </style>

@@ -132,26 +132,23 @@ export default {
 <style lang="stylus" scoped>
 
 h6
-  text-align: center
-  margin: 5px 0
-  font-weight: strong
+  text-align center
+  margin 5px 0
+  font-weight strong
 // console-page page loadout
 
-.console-page {
-  min-width: 800px;
-  max-width: 98%;
-  margin: auto;
-}
+.console-page
+  min-width 800px
+  max-width 98%
+  margin: auto
 
 // left-tab loadout
-.console-content-tab {
-  border-radius: 3px;
-  overflow: hidden;
-}
+.console-content-tab
+  border-radius 3px
+  overflow hidden
 
-.ap-left-panel {
-  border: solid $grey-5 1px;
-  border-radius: 3px;
-}
+.ap-left-panel
+  border solid $grey-5 1px
+  border-radius 3px
 
 </style>

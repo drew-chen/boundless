@@ -690,36 +690,36 @@ export default {
 <style lang="stylus" scoped>
 
 .body-table-row
-  cursor: pointer
+  cursor pointer
 
 .q-td
-  height: 4px
+  height 4px
 
 .left-column
-  width: 40%
-  white-space: normal
+  width 40%
+  white-space normal
 
 .middle-column
-  width: 35%
-  white-space: normal
+  width 35%
+  white-space normal
 
 .right-column
-  width: 15%
-  white-space: normal
+  width 15%
+  white-space normal
 
 .table-header
-  font-size: 1.1rem
-  font-weight: normal
-  position: sticky !important
-  top: 0
-  z-index: 1
-  background: #fff
+  font-size 1.1rem
+  font-weight normal
+  position sticky !important
+  top 0
+  z-index 1
+  background #fff
 
 .keyword-dropdown
-  min-width: 100px
+  min-width 100px
 
 .table
-  max-height: 74vh
-  margin-bottom: 0
+  max-height 74vh
+  margin-bottom 0
 
 </style>

@@ -367,7 +367,7 @@ export default {
 <style lang="stylus" scoped>
 
 .q-card
-  max-width: 1050px
+  max-width 1050px
 
 /*
 Handle also defines row height, since it is currently the tallest element in the
@@ -375,9 +375,9 @@ row. This means the handle is 100% of the row height. This is done so the cursor
 can stay consistent near the handle, instead of swapping back and forth.
 */
 .handle
-  cursor: move
-  height: 80px
-  width: 40px
+  cursor move
+  height 80px
+  width 40px
 
 /*
 This input has an extra element underneath it where form validation messages
@@ -385,12 +385,12 @@ are shown. This raises the input box above other input boxes on the same row.
 In order to align this input with others, it is pushed down.
 */
 .question-template-label-centering
-  top: 10px
-  position: relative
+  top 10px
+  position relative
 
 // During drag and drop movement, this class is used.
 .ghost-question
-  background: $grey-3
+  background $grey-3
 
 /*
 This is the drag preview that is directly under your mouse. This is
@@ -398,6 +398,6 @@ hidden because this preview covers the chosen question making it harder to
 see the chosen question.
 */
 .hide-question-preview
-  display: none
+  display none
 
 </style>
