@@ -28,7 +28,10 @@ Methods:
     <div
       class="container"
     >
-      <!-- Main form review. -->
+      <!-- -------------------- Main form review -------------------- -->
+
+      <h6>Main info</h6>
+
       <q-input
         filled readonly stack-label
         label="Project Name"
@@ -115,9 +118,12 @@ Methods:
         </div>
       </div>
 
-      <!-- Custom form review. -->
+      <!-- -------------------- Custom form review -------------------- -->
 
       <div v-if="customFormEnabled">
+
+        <h6>Additional questions</h6>
+
         <div v-if="customFormQuestions && customFormQuestions.length > 0">
           <div
             v-for="question in customFormQuestions"
@@ -183,6 +189,9 @@ export default {
 }
 </script>
 
-<style>
+<style lang="stylus" scoped>
+
+h6
+  margin 0 !important
 
 </style>

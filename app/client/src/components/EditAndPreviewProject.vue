@@ -1547,10 +1547,10 @@ Methods:
 
               <!-- -------------------- Form Response -------------------- -->
               <q-tab-panel name="formResponse">
-                <div class="tab-content shadow-2 q-pa-md row justify-center">
+                <div class="tab-content shadow-2 q-py-lg row justify-center">
                   <project-review-form
                     id="project-review-form"
-                    :projectName="configData.project"
+                    :projectName="curData.project"
                     :projectDescription="curData.description"
                     :projectMembers="curData.members"
                     :keywordOptions="keywordOptions"

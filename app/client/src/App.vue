@@ -237,6 +237,14 @@ h4 {
   padding: 10px;
 }
 
+h5 {
+  margin: 10px
+}
+
+h6 {
+  margin: 0
+}
+
 .header {
   font-size: 16px;
   font-weight: bold;

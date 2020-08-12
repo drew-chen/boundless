@@ -240,6 +240,4 @@ export default {
 /deep/ .container > *
   max-width 80%
 
-/deep/ h5
-  margin 10px 0
 </style>
