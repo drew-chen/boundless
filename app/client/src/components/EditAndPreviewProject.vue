@@ -1550,12 +1550,12 @@ Methods:
                 <div class="tab-content shadow-2 q-pa-md row justify-center">
                   <project-review-form
                     id="project-review-form"
-                    :projectName="curData.project"
+                    :projectName="configData.project"
                     :projectDescription="curData.description"
                     :projectMembers="curData.members"
                     :keywordOptions="keywordOptions"
                     :projectKeywords="curData.keywords"
-                    :customFormQuestions="curData.questions || []"
+                    :customFormQuestions="curData.customFormResponse || []"
                     :customFormEnabled="true"
                   />
                 </div>

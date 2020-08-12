@@ -92,6 +92,7 @@ export async function loadConfig ({ commit, getters }) {
     questionTemplates = (questionTemplates === undefined) ? [] : questionTemplates
     let customFormEnabled = data.projectsConfig.customFormEnabled
     customFormEnabled = (customFormEnabled === undefined) ? false : customFormEnabled
+
     commit('setKeywordOptions', keywordOptions)
     commit('setQuestionTemplates', questionTemplates)
     commit('setQuestions', [])
