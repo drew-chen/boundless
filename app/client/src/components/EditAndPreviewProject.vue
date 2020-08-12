@@ -113,41 +113,305 @@ Methods:
                   v-if="curData"
                   class="tab-content shadow-2"
                 >
-                  <!-- ------------------- Project Layout ------------------ -->
-                  <div
-                    class="shadow-2"
-                  >
-                    <!-- ----------------- Preview Project ----------------- -->
-                    <div v-if="childMode === 'preview'">
-                      <br class="small">
+                  <!-- ----------------- Preview Project ----------------- -->
+                  <div v-if="childMode === 'preview'">
+                    <br class="small">
 
-                      <!-- ----------------- Project Page ----------------- -->
-                      <div class="q-pa-md" align="left">
+                    <!-- ----------------- Project Page ----------------- -->
+                    <div class="q-pa-md" align="left">
 
-                        <!-- ---------------- Project Title ---------------- -->
-                        <div class="q-pa-md text-h4 text-primary text-center">
-                          {{ curData.project }}
-                          <q-separator />
-                        </div>
+                      <!-- ---------------- Project Title ---------------- -->
+                      <div class="q-pa-md text-h4 text-primary text-center">
+                        {{ curData.project }}
+                        <q-separator />
+                      </div>
 
-                        <!-- -------------- Project Overview -------------- -->
-                        <div
-                          class="q-pa-sm q-col-gutter-md row items-start"
-                          style="height: 320px;"
-                        >
+                      <!-- -------------- Project Overview -------------- -->
+                      <div
+                        class="q-pa-sm q-col-gutter-md row items-start"
+                        style="height: 320px;"
+                      >
 
-                          <div class="col-9">
-                            <div class="text-h5">
-                              Overview
-                              <q-separator color="secondary" />
+                        <div class="col-9">
+                          <div class="text-h5">
+                            Overview
+                            <q-separator color="secondary" />
+                          </div>
+
+                          <div
+                            class="row q-mt-sm q-mb-sm"
+                            style="max-height: 240px;"
+                          >
+                            <div class="col-5 q-mt-sm">
+                              <!-- -------------- Main Image ------------- -->
+                              <q-img
+                                contain
+                                class="project-img"
+                                :src="mainImage.cur"
+                                :style="
+                                  `background: ${
+                                    mainImage.color ? mainImage.color : 'black'
+                                  }`
+                                "
+                                :ratio="4/3"
+                              />
                             </div>
 
-                            <div
-                              class="row q-mt-sm q-mb-sm"
-                              style="max-height: 240px;"
-                            >
-                              <div class="col-5 q-mt-sm">
-                                <!-- -------------- Main Image ------------- -->
+                            <!-- -------------- Description -------------- -->
+                            <div class="col overview">
+
+                              <div class="q-pa-sm">
+                                <pre>{{ curData.description }}</pre>
+                              </div>
+
+                            </div>
+                          </div>
+                        </div>
+
+                        <div class="col-3" >
+
+                          <div class="text-h5">
+                            Team
+                            <q-separator color="secondary" />
+                          </div>
+
+                          <div class="overview">
+                            <q-list dense>
+                              <q-item
+                                v-for="(teamMember, index) in curData.members"
+                                :key="index"
+                                clickable v-ripple
+                                class="q-my-sm"
+                              >
+                                <q-item-section avatar>
+                                  <q-avatar color="primary" text-color="secondary"  >
+                                    {{ teamMember.name[0] }}
+                                  </q-avatar>
+                                </q-item-section>
+
+                                <q-item-section>
+                                  <q-item-label v-if="teamMember.role === 'lead'">
+                                    {{ teamMember.name }}: ({{ teamMember.role }})
+                                  </q-item-label>
+                                  <q-item-label v-else>
+                                    {{ teamMember.name }}
+                                  </q-item-label>
+                                  <q-item-label caption lines="1">
+                                    {{ teamMember.email }}
+                                  </q-item-label>
+                                </q-item-section>
+                              </q-item>
+                            </q-list>
+                          </div>
+
+                        </div>
+
+                      </div>
+
+                      <q-separator inset />
+
+                      <!-- ---------------- Progress Bar ----------------- -->
+                      <div class="q-pa-md text-h7" align="center">
+                        <div class="text-h5">
+                          Progress
+                        </div>
+
+                        <ProgressBar
+                          class="q-mt-sm progress-bar"
+                          :progressBar="progressBar"
+                          :progress="curData.progress"
+                        />
+                      </div>
+
+                      <q-separator inset />
+
+                      <!-- ---------------- Project Chips ---------------- -->
+                      <div class="q-pa-md" align="center">
+
+                        <q-chip
+                          disable clickable
+                          color="secondary"
+                          text-color="white" icon="far fa-clipboard"
+                        >
+                          Copy URL
+                        </q-chip>
+
+                        <span
+                          v-for="(chipContent, chipInd) in curData.webpage.chips"
+                          :key="chipInd"
+                        >
+                          <q-chip
+                            v-if="!chipContent.hidden"
+                            clickable
+                            color="secondary" text-color="white"
+                            :icon="chipContent.content.icon"
+                            @click="openNewTab(chipContent.content.url)"
+                          >
+                            {{ chipContent.content.label }}
+                          </q-chip>
+                        </span>
+
+                        <q-chip
+                          clickable
+                          @click="popDialog('keywords')"
+                          color="secondary" text-color="white" icon="vpn_key"
+                        >
+                          Keywords
+                        </q-chip>
+
+                      </div>
+
+                      <!-- ------------------- Body ------------------- -->
+                      <div class="q-pa-md">
+                        <div
+                          v-for="(bodyContent, bodyInd) in curData.webpage.body"
+                          :key="bodyInd"
+                        >
+                          <div :hidden="bodyContent.hidden === true">
+                            <div class="text-h5 q-mt-sm">
+                              {{ bodyContent.content.label }}
+                            </div>
+
+                            <q-separator color="secondary" />
+
+                            <div>
+                              <div
+                                v-if="bodyContent.content.type === 'TEXT_BOX'"
+                              >
+                                <div class="q-pa-sm">
+                                  <pre>{{ bodyContent.content.text }}</pre>
+                                </div>
+                              </div>
+
+                              <div
+                                v-else-if="
+                                  bodyContent.content.type === 'MARKDOWN'
+                                "
+                              >
+                                <div class="q-pa-sm">
+                                  <MarkdownTranslator
+                                    :storage="storage"
+                                    :data="bodyContent.content.text"
+                                  />
+                                </div>
+                              </div>
+
+                              <div v-else>
+                                <ul>
+                                  <li
+                                    v-for="(link, ulIndex) in bodyContent.content.list"
+                                    :key="ulIndex"
+                                  >
+                                    <div
+                                      v-if="(
+                                        bodyContent.content.type ===
+                                        'EVENT_LIST'
+                                      )"
+                                      style="
+                                          display: inline; padding-left: 12px;
+                                        "
+                                    >
+                                      {{ link.subject }}
+                                      <hr>
+                                      Description: {{ link.body }} <br>
+                                      Date and Time: {{ link.date }} <br>
+                                      <a v-if="link.url !== ''" :href="link.url">More...</a>
+                                    </div>
+                                    <span v-else>
+                                      <em v-if="link.url === ''">
+                                        {{ link.item }}
+                                      </em>
+                                      <a
+                                        v-else
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        :href="link.url"
+                                      >
+                                        {{ link.item }}
+                                      </a>
+                                    </span>
+                                  </li>
+                                </ul>
+                              </div>
+                            </div>
+                            <br>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <br><br>
+
+                  </div>
+
+                  <!-- ------------------ Edit Project ------------------- -->
+                  <div v-else-if="childMode === 'edit'">
+                    <br class="small">
+
+                    <!-- ----------------- Project Page ------------------ -->
+                    <div class="q-pa-md" align="left">
+
+                      <!-- --------------- Project Title ----------------- -->
+                      <div class="q-pa-md text-h4 text-primary text-center">
+                        <a class="cursor-pointer">{{ curData.project }} </a>
+
+                        <q-icon
+                          class="cursor-pointer"
+                          name="edit" size=".8em" color="accent"
+                        />
+
+                        <popup-input-limit-len
+                          title="Edit Project Name"
+                          :lenLimit="60"
+                          :initialValue="curData.project"
+                          @save="saveEditedName($event)"
+                        />
+
+                        <q-separator />
+                      </div>
+
+                      <!-- -------------- Project Overview --------------- -->
+                      <div
+                        class="q-pa-sm q-col-gutter-md row items-start"
+                        style="height: 320px;"
+                      >
+                        <!-- -------------- Overview Panel --------------- -->
+                        <div class="col-9">
+                          <!-- ----------------- Title ------------------ -->
+                          <div class="text-h5">
+                            Overview
+                            <q-separator color="secondary" />
+                          </div>
+
+                          <!-- ---------------- Content ------------------ -->
+                          <div
+                            class="row q-mt-sm q-mb-sm"
+                            style="max-height: 240px;"
+                          >
+                            <!-- ------------- Main Image ---------------- -->
+                            <div class="col-5 q-mt-sm">
+                              <div align="center">
+                                <q-btn
+                                  outline
+                                  label="Image Background Color"
+                                  @click="updated = true"
+                                >
+                                  <q-popup-proxy
+                                    transition-show="scale"
+                                    transition-hide="scale"
+                                  >
+                                    <q-color flat v-model="mainImage.color" />
+
+                                    <q-btn flat v-close-popup>
+                                      Done
+                                    </q-btn>
+                                  </q-popup-proxy>
+                                </q-btn>
+                              </div>
+                              <div
+                                class="cursor-pointer"
+                                @click="invokeFilePicker"
+                              >
                                 <q-img
                                   contain
                                   class="project-img"
@@ -159,885 +423,711 @@ Methods:
                                   "
                                   :ratio="4/3"
                                 />
-                              </div>
 
-                              <!-- -------------- Description -------------- -->
-                              <div class="col overview">
+                                <q-icon
+                                  dense flat
+                                  size="xs" color="accent" name="collections"
+                                  class="full-width"
+                                />
 
-                                <div class="q-pa-sm">
-                                  <pre>{{ curData.description }}</pre>
-                                </div>
+                                <input
+                                  hidden
+                                  type="file" ref="imageInput"
+                                  accept="image/*"
+                                  @change="filePickerOnChange"
+                                />
 
-                              </div>
-                            </div>
-                          </div>
-
-                          <div class="col-3" >
-
-                            <div class="text-h5">
-                              Team
-                              <q-separator color="secondary" />
-                            </div>
-
-                            <div class="overview">
-                              <q-list dense>
-                                <q-item
-                                  v-for="(teamMember, index) in curData.members"
-                                  :key="index"
-                                  clickable v-ripple
-                                  class="q-my-sm"
+                                <q-tooltip
+                                  anchor="bottom middle"
+                                  self="top middle"
+                                  :offset="[10, 10]"
                                 >
-                                  <q-item-section avatar>
-                                    <q-avatar color="primary" text-color="secondary"  >
-                                      {{ teamMember.name[0] }}
-                                    </q-avatar>
-                                  </q-item-section>
-
-                                  <q-item-section>
-                                    <q-item-label v-if="teamMember.role === 'lead'">
-                                      {{ teamMember.name }}: ({{ teamMember.role }})
-                                    </q-item-label>
-                                    <q-item-label v-else>
-                                      {{ teamMember.name }}
-                                    </q-item-label>
-                                    <q-item-label caption lines="1">
-                                      {{ teamMember.email }}
-                                    </q-item-label>
-                                  </q-item-section>
-                                </q-item>
-                              </q-list>
+                                  Choose your image file...
+                                </q-tooltip>
+                              </div>
                             </div>
 
+                            <!-- ------------- Description --------------- -->
+                            <div class="col overview">
+
+                              <q-input
+                                filled autogrow
+                                class="q-pa-sm"
+                                v-model="curData.description"
+                                :rules="[val => !!val || notifyError()]"
+                                @focus="updated = true"
+                              />
+
+                            </div>
                           </div>
 
                         </div>
 
-                        <q-separator inset />
+                        <!-- --------------- Team Panel ----------------- -->
+                        <div class="col">
 
-                        <!-- ---------------- Progress Bar ----------------- -->
-                        <div class="q-pa-md text-h7" align="center">
                           <div class="text-h5">
-                            Progress
+                            <div class="row">
+                              Team
+                              <q-space/>
+
+                              <!-- Adding Member/s to Project -->
+                              <div>
+                                <q-btn
+                                  dense round
+                                  size="sm" color="accent" icon="add"
+                                  @click="addProjectMember"
+                                />
+                              </div>
+                            </div>
+
+                            <q-separator class="q-mb-sm" color="secondary" />
                           </div>
 
-                          <ProgressBar
-                            class="q-mt-sm progress-bar"
-                            :progressBar="progressBar"
-                            :progress="curData.progress"
-                          />
-                        </div>
-
-                        <q-separator inset />
-
-                        <!-- ---------------- Project Chips ---------------- -->
-                        <div class="q-pa-md" align="center">
-
-                          <q-chip
-                            disable clickable
-                            color="secondary"
-                            text-color="white" icon="far fa-clipboard"
-                          >
-                            Copy URL
-                          </q-chip>
-
-                          <span
-                            v-for="(chipContent, chipInd) in curData.webpage.chips"
-                            :key="chipInd"
-                          >
-                            <q-chip
-                              v-if="!chipContent.hidden"
-                              clickable
-                              color="secondary" text-color="white"
-                              :icon="chipContent.content.icon"
-                              @click="openNewTab(chipContent.content.url)"
-                            >
-                              {{ chipContent.content.label }}
-                            </q-chip>
-                          </span>
-
-                          <q-chip
-                            clickable
-                            @click="popDialog('keywords')"
-                            color="secondary" text-color="white" icon="vpn_key"
-                          >
-                            Keywords
-                          </q-chip>
-
-                        </div>
-
-                        <!-- ------------------- Body ------------------- -->
-                        <div class="q-pa-md">
                           <div
-                            v-for="(bodyContent, bodyInd) in curData.webpage.body"
-                            :key="bodyInd"
+                            class="overview q-mt-sm"
+                            style="overflow-x: hidden; padding: 2px 2px;"
                           >
-                            <div :hidden="bodyContent.hidden === true">
-                              <div class="text-h5 q-mt-sm">
-                                {{ bodyContent.content.label }}
-                              </div>
+                            <q-list dense>
+                              <q-item
+                                v-for="(teamMember, index) in curData.members"
+                                :key="index"
+                                clickable v-ripple
+                                style="border-radius: 3px;"
+                              >
+                                <q-item-section avatar>
+                                  <q-avatar color="primary" text-color="secondary"  >
+                                    {{ teamMember.name[0] }}
+                                  </q-avatar>
+                                </q-item-section>
 
-                              <q-separator color="secondary" />
+                                <q-item-section>
+                                  <q-item-label v-if="teamMember.role === 'lead'">
+                                    {{ teamMember.name }}: ({{ teamMember.role }})
+                                  </q-item-label>
+                                  <q-item-label v-else>
+                                    {{ teamMember.name }}
+                                  </q-item-label>
+                                  <q-item-label caption lines="1">
+                                    {{ teamMember.email }}
+                                  </q-item-label>
+                                </q-item-section>
 
-                              <div>
-                                <div
-                                  v-if="bodyContent.content.type === 'TEXT_BOX'"
-                                >
-                                  <div class="q-pa-sm">
-                                    <pre>{{ bodyContent.content.text }}</pre>
+                                <div class="column q-pl-sm items-end">
+                                  <div class="col">
+                                    <q-toggle
+                                      dense
+                                      color="accent" true-value="lead"
+                                      false-value="member"
+                                      v-model="curData.members[index].role"
+                                      @input="updated = true"
+                                    />
                                   </div>
-                                </div>
 
-                                <div
-                                  v-else-if="
-                                    bodyContent.content.type === 'MARKDOWN'
-                                  "
-                                >
-                                  <div class="q-pa-sm">
-                                    <MarkdownTranslator
-                                      :storage="storage"
-                                      :data="bodyContent.content.text"
+                                  <div class="col">
+                                    <q-btn
+                                      :disable="curData.members.length === 1"
+                                      dense round
+                                      color="accent" size="sm" icon="delete"
+                                      @click="
+                                        curData.members.splice(index, 1);
+                                        updated = true
+                                      "
                                     />
                                   </div>
                                 </div>
+                              </q-item>
+                            </q-list>
 
-                                <div v-else>
-                                  <ul>
-                                    <li
-                                      v-for="(link, ulIndex) in bodyContent.content.list"
-                                      :key="ulIndex"
+                          </div>
+
+                        </div>
+                      </div>
+
+                      <q-separator inset />
+                      <!-- --------------- Progress Bar ------------------ -->
+                      <div class="q-pa-md text-h7" align="center">
+                        <div class="text-h5">
+                          Progress
+                        </div>
+
+                        <div class="row q-mt-sm">
+                          <div class="col">
+                            <!-- Col filler -->
+                          </div>
+
+                          <ProgressBar
+                            class="col progress-bar"
+                            :progressBar="progressBar"
+                            :progress="curData.progress"
+                          />
+
+                          <div class="col q-ml-sm" align="left">
+                            <div v-if="mode === 'edit'">
+                              <div class="row">
+                                <q-btn
+                                  dense
+                                  size="sm" color="accent"
+                                  icon="keyboard_arrow_up"
+                                  @click="progressCountUp"
+                                />
+                              </div>
+                              <div class="row" style="margin-top: 1px;">
+                                <q-btn
+                                  dense
+                                  size="sm" color="accent"
+                                  icon="keyboard_arrow_down"
+                                  @click="progressCountDown"
+                                />
+                              </div>
+                            </div>
+                          </div>
+
+                        </div>
+
+                      </div>
+
+                      <hr>
+                      <!-- ------------------ Keywords ------------------ -->
+                      <div class="row q-pa-sm" align="left">
+                        <p class="col-4 header">Keywords:</p>
+
+                        <q-option-group
+                          dense inline
+                          class="col" type="checkbox"
+                          v-model="curData.keywords"
+                          :options="keywordOptions"
+                          @input="updated = true"
+                        />
+                      </div>
+
+                      <hr>
+                      <!-- -------------------- Chips -------------------- -->
+                      <div>
+                        <div class="row" align="left">
+                          <p class="col q-pa-sm header">
+                            Add Chips:
+                          </p>
+
+                          <q-select
+                            dense outlined options-dense
+                            class="col-3" label="Chip Type"
+                            style="overflow: auto;"
+                            v-model="chipType"
+                            :options="configData.chipContentType"
+                          />
+
+                          <div class="col-1 q-mt-sm" align="center" >
+                            <q-btn
+                              :disable="chipType === ''"
+                              dense round
+                              color="accent" icon="add"
+                              @click="addChip(); addedChip = true"
+                            />
+                          </div>
+                        </div>
+
+                        <div
+                          v-for="(chipContent, chipInd) in curData.webpage.chips"
+                          :key="chipInd"
+                          class="row q-mt-sm q-mb-sm"
+                        >
+                          <!-- ----------- Chip Type SOURCE -------------- -->
+                          <div
+                            v-if="chipContent.content.type === 'SOURCE'"
+                            class="col q-mb-xs q-pa-sm"
+                          >
+                            <q-card class="q-pa-md">
+                              <div class="row" align="left">
+                                <strong>Source Chip</strong>
+                                <hr class="col q-ml-sm">
+                              </div>
+
+                              <q-input
+                                filled
+                                class="q-mt-sm" label="Source"
+                                placeholder="Link to source code goes here."
+                                v-model="chipContent.content.url"
+                                :autofocus="addedChip"
+                                :rules="[val => !!val || 'Field is required']"
+                                @focus="addedChip = false"
+                              />
+                            </q-card>
+                          </div>
+
+                          <!-- ------------- Chip Type VIDEO ------------- -->
+                          <div
+                            v-if="chipContent.content.type === 'VIDEO'"
+                            class="col q-mb-xs q-pa-sm"
+                          >
+                            <q-card class="q-pa-md">
+                              <div class="row" align="left">
+                                <strong>Video Chip</strong>
+                                <hr class="col q-ml-sm">
+                              </div>
+
+                              <q-input
+                                filled
+                                class="q-mt-sm" label="Video"
+                                placeholder="Link to video goes here. (Currently only supports one.)"
+                                v-model="chipContent.content.url"
+                                :autofocus="addedChip"
+                                :rules="[val => !!val || 'Field is required']"
+                                @focus="addedChip = false"
+                              />
+                            </q-card>
+                          </div>
+
+                          <!-- ------------ Chip Type CUSTOM ------------- -->
+                          <div
+                            v-if="chipContent.content.type === 'CUSTOM'"
+                            class="col q-mb-xs q-pa-sm"
+                          >
+                            <q-card class="q-pa-md">
+                              <div class="row" align="left">
+                                <strong>Custom Chip</strong>
+                                <hr class="col q-ml-sm">
+                              </div>
+
+                              <q-input
+                                filled dense
+                                class="q-mt-sm" label="Custom Chip Label"
+                                placeholder="Please enter the label for the custom chip."
+                                v-model="chipContent.content.label"
+                                :rules="[val => !!val || 'Field is required']"
+                                :autofocus="addedChip"
+                                @focus="addedChip = false"
+                              />
+
+                              <q-input
+                                filled dense
+                                class="q-mt-sm" label="Custom Chip URL"
+                                placeholder="Link to video goes here. (Currently only supports one.)"
+                                v-model="chipContent.content.url"
+                                :rules="[val => !!val || 'Field is required']"
+                                @focus="addedChip = false"
+                              />
+
+                              <div class="row q-pa-sm" align="left">
+                                <div class="col">
+                                  <q-list bordered separator>
+                                    <q-item
+                                      v-for="
+                                        (val, ind) in configData.customChips
+                                      "
+                                      :key="ind"
+                                      clickable v-ripple
+                                      :active="
+                                        chipContent.content.icon === val.value
+                                      "
+                                      @click="
+                                        chipContent.content.icon = val.value
+                                      "
+                                      active-class="text-white bg-secondary"
                                     >
-                                      <div
-                                        v-if="(
-                                          bodyContent.content.type ===
-                                          'EVENT_LIST'
-                                        )"
-                                        style="
-                                            display: inline; padding-left: 12px;
-                                          "
-                                      >
-                                        {{ link.subject }}
-                                        <hr>
-                                        Description: {{ link.body }} <br>
-                                        Date and Time: {{ link.date }} <br>
-                                        <a v-if="link.url !== ''" :href="link.url">More...</a>
-                                      </div>
-                                      <span v-else>
-                                        <em v-if="link.url === ''">
-                                          {{ link.item }}
-                                        </em>
-                                        <a
-                                          v-else
-                                          target="_blank"
-                                          rel="noopener noreferrer"
-                                          :href="link.url"
-                                        >
-                                          {{ link.item }}
-                                        </a>
-                                      </span>
-                                    </li>
-                                  </ul>
+                                      <q-item-section avatar>
+                                        <q-icon :name="val.value" />
+                                      </q-item-section>
+
+                                      <q-item-section align="center">
+                                      </q-item-section>
+
+                                      <q-item-section side>
+                                        {{ val.label }}
+                                      </q-item-section>
+                                    </q-item>
+                                  </q-list>
+                                </div>
+
+                                <div
+                                  class="col" align="center"
+                                  style="
+                                    display: flex;
+                                    justify-content: center;
+                                    align-items: center;
+                                  "
+                                >
+                                  <q-chip
+                                    color="secondary" text-color="white"
+                                    :icon="chipContent.content.icon"
+                                  >
+                                    {{ chipContent.content.label || 'Sample goes here' }}
+                                  </q-chip>
                                 </div>
                               </div>
-                              <br>
-                            </div>
+                            </q-card>
+                          </div>
+
+                          <!-- ----------- Chip Index & Delete ----------- -->
+                          <div
+                            class="col-1" align="center"
+                            style="margin: .7vh auto;"
+                          >
+                            <q-checkbox
+                              dense
+                              class="q-pa-sm q-mb-sm" label="Hide"
+                              v-model="curData.webpage.chips[chipInd].hidden"
+                            />
+
+                            <q-input
+                              dense filled
+                              class="q-pa-xs q-mb-sm"
+                              label="Index" type="number"
+                              v-model="curData.webpage.chips[chipInd].index"
+                              @blur="curData.webpage.chips[chipInd].index = curData.webpage.chips[chipInd].index < 1 ?  1 : parseInt(curData.webpage.chips[chipInd].index)"
+                            />
+
+                            <q-btn
+                              dense round
+                              class="bottom" color="accent" icon="delete"
+                              @click="
+                                curData.webpage.chips.splice(chipInd, 1)
+                              "
+                            />
                           </div>
                         </div>
                       </div>
 
-                      <br><br>
+                      <hr>
 
-                    </div>
+                      <!-- ---------------- Custom Field ----------------- -->
+                      <div>
+                        <div class="row" align="left">
+                          <p class="col q-pa-sm header">
+                            Add Content:
+                          </p>
 
-                    <!-- ------------------ Edit Project ------------------- -->
-                    <div v-else-if="childMode === 'edit'">
-                      <br class="small">
-
-                      <!-- ----------------- Project Page ------------------ -->
-                      <div class="q-pa-md" align="left">
-
-                        <!-- --------------- Project Title ----------------- -->
-                        <div class="q-pa-md text-h4 text-primary text-center">
-                          <a class="cursor-pointer">{{ curData.project }} </a>
-
-                          <q-icon
-                            class="cursor-pointer"
-                            name="edit" size=".8em" color="accent"
+                          <q-select
+                            dense outlined options-dense
+                            class="col-3" label="Content Type"
+                            style="overflow: auto;"
+                            v-model="bodyType"
+                            :options="configData.bodyContentType"
                           />
 
-                          <popup-input-limit-len
-                            title="Edit Project Name"
-                            :lenLimit="60"
-                            :initialValue="curData.project"
-                            @save="saveEditedName($event)"
-                          />
-
-                          <q-separator />
+                          <div class="col-1 q-mt-sm" align="center" >
+                            <q-btn
+                              :disable="bodyType === ''"
+                              dense round
+                              color="accent" icon="add"
+                              @click="addCustomField(); addedContent = true"
+                            />
+                          </div>
                         </div>
 
-                        <!-- -------------- Project Overview --------------- -->
                         <div
-                          class="q-pa-sm q-col-gutter-md row items-start"
-                          style="height: 320px;"
+                          v-for="(bodyContent, ind) in curData.webpage.body"
+                          :key="ind"
+                          class="row q-mt-sm q-mb-sm"
                         >
-                          <!-- -------------- Overview Panel --------------- -->
-                          <div class="col-9">
-                            <!-- ----------------- Title ------------------ -->
-                            <div class="text-h5">
-                              Overview
-                              <q-separator color="secondary" />
-                            </div>
 
-                            <!-- ---------------- Content ------------------ -->
-                            <div
-                              class="row q-mt-sm q-mb-sm"
-                              style="max-height: 240px;"
-                            >
-                              <!-- ------------- Main Image ---------------- -->
-                              <div class="col-5 q-mt-sm">
-                                <div align="center">
-                                  <q-btn
-                                    outline
-                                    label="Image Background Color"
-                                    @click="updated = true"
-                                  >
-                                    <q-popup-proxy
-                                      transition-show="scale"
-                                      transition-hide="scale"
-                                    >
-                                      <q-color flat v-model="mainImage.color" />
-
-                                      <q-btn flat v-close-popup>
-                                        Done
-                                      </q-btn>
-                                    </q-popup-proxy>
-                                  </q-btn>
-                                </div>
-                                <div
-                                  class="cursor-pointer"
-                                  @click="invokeFilePicker"
-                                >
-                                  <q-img
-                                    contain
-                                    class="project-img"
-                                    :src="mainImage.cur"
-                                    :style="
-                                      `background: ${
-                                        mainImage.color ? mainImage.color : 'black'
-                                      }`
-                                    "
-                                    :ratio="4/3"
-                                  />
-
-                                  <q-icon
-                                    dense flat
-                                    size="xs" color="accent" name="collections"
-                                    class="full-width"
-                                  />
-
-                                  <input
-                                    hidden
-                                    type="file" ref="imageInput"
-                                    accept="image/*"
-                                    @change="filePickerOnChange"
-                                  />
-
-                                  <q-tooltip
-                                    anchor="bottom middle"
-                                    self="top middle"
-                                    :offset="[10, 10]"
-                                  >
-                                    Choose your image file...
-                                  </q-tooltip>
-                                </div>
-                              </div>
-
-                              <!-- ------------- Description --------------- -->
-                              <div class="col overview">
-
-                                <q-input
-                                  filled autogrow
-                                  class="q-pa-sm"
-                                  v-model="curData.description"
-                                  :rules="[val => !!val || notifyError()]"
-                                  @focus="updated = true"
-                                />
-
-                              </div>
-                            </div>
-
-                          </div>
-
-                          <!-- --------------- Team Panel ----------------- -->
-                          <div class="col">
-
-                            <div class="text-h5">
-                              <div class="row">
-                                Team
-                                <q-space/>
-
-                                <!-- Adding Member/s to Project -->
-                                <div>
-                                  <q-btn
-                                    dense round
-                                    size="sm" color="accent" icon="add"
-                                    @click="addProjectMember"
-                                  />
-                                </div>
-                              </div>
-
-                              <q-separator class="q-mb-sm" color="secondary" />
-                            </div>
-
-                            <div
-                              class="overview q-mt-sm"
-                              style="overflow-x: hidden; padding: 2px 2px;"
-                            >
-                              <q-list dense>
-                                <q-item
-                                  v-for="(teamMember, index) in curData.members"
-                                  :key="index"
-                                  clickable v-ripple
-                                  style="border-radius: 3px;"
-                                >
-                                  <q-item-section avatar>
-                                    <q-avatar color="primary" text-color="secondary"  >
-                                      {{ teamMember.name[0] }}
-                                    </q-avatar>
-                                  </q-item-section>
-
-                                  <q-item-section>
-                                    <q-item-label v-if="teamMember.role === 'lead'">
-                                      {{ teamMember.name }}: ({{ teamMember.role }})
-                                    </q-item-label>
-                                    <q-item-label v-else>
-                                      {{ teamMember.name }}
-                                    </q-item-label>
-                                    <q-item-label caption lines="1">
-                                      {{ teamMember.email }}
-                                    </q-item-label>
-                                  </q-item-section>
-
-                                  <div class="column q-pl-sm items-end">
-                                    <div class="col">
-                                      <q-toggle
-                                        dense
-                                        color="accent" true-value="lead"
-                                        false-value="member"
-                                        v-model="curData.members[index].role"
-                                        @input="updated = true"
-                                      />
-                                    </div>
-
-                                    <div class="col">
-                                      <q-btn
-                                        :disable="curData.members.length === 1"
-                                        dense round
-                                        color="accent" size="sm" icon="delete"
-                                        @click="
-                                          curData.members.splice(index, 1);
-                                          updated = true
-                                        "
-                                      />
-                                    </div>
-                                  </div>
-                                </q-item>
-                              </q-list>
-
-                            </div>
-
-                          </div>
-                        </div>
-
-                        <q-separator inset />
-                        <!-- --------------- Progress Bar ------------------ -->
-                        <div class="q-pa-md text-h7" align="center">
-                          <div class="text-h5">
-                            Progress
-                          </div>
-
-                          <div class="row q-mt-sm">
-                            <div class="col">
-                              <!-- Col filler -->
-                            </div>
-
-                            <ProgressBar
-                              class="col progress-bar"
-                              :progressBar="progressBar"
-                              :progress="curData.progress"
-                            />
-
-                            <div class="col q-ml-sm" align="left">
-                              <div v-if="mode === 'edit'">
-                                <div class="row">
-                                  <q-btn
-                                    dense
-                                    size="sm" color="accent"
-                                    icon="keyboard_arrow_up"
-                                    @click="progressCountUp"
-                                  />
-                                </div>
-                                <div class="row" style="margin-top: 1px;">
-                                  <q-btn
-                                    dense
-                                    size="sm" color="accent"
-                                    icon="keyboard_arrow_down"
-                                    @click="progressCountDown"
-                                  />
-                                </div>
-                              </div>
-                            </div>
-
-                          </div>
-
-                        </div>
-
-                        <hr>
-                        <!-- ------------------ Keywords ------------------ -->
-                        <div class="row q-pa-sm" align="left">
-                          <p class="col-4 header">Keywords:</p>
-
-                          <q-option-group
-                            dense inline
-                            class="col" type="checkbox"
-                            v-model="curData.keywords"
-                            :options="keywordOptions"
-                            @input="updated = true"
-                          />
-                        </div>
-
-                        <hr>
-                        <!-- -------------------- Chips -------------------- -->
-                        <div>
-                          <div class="row" align="left">
-                            <p class="col q-pa-sm header">
-                              Add Chips:
-                            </p>
-
-                            <q-select
-                              dense outlined options-dense
-                              class="col-3" label="Chip Type"
-                              style="overflow: auto;"
-                              v-model="chipType"
-                              :options="configData.chipContentType"
-                            />
-
-                            <div class="col-1 q-mt-sm" align="center" >
-                              <q-btn
-                                :disable="chipType === ''"
-                                dense round
-                                color="accent" icon="add"
-                                @click="addChip(); addedChip = true"
-                              />
-                            </div>
-                          </div>
-
+                          <!-- ---------- Custom Type TEXT_BOX ----------- -->
                           <div
-                            v-for="(chipContent, chipInd) in curData.webpage.chips"
-                            :key="chipInd"
-                            class="row q-mt-sm q-mb-sm"
+                            v-if="bodyContent.content.type === 'TEXT_BOX'"
+                            class="col q-mb-xs q-pa-sm"
                           >
-                            <!-- ----------- Chip Type SOURCE -------------- -->
-                            <div
-                              v-if="chipContent.content.type === 'SOURCE'"
-                              class="col q-mb-xs q-pa-sm"
-                            >
-                              <q-card class="q-pa-md">
-                                <div class="row" align="left">
-                                  <strong>Source Chip</strong>
-                                  <hr class="col q-ml-sm">
-                                </div>
+                            <q-card class="q-pa-md">
+                              <div class="row" align="left">
+                                <strong>Text Box</strong>
+                                <hr class="col q-ml-sm">
+                              </div>
 
-                                <q-input
-                                  filled
-                                  class="q-mt-sm" label="Source"
-                                  placeholder="Link to source code goes here."
-                                  v-model="chipContent.content.url"
-                                  :autofocus="addedChip"
-                                  :rules="[val => !!val || 'Field is required']"
-                                  @focus="addedChip = false"
-                                />
-                              </q-card>
-                            </div>
-
-                            <!-- ------------- Chip Type VIDEO ------------- -->
-                            <div
-                              v-if="chipContent.content.type === 'VIDEO'"
-                              class="col q-mb-xs q-pa-sm"
-                            >
-                              <q-card class="q-pa-md">
-                                <div class="row" align="left">
-                                  <strong>Video Chip</strong>
-                                  <hr class="col q-ml-sm">
-                                </div>
-
-                                <q-input
-                                  filled
-                                  class="q-mt-sm" label="Video"
-                                  placeholder="Link to video goes here. (Currently only supports one.)"
-                                  v-model="chipContent.content.url"
-                                  :autofocus="addedChip"
-                                  :rules="[val => !!val || 'Field is required']"
-                                  @focus="addedChip = false"
-                                />
-                              </q-card>
-                            </div>
-
-                            <!-- ------------ Chip Type CUSTOM ------------- -->
-                            <div
-                              v-if="chipContent.content.type === 'CUSTOM'"
-                              class="col q-mb-xs q-pa-sm"
-                            >
-                              <q-card class="q-pa-md">
-                                <div class="row" align="left">
-                                  <strong>Custom Chip</strong>
-                                  <hr class="col q-ml-sm">
-                                </div>
-
-                                <q-input
-                                  filled dense
-                                  class="q-mt-sm" label="Custom Chip Label"
-                                  placeholder="Please enter the label for the custom chip."
-                                  v-model="chipContent.content.label"
-                                  :rules="[val => !!val || 'Field is required']"
-                                  :autofocus="addedChip"
-                                  @focus="addedChip = false"
-                                />
-
-                                <q-input
-                                  filled dense
-                                  class="q-mt-sm" label="Custom Chip URL"
-                                  placeholder="Link to video goes here. (Currently only supports one.)"
-                                  v-model="chipContent.content.url"
-                                  :rules="[val => !!val || 'Field is required']"
-                                  @focus="addedChip = false"
-                                />
-
-                                <div class="row q-pa-sm" align="left">
-                                  <div class="col">
-                                    <q-list bordered separator>
-                                      <q-item
-                                        v-for="
-                                          (val, ind) in configData.customChips
-                                        "
-                                        :key="ind"
-                                        clickable v-ripple
-                                        :active="
-                                          chipContent.content.icon === val.value
-                                        "
-                                        @click="
-                                          chipContent.content.icon = val.value
-                                        "
-                                        active-class="text-white bg-secondary"
-                                      >
-                                        <q-item-section avatar>
-                                          <q-icon :name="val.value" />
-                                        </q-item-section>
-
-                                        <q-item-section align="center">
-                                        </q-item-section>
-
-                                        <q-item-section side>
-                                          {{ val.label }}
-                                        </q-item-section>
-                                      </q-item>
-                                    </q-list>
-                                  </div>
-
-                                  <div
-                                    class="col" align="center"
-                                    style="
-                                      display: flex;
-                                      justify-content: center;
-                                      align-items: center;
-                                    "
-                                  >
-                                    <q-chip
-                                      color="secondary" text-color="white"
-                                      :icon="chipContent.content.icon"
-                                    >
-                                      {{ chipContent.content.label || 'Sample goes here' }}
-                                    </q-chip>
-                                  </div>
-                                </div>
-                              </q-card>
-                            </div>
-
-                            <!-- ----------- Chip Index & Delete ----------- -->
-                            <div
-                              class="col-1" align="center"
-                              style="margin: .7vh auto;"
-                            >
-                              <q-checkbox
-                                dense
-                                class="q-pa-sm q-mb-sm" label="Hide"
-                                v-model="curData.webpage.chips[chipInd].hidden"
+                              <q-input
+                                filled
+                                class="q-mt-sm" label="Label"
+                                placeholder="Title"
+                                v-model="bodyContent.content.label"
+                                :autofocus="addedContent"
+                                :rules="[val => !!val || 'Field is required']"
+                                @focus="addedContent = false"
                               />
 
                               <q-input
-                                dense filled
-                                class="q-pa-xs q-mb-sm"
-                                label="Index" type="number"
-                                v-model="curData.webpage.chips[chipInd].index"
-                                @blur="curData.webpage.chips[chipInd].index = curData.webpage.chips[chipInd].index < 1 ?  1 : parseInt(curData.webpage.chips[chipInd].index)"
+                                filled autogrow
+                                class="q-mt-sm" label="Body/Text Description"
+                                placeholder="Please enter the body for the respective label."
+                                v-model="bodyContent.content.text"
+                                :rules="[val => !!val || 'Field is required']"
                               />
-
-                              <q-btn
-                                dense round
-                                class="bottom" color="accent" icon="delete"
-                                @click="
-                                  curData.webpage.chips.splice(chipInd, 1)
-                                "
-                              />
-                            </div>
-                          </div>
-                        </div>
-
-                        <hr>
-
-                        <!-- ---------------- Custom Field ----------------- -->
-                        <div>
-                          <div class="row" align="left">
-                            <p class="col q-pa-sm header">
-                              Add Content:
-                            </p>
-
-                            <q-select
-                              dense outlined options-dense
-                              class="col-3" label="Content Type"
-                              style="overflow: auto;"
-                              v-model="bodyType"
-                              :options="configData.bodyContentType"
-                            />
-
-                            <div class="col-1 q-mt-sm" align="center" >
-                              <q-btn
-                                :disable="bodyType === ''"
-                                dense round
-                                color="accent" icon="add"
-                                @click="addCustomField(); addedContent = true"
-                              />
-                            </div>
+                            </q-card>
                           </div>
 
+                          <!-- ---------- Custom Type MARKDOWN ----------- -->
                           <div
-                            v-for="(bodyContent, ind) in curData.webpage.body"
-                            :key="ind"
-                            class="row q-mt-sm q-mb-sm"
+                            v-else-if="
+                              bodyContent.content.type === 'MARKDOWN'
+                            "
+                            class="col q-mb-xs q-pa-sm"
                           >
+                            <q-card class="q-pa-md">
+                              <q-tabs
+                                dense
+                                class="text-grey" align="left"
+                                active-color="secondary"
+                                indicator-color="primary"
+                                v-model="bodyContent.content.view"
+                              >
+                                <q-tab name="edit" label="Edit" />
 
-                            <!-- ---------- Custom Type TEXT_BOX ----------- -->
-                            <div
-                              v-if="bodyContent.content.type === 'TEXT_BOX'"
-                              class="col q-mb-xs q-pa-sm"
-                            >
-                              <q-card class="q-pa-md">
-                                <div class="row" align="left">
-                                  <strong>Text Box</strong>
-                                  <hr class="col q-ml-sm">
-                                </div>
+                                <q-separator vertical />
 
-                                <q-input
-                                  filled
-                                  class="q-mt-sm" label="Label"
-                                  placeholder="Title"
-                                  v-model="bodyContent.content.label"
-                                  :autofocus="addedContent"
-                                  :rules="[val => !!val || 'Field is required']"
-                                  @focus="addedContent = false"
-                                />
+                                <q-tab name="preview" label="Preview" />
 
-                                <q-input
-                                  filled autogrow
-                                  class="q-mt-sm" label="Body/Text Description"
-                                  placeholder="Please enter the body for the respective label."
-                                  v-model="bodyContent.content.text"
-                                  :rules="[val => !!val || 'Field is required']"
-                                />
-                              </q-card>
-                            </div>
+                                <q-space />
 
-                            <!-- ---------- Custom Type MARKDOWN ----------- -->
-                            <div
-                              v-else-if="
-                                bodyContent.content.type === 'MARKDOWN'
-                              "
-                              class="col q-mb-xs q-pa-sm"
-                            >
-                              <q-card class="q-pa-md">
-                                <q-tabs
-                                  dense
-                                  class="text-grey" align="left"
-                                  active-color="secondary"
-                                  indicator-color="primary"
-                                  v-model="bodyContent.content.view"
+                                <q-btn-dropdown
+                                  v-if="
+                                    curData.files &&
+                                    Object.entries(curData.files).length
+                                  "
+                                  stretch flat
+                                  label="Attachments"
                                 >
-                                  <q-tab name="edit" label="Edit" />
+                                  <q-list>
+                                    <q-item
+                                      v-for="(val, key, ind) in curData.files"
+                                      :key="ind"
+                                      dense
+                                    >
+                                      <q-item-section>
+                                        {{ key }}
+                                      </q-item-section>
 
-                                  <q-separator vertical />
+                                      <q-item-section side avatar>
+                                        <q-btn
+                                          round flat dense
+                                          icon="far fa-clipboard"
+                                          @click="
+                                            fetchAttachmentURL(
+                                              val, 'projects'
+                                            )
+                                          "
+                                        />
+                                      </q-item-section>
+                                    </q-item>
+                                  </q-list>
+                                </q-btn-dropdown>
+                              </q-tabs>
 
-                                  <q-tab name="preview" label="Preview" />
+                              <q-separator />
 
-                                  <q-space />
+                              <q-tab-panels
+                                animated
+                                v-model="bodyContent.content.view"
+                              >
+                                <q-tab-panel name="edit">
+                                  <div class="row" align="left">
+                                    <strong>Markdown/HTML</strong>
+                                    <hr class="col q-ml-sm">
+                                  </div>
 
-                                  <q-btn-dropdown
-                                    v-if="
-                                      curData.files &&
-                                      Object.entries(curData.files).length
+                                  <q-input
+                                    filled
+                                    class="q-mt-sm" label="Label"
+                                    placeholder="Title"
+                                    v-model="bodyContent.content.label"
+                                    :autofocus="addedContent"
+                                    @focus="
+                                      addedContent = false; updated  = true
                                     "
-                                    stretch flat
-                                    label="Attachments"
+                                  /><br />
+                                    <!-- :rules="
+                                      [val => !!val || 'Field is required']
+                                    " -->
+
+                                  <q-input
+                                    filled autogrow
+                                    class="q-mt-sm"
+                                    label="Body/Text Description"
+                                    placeholder="Please enter the body for the respective label."
+                                    v-model="bodyContent.content.text"
+                                    :rules="
+                                      [val => !!val || 'Field is required']
+                                    "
+                                    @focus="updated = true"
+                                  />
+                                </q-tab-panel>
+
+                                <q-tab-panel name="preview">
+                                  <div
+                                    v-if="bodyContent.content.label"
+                                    class="text-h5 q-mt-sm"
                                   >
-                                    <q-list>
-                                      <q-item
-                                        v-for="(val, key, ind) in curData.files"
-                                        :key="ind"
-                                        dense
-                                      >
-                                        <q-item-section>
-                                          {{ key }}
-                                        </q-item-section>
+                                    {{ bodyContent.content.label }}
+                                    <q-separator color="secondary" />
+                                  </div>
 
-                                        <q-item-section side avatar>
-                                          <q-btn
-                                            round flat dense
-                                            icon="far fa-clipboard"
-                                            @click="
-                                              fetchAttachmentURL(
-                                                val, 'projects'
-                                              )
-                                            "
-                                          />
-                                        </q-item-section>
-                                      </q-item>
-                                    </q-list>
-                                  </q-btn-dropdown>
-                                </q-tabs>
+                                  <p
+                                    v-if="!bodyContent.content.text"
+                                    class="q-mt-sm"
+                                  >
+                                    BODY TEXT IS REQUIED!
+                                  </p>
 
-                                <q-separator />
+                                  <MarkdownTranslator
+                                    v-else
+                                    :storage="storage"
+                                    :data="bodyContent.content.text"
+                                  />
+                                </q-tab-panel>
+                              </q-tab-panels>
+                            </q-card>
+                          </div>
 
-                                <q-tab-panels
-                                  animated
-                                  v-model="bodyContent.content.view"
+                          <!-- -------- Custom Type URL_LIST --------- -->
+                          <div
+                            v-else-if="
+                              bodyContent.content.type === 'ORDERED_LIST' ||
+                              bodyContent.content.type === 'UNORDERED_LIST'
+                            "
+                            class="col q-mb-xs q-pa-sm"
+                          >
+                            <q-card class="q-pa-md">
+                              <div class="row" align="left">
+                                <strong>URL List</strong>
+                                <hr class="col q-ml-sm">
+                              </div>
+
+                              <q-input
+                                filled
+                                class="q-mt-sm"
+                                label="Label" placeholder="Title"
+                                v-model="bodyContent.content.label"
+                                :autofocus="addedContent"
+                                :rules="[val => !!val || 'Field is required']"
+                                @focus="addedContent = false; updated = true"
+                              />
+
+                              <div class="row inline full-width q-pa-md">
+                                <strong>List</strong>
+                                <hr class="col q-ml-sm q-mr-sm">
+                                <div>
+                                  <q-btn
+                                    dense round
+                                    color="accent" icon="add"
+                                    @click="bodyContent.content.list.push({index: bodyContent.content.list.length + 1}); updated = true"
+                                  />
+                                </div>
+                              </div>
+
+                              <ul>
+                                <li
+                                  v-for="(link, olIndex) in bodyContent.content.list"
+                                  :key="olIndex"
+                                  align="left"
                                 >
-                                  <q-tab-panel name="edit">
-                                    <div class="row" align="left">
-                                      <strong>Markdown/HTML</strong>
-                                      <hr class="col q-ml-sm">
-                                    </div>
-
+                                  <div class="row inline full-width q-gutter-xs q-mb-sm">
                                     <q-input
-                                      filled
-                                      class="q-mt-sm" label="Label"
-                                      placeholder="Title"
-                                      v-model="bodyContent.content.label"
-                                      :autofocus="addedContent"
-                                      @focus="
-                                        addedContent = false; updated  = true
-                                      "
-                                    /><br />
-                                      <!-- :rules="
-                                        [val => !!val || 'Field is required']
-                                      " -->
-
-                                    <q-input
-                                      filled autogrow
-                                      class="q-mt-sm"
-                                      label="Body/Text Description"
-                                      placeholder="Please enter the body for the respective label."
-                                      v-model="bodyContent.content.text"
-                                      :rules="
-                                        [val => !!val || 'Field is required']
-                                      "
+                                      dense filled
+                                      class="col-1" type="number"
+                                      label="Index"
+                                      v-model="link.index"
+                                      :rules="[val => !!val]"
+                                      @blur="link.index = link.index > 0 ? parseInt(link.index) : 1"
                                       @focus="updated = true"
                                     />
-                                  </q-tab-panel>
 
-                                  <q-tab-panel name="preview">
-                                    <div
-                                      v-if="bodyContent.content.label"
-                                      class="text-h5 q-mt-sm"
-                                    >
-                                      {{ bodyContent.content.label }}
-                                      <q-separator color="secondary" />
+                                    <q-input
+                                      dense filled
+                                      class="col" label="URL Name"
+                                      placeholder="Please enter the alias for the URL."
+                                      v-model="link.item"
+                                      :rules="[val => !!val || 'Field is required']"
+                                      @focus="updated = true"
+                                    />
+
+                                    <q-input
+                                      dense filled
+                                      class="col" label="URL"
+                                      placeholder="https://www.google.com"
+                                      v-model="link.url"
+                                      :rules="[val => true]"
+                                      @focus="updated = true"
+                                    />
+
+                                    <div>
+                                      <q-btn
+                                        :disable="bodyContent.content.list.length === 1"
+                                        dense flat round
+                                        icon="delete"
+                                        @click="bodyContent.content.list.splice(olIndex, 1); updated = true"
+                                      />
                                     </div>
-
-                                    <p
-                                      v-if="!bodyContent.content.text"
-                                      class="q-mt-sm"
-                                    >
-                                      BODY TEXT IS REQUIED!
-                                    </p>
-
-                                    <MarkdownTranslator
-                                      v-else
-                                      :storage="storage"
-                                      :data="bodyContent.content.text"
-                                    />
-                                  </q-tab-panel>
-                                </q-tab-panels>
-                              </q-card>
-                            </div>
-
-                            <!-- -------- Custom Type URL_LIST --------- -->
-                            <div
-                              v-else-if="
-                                bodyContent.content.type === 'ORDERED_LIST' ||
-                                bodyContent.content.type === 'UNORDERED_LIST'
-                              "
-                              class="col q-mb-xs q-pa-sm"
-                            >
-                              <q-card class="q-pa-md">
-                                <div class="row" align="left">
-                                  <strong>URL List</strong>
-                                  <hr class="col q-ml-sm">
-                                </div>
-
-                                <q-input
-                                  filled
-                                  class="q-mt-sm"
-                                  label="Label" placeholder="Title"
-                                  v-model="bodyContent.content.label"
-                                  :autofocus="addedContent"
-                                  :rules="[val => !!val || 'Field is required']"
-                                  @focus="addedContent = false; updated = true"
-                                />
-
-                                <div class="row inline full-width q-pa-md">
-                                  <strong>List</strong>
-                                  <hr class="col q-ml-sm q-mr-sm">
-                                  <div>
-                                    <q-btn
-                                      dense round
-                                      color="accent" icon="add"
-                                      @click="bodyContent.content.list.push({index: bodyContent.content.list.length + 1}); updated = true"
-                                    />
                                   </div>
-                                </div>
+                                </li>
+                              </ul>
+                            </q-card>
+                          </div>
 
-                                <ul>
-                                  <li
-                                    v-for="(link, olIndex) in bodyContent.content.list"
-                                    :key="olIndex"
-                                    align="left"
-                                  >
-                                    <div class="row inline full-width q-gutter-xs q-mb-sm">
+                          <!-- -------- Custom Type EVENT_LIST ---------- -->
+                          <div
+                            v-else
+                            class="col q-mb-xs q-pa-sm"
+                          >
+                            <q-card class="q-pa-md">
+                              <div class="row" align="left">
+                                <strong>Event List</strong>
+                                <hr class="col q-ml-sm">
+                              </div>
+
+                              <q-input
+                                filled
+                                class="q-mt-sm" label="Label"
+                                placeholder="Title"
+                                v-model="bodyContent.content.label"
+                                :autofocus="addedContent"
+                                :rules="[val => !!val || 'Field is required']"
+                                @focus="addedContent = false"
+                              />
+
+                              <div class="row inline full-width q-pa-md">
+                                <strong>List</strong>
+                                <hr class="col q-ml-sm q-mr-sm">
+                                <div>
+                                  <q-btn
+                                    dense round
+                                    color="accent" icon="add"
+                                    @click="bodyContent.content.list.push({})"
+                                  />
+                                </div>
+                              </div>
+
+                              <ul>
+                                <li
+                                  v-for="(link, evIndex) in bodyContent.content.list"
+                                  :key="evIndex"
+                                  align="left"
+                                >
+                                  <div class="row inline full-width">
+                                    <div class="row inline full-width q-gutter-xs">
                                       <q-input
                                         dense filled
-                                        class="col-1" type="number"
-                                        label="Index"
-                                        v-model="link.index"
-                                        :rules="[val => !!val]"
-                                        @blur="link.index = link.index > 0 ? parseInt(link.index) : 1"
-                                        @focus="updated = true"
+                                        class="col" label="Subject"
+                                        placeholder="Please enter the subject matter here."
+                                        v-model="link.subject"
+                                        :rules="[val => !!val || 'Field is required']"
                                       />
 
                                       <q-input
                                         dense filled
-                                        class="col" label="URL Name"
-                                        placeholder="Please enter the alias for the URL."
-                                        v-model="link.item"
+                                        class="col" label="Date and Time"
+                                        placeholder="2019:06:02.00:00"
+                                        v-model="link.date"
                                         :rules="[val => !!val || 'Field is required']"
-                                        @focus="updated = true"
+                                      />
+
+                                      <q-btn
+                                        disable dense flat round
+                                        @click="bodyContent.content.list.splice(evIndex, 1)"
+                                      />
+                                    </div>
+                                    <div class="row inline full-width q-gutter-xs">
+                                      <q-input
+                                        dense filled
+                                        class="col" label="Body"
+                                        placeholder="Please enter the details regarding the subject matter."
+                                        v-model="link.body"
+                                        :rules="[val => !!val || 'Field is required']"
                                       />
 
                                       <q-input
@@ -1045,151 +1135,56 @@ Methods:
                                         class="col" label="URL"
                                         placeholder="https://www.google.com"
                                         v-model="link.url"
-                                        :rules="[val => true]"
-                                        @focus="updated = true"
+                                        :rules="[val => !!val || 'Field is required']"
                                       />
 
-                                      <div>
-                                        <q-btn
-                                          :disable="bodyContent.content.list.length === 1"
-                                          dense flat round
-                                          icon="delete"
-                                          @click="bodyContent.content.list.splice(olIndex, 1); updated = true"
-                                        />
-                                      </div>
+                                      <q-btn
+                                        :disable="bodyContent.content.list.length === 1"
+                                        dense flat round
+                                        icon="delete"
+                                        @click="bodyContent.content.list.splice(evIndex, 1)"
+                                      />
                                     </div>
-                                  </li>
-                                </ul>
-                              </q-card>
-                            </div>
-
-                            <!-- -------- Custom Type EVENT_LIST ---------- -->
-                            <div
-                              v-else
-                              class="col q-mb-xs q-pa-sm"
-                            >
-                              <q-card class="q-pa-md">
-                                <div class="row" align="left">
-                                  <strong>Event List</strong>
-                                  <hr class="col q-ml-sm">
-                                </div>
-
-                                <q-input
-                                  filled
-                                  class="q-mt-sm" label="Label"
-                                  placeholder="Title"
-                                  v-model="bodyContent.content.label"
-                                  :autofocus="addedContent"
-                                  :rules="[val => !!val || 'Field is required']"
-                                  @focus="addedContent = false"
-                                />
-
-                                <div class="row inline full-width q-pa-md">
-                                  <strong>List</strong>
-                                  <hr class="col q-ml-sm q-mr-sm">
-                                  <div>
-                                    <q-btn
-                                      dense round
-                                      color="accent" icon="add"
-                                      @click="bodyContent.content.list.push({})"
-                                    />
                                   </div>
-                                </div>
+                                </li>
+                              </ul>
 
-                                <ul>
-                                  <li
-                                    v-for="(link, evIndex) in bodyContent.content.list"
-                                    :key="evIndex"
-                                    align="left"
-                                  >
-                                    <div class="row inline full-width">
-                                      <div class="row inline full-width q-gutter-xs">
-                                        <q-input
-                                          dense filled
-                                          class="col" label="Subject"
-                                          placeholder="Please enter the subject matter here."
-                                          v-model="link.subject"
-                                          :rules="[val => !!val || 'Field is required']"
-                                        />
+                            </q-card>
+                          </div>
 
-                                        <q-input
-                                          dense filled
-                                          class="col" label="Date and Time"
-                                          placeholder="2019:06:02.00:00"
-                                          v-model="link.date"
-                                          :rules="[val => !!val || 'Field is required']"
-                                        />
+                          <!-- ------- Custom Field Index & Delete ------- -->
+                          <div
+                            class="col-1" align="center"
+                            style="margin: auto;"
+                          >
+                            <q-checkbox
+                              dense
+                              class="q-pa-sm q-mb-sm" label='Hide'
+                              v-model="curData.webpage.body[ind].hidden"
+                              @input="updated = true"
+                            />
 
-                                        <q-btn
-                                          disable dense flat round
-                                          @click="bodyContent.content.list.splice(evIndex, 1)"
-                                        />
-                                      </div>
-                                      <div class="row inline full-width q-gutter-xs">
-                                        <q-input
-                                          dense filled
-                                          class="col" label="Body"
-                                          placeholder="Please enter the details regarding the subject matter."
-                                          v-model="link.body"
-                                          :rules="[val => !!val || 'Field is required']"
-                                        />
+                            <q-input
+                              dense filled
+                              class="q-pa-xs q-mb-md"
+                              label="Index" type="number"
+                              v-model="curData.webpage.body[ind].index"
+                              @blur="curData.webpage.body[ind].index = curData.webpage.body[ind].index < 1 ?  1 : parseInt(curData.webpage.body[ind].index)"
+                              @focus="updated = true"
+                            />
 
-                                        <q-input
-                                          dense filled
-                                          class="col" label="URL"
-                                          placeholder="https://www.google.com"
-                                          v-model="link.url"
-                                          :rules="[val => !!val || 'Field is required']"
-                                        />
-
-                                        <q-btn
-                                          :disable="bodyContent.content.list.length === 1"
-                                          dense flat round
-                                          icon="delete"
-                                          @click="bodyContent.content.list.splice(evIndex, 1)"
-                                        />
-                                      </div>
-                                    </div>
-                                  </li>
-                                </ul>
-
-                              </q-card>
-                            </div>
-
-                            <!-- ------- Custom Field Index & Delete ------- -->
-                            <div
-                              class="col-1" align="center"
-                              style="margin: auto;"
-                            >
-                              <q-checkbox
-                                dense
-                                class="q-pa-sm q-mb-sm" label='Hide'
-                                v-model="curData.webpage.body[ind].hidden"
-                                @input="updated = true"
-                              />
-
-                              <q-input
-                                dense filled
-                                class="q-pa-xs q-mb-md"
-                                label="Index" type="number"
-                                v-model="curData.webpage.body[ind].index"
-                                @blur="curData.webpage.body[ind].index = curData.webpage.body[ind].index < 1 ?  1 : parseInt(curData.webpage.body[ind].index)"
-                                @focus="updated = true"
-                              />
-
-                              <q-btn
-                                dense round
-                                class="bottom" color="accent" icon="delete"
-                                @click="curData.webpage.body.splice(ind, 1); updated = true"
-                              />
-                            </div>
+                            <q-btn
+                              dense round
+                              class="bottom" color="accent" icon="delete"
+                              @click="curData.webpage.body.splice(ind, 1); updated = true"
+                            />
                           </div>
                         </div>
                       </div>
-
-                      <br><br>
-
                     </div>
+
+                    <br><br>
+
                   </div>
 
                   <!-- ------------------- Popup Dialog -------------------- -->
@@ -1492,15 +1487,7 @@ Methods:
 
               <!-- -------------------- Attachments -------------------- -->
               <q-tab-panel name="attachments">
-                <div
-                  class="shadow-2 q-pa-md"
-                  style="
-                    margin: auto;
-                    max-width: 1000px;
-                    min-width: 800px;
-                    border-radius: 3px;
-                  "
-                >
+                <div class="tab-content shadow-2 q-pa-md">
                   <div
                     v-if="childMode === 'preview'"
                     class="text-h5 q-mb-md"
@@ -1560,8 +1547,9 @@ Methods:
 
               <!-- -------------------- Form Response -------------------- -->
               <q-tab-panel name="formResponse">
-                <div>
+                <div class="tab-content shadow-2 q-pa-md row justify-center">
                   <project-review-form
+                    id="project-review-form"
                     :projectName="curData.project"
                     :projectDescription="curData.description"
                     :projectMembers="curData.members"
@@ -2010,15 +1998,14 @@ export default {
   },
 
   methods: {
+    /**
+     * Prompt a confirmation dialog on delete.
+     * @param {String} key: alias of the file.
+     * @param {String} pathToFile: path of file inside storage.
+     * @param {String} type: name of the collection
+     * @return {Promise<Boolean>}
+     */
     deleteAttachment: async function (key, pathToFile, type) {
-      /**
-       * prompt a confirmation dialog on delete
-       * @param {String} key: alias of the file
-       * @param {String} pathToFile: path of file inside storage
-       * @param {String} type: name of the collection
-       * @return {Promise<Boolean>}
-       */
-
       this.$q.dialog({
         title: 'Confirmation to Delete',
         message: `Delete ${key}?`,
@@ -2050,16 +2037,15 @@ export default {
           return false
         })
     },
+    /**
+     * fetches the download url then download the file for the client
+     * params:
+     * @param {String} alias: shown filename on the web
+     * @param {String} pathToFile: file path on the cloud storage
+     * @param {String} type: type of the collection inside storage
+     * @return {Promise<Boolean>}
+     */
     downloadAttachment: async function (alias, pathToFile, type) {
-      /**
-       * fetches the download url then download the file for the client
-       * params:
-       * @param {String} alias: shown filename on the web
-       * @param {String} pathToFile: file path on the cloud storage
-       * @param {String} type: type of the collection inside storage
-       * @return {Promise<Boolean>}
-       */
-
       try {
         let url = await this.storage.ref().child(
           `${type}/${pathToFile}`
@@ -2101,14 +2087,13 @@ export default {
         return false
       }
     },
+    /**
+     * fetches the attachment url and open the url on a new tab
+     * @param {String} pathToFile: path to file
+     * @param {String} type: collection type
+     * @return {Promise<Boolean>}
+     */
     fetchAttachmentURLAndOpen: async function (pathToFile, type) {
-      /**
-       * fetches the attachment url and open the url on a new tab
-       * @param {String} pathToFile: path to file
-       * @param {String} type: collection type
-       * @return {Promise<Boolean>}
-       */
-
       try {
         let url = await this.storage.ref().child(
           `${type}/${pathToFile}`
@@ -2136,13 +2121,11 @@ export default {
         return false
       }
     },
+    /**
+     * helper function to update users in add user dialog
+     * @param {Object} newUser: user record to be added to the project
+     */
     updateUsers: function (newUser) {
-      /**
-       * helper function to update users in add user dialog
-       * @param {Object} newUser: user record to be added to the project
-       * @return {void}
-       */
-
       this.userEmailToObjMap[newUser.email] = newUser
       newUser.role = 'member'
       this.addMemberDialog.use.push(newUser)
@@ -2151,15 +2134,11 @@ export default {
       this.updated = true
       this.curData.project = editedName
     },
+    /**
+     * helper function to add members to the project
+     */
     submitAddMembers: function () {
-      /**
-       * helper function to add members to the project
-       * @param {void}
-       * @return: <void>
-       */
-
       let members = []
-
       this.addMemberDialog.use.forEach(member => {
         members.push(member.value || member)
       })
@@ -2167,15 +2146,13 @@ export default {
       this.curData.members = members
       this.updated = true
     },
+    /**
+     * modified version of source code from quasr.dev
+     * helper function for filtering q-select
+     * @param {String} val: value to filter for
+     * @param {Function} update: callback function to be modified
+     */
     filterFn: function (val, update) {
-      /**
-       * modified version of source code from quasr.dev
-       * helper function for filtering q-select
-       * @param {String} val: value to filter for
-       * @param {Function} update: callback function to be modified
-       * @return {void}
-       */
-
       update(() => {
         if (val === '') {
           this.addMemberDialog.filter = this.addMemberDialog.options
@@ -2188,14 +2165,12 @@ export default {
         }
       })
     },
+    /**
+     * https://stackoverflow.com/questions/400212/how-do-i-copy-to-the-clipboard-in-javascript
+     * fallback url copy to clipboard if not hosted on https
+     * @param {String} entry: url to be copied back to clipboard
+     */
     fallbackCopyTextToClipboard: function (entry) {
-      /**
-       * https://stackoverflow.com/questions/400212/how-do-i-copy-to-the-clipboard-in-javascript
-       * fallback url copy to clipboard if not hosted on https
-       * @param {String} entry: url to be copied back to clipboard
-       * @return {void}
-       */
-
       let textArea = document.createElement('textarea')
       textArea.value = entry
       document.body.prepend(textArea)
@@ -2209,28 +2184,24 @@ export default {
 
       document.body.removeChild(textArea)
     },
+    /**
+     * https://stackoverflow.com/questions/400212/how-do-i-copy-to-the-clipboard-in-javascript
+     * logic handler to call either fallback or built-in
+     * @param {String} entry: current url
+     */
     copyTextToClipboard: function (entry) {
-      /**
-       * https://stackoverflow.com/questions/400212/how-do-i-copy-to-the-clipboard-in-javascript
-       * logic handler to call either fallback or built-in
-       * @param {String} entry: current url
-       * @return {void}
-       */
-
       if (!navigator.clipboard) {
         this.fallbackCopyTextToClipboard(entry)
       } else {
         navigator.clipboard.writeText(entry)
       }
     },
+    /**
+     * fetches the attachment url and copy the url to nav.clipboard
+     * @param  {String} pathToFile: path to file
+     * @param {String} type: collection type
+     */
     fetchAttachmentURL: function (pathToFile, type) {
-      /**
-       * fetches the attachment url and copy the url to nav.clipboard
-       * @param  {String} pathToFile: path to file
-       * @param {String} type: collection type
-       * @return {void}
-       */
-
       let url = `local://${type}/${pathToFile}`
 
       this.copyTextToClipboard(url)
@@ -2249,13 +2220,10 @@ export default {
         ]
       })
     },
+    /**
+     * loading the progress bar configuration from the session storage
+     */
     loadProgressBarConf: function () {
-      /**
-       * loading the progress bar configuration from the session storage
-       * @param {void}
-       * @return {void}
-       */
-
       if (this.$q.sessionStorage.has('boundless_config')) {
         let cachedConfig = this.$q.sessionStorage.getItem('boundless_config')
 
@@ -2264,13 +2232,11 @@ export default {
         }
       }
     },
+    /**
+     * helper funciton to handle file attachment and its alias
+     * @param {Object} data: record containing files
+     */
     updateAttachments: function (data) {
-      /**
-       * helper funciton to handle file attachment and its alias
-       * @param {Object} data: record containing files
-       * @return {void}
-       */
-
       let aliasName = ''
 
       for (let file in data) {
@@ -2286,22 +2252,16 @@ export default {
       this.fileAttachmentDialog.visible = false
       this.$forceUpdate()
     },
+    /**
+     * helper function leave attachments dialog
+     */
     leaveAttachments: function () {
-      /**
-       * helper function leave attachments dialog
-       * @param {void}
-       * @return {void}
-       */
-
       this.fileAttachmentDialog.visible = false
     },
+    /**
+     * helper function to close attachment dialog
+     */
     updateAtHide: function (entry) {
-      /**
-       * helper function to close attachment dialog
-       * @param {void}
-       * @return {void}
-       */
-
       if (entry) {
         if (entry[0] === 'index') {
           this.curData.logs[entry[1]].index = parseInt(entry[2])
@@ -2312,22 +2272,17 @@ export default {
 
       this.$forceUpdate()
     },
+    /**
+     * helper function to click on the hidden file picker
+     */
     invokeFilePicker: function () {
-      /**
-       * helper function to click on the hidden file picker
-       * @param {void}
-       * @return {void}
-       */
-
       this.$refs.imageInput.click()
     },
+    /**
+     * changes file references on file change
+     * @param {Event} e: event handler of the event
+     */
     filePickerOnChange: function (e) {
-      /**
-       * changes file references on file change
-       * @param {Event} e: event handler of the event
-       * @return {void}
-       */
-
       const file = e.target.files[0]
 
       if (file) {
@@ -2340,14 +2295,12 @@ export default {
         // this.updated = false // removed for persistance
       }
     },
+    /**
+     * submit handler of the component; put images and files into storage;
+     * update project's data to ToC as well as webpage; emit 'added' event
+     * @return {Promise<Boolean>}
+     */
     onSubmit: function () {
-      /**
-       * submit handler of the component; put images and files into storage;
-       * update project's data to ToC as well as webpage; emit 'added' event
-       * @param {void}
-       * @return {Promise<Boolean>}
-       */
-
       // edit, preview, and submit handler
       if (this.submitMode === 'view') {
         this.childMode = (this.childMode === 'preview') ? 'edit' : 'preview'
@@ -2362,13 +2315,11 @@ export default {
         return this.submitToDatabase()
       }
     },
+    /**
+     * submit handler for data submit to database
+     * @return {Promise<Boolean>}
+     */
     submitToDatabase: async function () {
-      /**
-       * submit handler for data submit to database
-       * @param {void}
-       * @return {Promise<Boolean>}
-       */
-
       if (this.curData.keywords.length > 1) {
         let tbdIndex = this.curData.keywords.indexOf('tbd')
 
@@ -2441,15 +2392,13 @@ export default {
         return false
       }
     },
+    /**
+     * load firebase database reference
+     * load firebase storage reference (if applicable)
+     * load firebase cloud functions reference (if applicable)
+     * @return {Promise<Boolean>}
+     */
     loadFireRefs: async function () {
-      /**
-       * load firebase database reference
-       * load firebase storage reference (if applicable)
-       * load firebase cloud functions reference (if applicable)
-       * @param {void}
-       * @return {Promise<Boolean>}
-       */
-
       if (this.$q.localStorage.has('boundless_db')) {
         let sessionDb = this.$q.localStorage.getItem('boundless_db')
 
@@ -2489,14 +2438,12 @@ export default {
         }
       }
     },
+    /**
+     * TODO: load from cache
+     * load config for the component
+     * @return {Promise<Boolean>}
+     */
     loadConfig: async function () {
-      /**
-       * TODO: load from cache
-       * load config for the component
-       * @param {void}
-       * @return {Promise<Boolean>}
-       */
-
       try {
         let doc = await this.db.collection('config').doc('project').get()
 
@@ -2558,13 +2505,11 @@ export default {
         return false
       }
     },
+    /**
+     * load required information from the database
+     * @return {Promise<Boolean>}
+     */
     loadInformation: async function () {
-      /**
-       * load required information from the database
-       * @param {void}
-       * @return {Promise<Boolean>}
-       */
-
       this.loading = true
 
       let promises = []
@@ -2663,35 +2608,27 @@ export default {
         return false
       }
     },
+    /**
+     * helper function to popup advanced settings dialog
+     */
     popupAdvancedSettingsDialog: function () {
-      /**
-       * helper function to popup advanced settings dialog
-       * @param {void}
-       * @return {void}
-       */
-
       this.advancedDialog = true
       this.oldAdvancedSettings.hidden = this.curData.hidden
     },
+    /**
+     * helper function for advanced setting canceler
+     */
     advancedSettingsCancel: function () {
-      /**
-       * helper function for advanced setting canceler
-       * @param {void}
-       * @return {void}
-       */
-
       this.aliasKeys = Object.keys(this.aliasMap)
       this.aliasVals = Object.values(this.aliasMap)
       this.curData.hidden = this.oldAdvancedSettings.hidden
       this.oldAdvancedSettings = {}
     },
+    /**
+     * helper function for advance setting setter
+     * @return {Promise<Boolean>}
+     */
     advancedSettingSet: async function () {
-      /**
-       * helper function for advance setting setter
-       * @param {void}
-       * @return {Promise<Boolean>}
-       */
-
       let alias = ''
       let oldAlias = this.curData.alias
 
@@ -2738,24 +2675,18 @@ export default {
         return false
       }
     },
+    /**
+     * covert title as default alias
+     */
     addToAliasKeys: function () {
-      /**
-       * covert title as default alias
-       * @param {void}
-       * @return {void}
-       */
-
       let initName = this.curData.project.split(' ').join('_').toLowerCase()
       this.aliasKeys.push(initName)
       this.aliasVals.push(this.curData.uuid)
     },
+    /**
+     * helper function to validate if alias can be added
+     */
     aliasValidation: function (val) {
-      /**
-       * helper function to validate if alias can be added
-       * @param {void}
-       * @return {void}
-       */
-
       if (val === '') {
         this.aliasEditObj.error = true
         this.aliasEditObj.message = 'Cannot be empty!'
@@ -2785,28 +2716,22 @@ export default {
       this.aliasEditObj.message = ''
       return true
     },
+    /**
+     * TODO:
+     * delete the log thread
+     */
     deleteLogThread: function (index) {
-      /**
-       * TODO:
-       * delete the log thread
-       * @param {void}
-       * @return {void}
-       */
-
       this.curData.logs.splice(index, 1)
 
       this.updated = true
 
       this.$forceUpdate()
     },
+    /**
+     * TODO:
+     * create the log thread
+     */
     createLogThread: function () {
-      /**
-       * TODO:
-       * create the log thread
-       * @param {void}
-       * @return {void}
-       */
-
       this.$q.dialog({
         dark: true,
         title: 'Description...',
@@ -2848,13 +2773,10 @@ export default {
         }
       })
     },
+    /**
+     * helper function to add log inside a thread
+     */
     addLog: function (index) {
-      /**
-       * helper function to add log inside a thread
-       * @param {void}
-       * @return {void}
-       */
-
       this.$q.dialog({
         dark: true,
         title: 'Description...',
@@ -2898,13 +2820,12 @@ export default {
         // nothing goes here
       })
     },
+    /**
+     * helper function to delete log from the thread
+     * @param {Number} index: index of the log to be remove
+     * @param {String} parent: name of the thread
+     */
     deleteLog: function (index, parent) {
-      /**
-       * helper function to delete log from the thread
-       * @param {Number} index: index of the log to be remove
-       * @param {String} parent: name of the thread
-       * @return {void}
-       */
 
       this.curData.logs[parent].data.splice(index, 1)
 
@@ -2912,14 +2833,12 @@ export default {
 
       this.$forceUpdate()
     },
+    /**
+     * helper function to reply to a log
+     * @param {Integer} familyIndex: index of the log to be replied to
+     * @param {Object} responseObj: record of the response
+     */
     replyLog: function (familyIndex, responseObj) {
-      /**
-       * helper function to reply to a log
-       * @param {Integer} familyIndex: index of the log to be replied to
-       * @param {Object} responseObj: record of the response
-       * @return {void}
-       */
-
       this.$q.dialog({
         dark: true,
         title: 'Response...',
@@ -2960,11 +2879,11 @@ export default {
         // nothing goes here
       })
     },
+    /**
+     * helper function to validate the name of the project
+     * @return {Boolean}
+     */
     projectNameValidation: function () {
-      /**
-       * helper function to validate the name of the project
-       * @return {Boolean}
-       */
 
       if (this.$v.curData.project.maxLength && this.$v.curData.project.required) {
         console.log(this.$v)
@@ -2972,14 +2891,11 @@ export default {
       }
       return false
     },
+    /**
+     * allow the user to add custom content on the body section
+     * which will be displayed on their individual webpage
+     */
     addCustomField: function () {
-      /**
-       * allow the user to add custom content on the body section
-       * which will be displayed on their individual webpage
-       * @param {void}
-       * @return {void}
-       */
-
       let tmpBody = {}
 
       if (this.bodyType.value === 'TEXT_BOX') {
@@ -3024,14 +2940,11 @@ export default {
       this.curData.webpage.body.push(tmpBody)
       this.updated = true
     },
+    /**
+     * allow the user to add custom chip for the chips section
+     * which will be displayed on their individual webpage
+     */
     addChip: function () {
-      /**
-       * allow the user to add custom chip for the chips section
-       * which will be displayed on their individual webpage
-       * @param {void}
-       * @return {void}
-       */
-
       let tmpChip = {}
 
       if (this.chipType.value === 'SOURCE') {
@@ -3066,13 +2979,12 @@ export default {
       this.curData.webpage.chips.push(tmpChip)
       this.updated = true
     },
+    /**
+     * create a list of members who are in charge of of the challenge
+     * @param {Array<Object>} entry: list of member objects
+     * @return {String}
+     */
     displayMembers: function (entry) {
-      /**
-       * create a list of members who are in charge of of the challenge
-       * @param {Array<Object>} entry: list of member objects
-       * @return {String}
-       */
-
       let retMembers = ''
 
       entry.forEach(member => {
@@ -3081,13 +2993,11 @@ export default {
 
       return retMembers.substring(1, retMembers.length)
     },
+    /**
+     * trigger the description pop-up dialog
+     * @param {String} entry: description of the challenge
+     */
     popDialog: function (entry) {
-      /**
-       * trigger the description pop-up dialog
-       * @param {String} entry: description of the challenge
-       * @return {void}
-       */
-
       if (entry === 'awards') {
         this.dialogJSON['title'] = 'Impact Awards'
       } else {
@@ -3108,13 +3018,11 @@ export default {
 
       this.fixedDialog = true
     },
+    /**
+     * get the path of the main photo of the project
+     * @return {String}
+     */
     getMainPhoto: function () {
-      /**
-       * get the path of the main photo of the project
-       * @param {void}
-       * @return {String}
-       */
-
       let val = `statics/images/computer-keyboard.jpg`
 
       if (this.$q.sessionStorage.has('boundless_config')) {
@@ -3132,13 +3040,10 @@ export default {
 
       return val
     },
+    /**
+     * helper function to count up this.curData.progress
+     */
     progressCountUp: function () {
-      /**
-       * helper function to count up this.curData.progress
-       * @param {void}
-       * @return {void}
-       */
-
       if (this.curData.progress === 2 * this.progressBar.tags.length - 1) {
         this.curData.progress = 0
       } else {
@@ -3147,13 +3052,10 @@ export default {
 
       this.updated = true
     },
+    /**
+     * helper function to count down this.curData.progress
+     */
     progressCountDown: function () {
-      /**
-       * helper function to count down this.curData.progress
-       * @param {void}
-       * @return {void}
-       */
-
       if (this.curData.progress === 0) {
         this.curData.progress = 2 * this.progressBar.tags.length - 1
       } else {
@@ -3161,13 +3063,10 @@ export default {
       }
       this.updated = true
     },
+    /**
+     * helper function to handle adding new project member
+     */
     addProjectMember: function () {
-      /**
-       * helper function to handle adding new project member
-       * @param {void}
-       * @return {void}
-       */
-
       let itemOptions = []
 
       for (let email in this.userEmailToObjMap) {
@@ -3218,31 +3117,22 @@ export default {
 
       this.addMemberDialog.use = this.curData.members
     },
+    /**
+     * 'close' event emitter
+     */
     emitClose: function () {
-      /**
-       * 'close' event emitter
-       * @param {void}
-       * @return {void}
-       */
-
       this.$emit('close')
     },
+    /**
+     * 'added' event emitter
+     */
     emitAdded: function () {
-      /**
-       * 'added' event emitter
-       * @param {void}
-       * @return {void}
-       */
-
       this.$emit('added')
     },
+    /**
+     * sort the content of this.data.webpage.body in order by index field
+     */
     sortBody: function () {
-      /**
-       * sort the content of this.data.webpage.body in order by index field
-       * @param {void}
-       * @return {void}
-       */
-
       this.data.webpage.body.sort((a, b) => {
         return a.index - b.index
       })
@@ -3255,24 +3145,18 @@ export default {
         }
       })
     },
+    /**
+     * sort the content of this.data.webpage.chips in order by index field
+     */
     sortChip: function () {
-      /**
-       * sort the content of this.data.webpage.chips in order by index field
-       * @param {void}
-       * @return {void}
-       */
-
       this.data.webpage.chips.sort((a, b) => {
         return a.index - b.index
       })
     },
+    /**
+     * sort the content of this.curData.webpage.body in order by index field
+     */
     curSortBody: function () {
-      /**
-       * sort the content of this.curData.webpage.body in order by index field
-       * @param {void}
-       * @return {void}
-       */
-
       this.curData.webpage.body.sort((a, b) => {
         return a.index - b.index
       })
@@ -3285,24 +3169,19 @@ export default {
         }
       })
     },
+    /**
+     * sort the content of this.curData.webpage.chips in order by index field
+     */
     curSortChip: function () {
-      /**
-       * sort the content of this.curData.webpage.chips in order by index field
-       * @param {void}
-       * @return {void}
-       */
-
       this.curData.webpage.chips.sort((a, b) => {
         return a.index - b.index
       })
     },
+    /**
+     * open new tab given a link
+     * @param {String} url: url of the link
+     */
     openNewTab: function (url) {
-      /**
-       * open new tab given a link
-       * @param {String} url: url of the link
-       * @return {void}
-       */
-
       window.open(url, '_blank', 'noopener')
     },
     deepObjCopy: function (aObject) {
@@ -3326,13 +3205,11 @@ export default {
 
       return bObject
     },
+    /**
+     * helper function to display notfiy
+     * @return {String}
+     */
     notifyError: function () {
-      /**
-       * helper function to display notfiy
-       * @param {void}
-       * @return {String}
-       */
-
       this.$q.notify({
         color: 'negative',
         message: 'Field is required!',
@@ -3354,10 +3231,13 @@ export default {
   border-radius 3px
   text-align center
 
+#project-review-form
+  max-width: 80%
+
 .project-img
-  border: 3px solid #ddd
+  border 3px solid #ddd
   border-radius: 4px
-  padding: 5px
+  padding 5px
 
 .overview
   max-height 240px
