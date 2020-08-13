@@ -9,7 +9,7 @@
 ## under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES
 ## OR CONDITIONS OF ANY KIND, either express or implied.
 
-Name:     components/EditAndPreviewProject.vue
+Name:     components/EditAndPreview/EditAndPreviewProject.vue
 Purpose:  The user interface to allow the admin to edit and preview the
           resulting edits of the project before submitting
 Methods:
@@ -1893,15 +1893,15 @@ import firebase from 'firebase/app'
 import 'firebase/firestore'
 import cloneDeep from 'lodash.clonedeep'
 
-import productionDb, { productionStorage } from '../firebase/init_production'
-import testingDb, { testingStorage } from '../firebase/init_testing'
+import productionDb, { productionStorage } from '../../firebase/init_production'
+import testingDb, { testingStorage } from '../../firebase/init_testing'
 
-import UploadGUI from '../components/Upload.vue'
-import ProgressBar from '../components/ProgressBar.vue'
-import AddUser from '../components/SubmitUserAdminConsole.vue'
-import PopupInputLimitLen from '../components/Popups/PopupInputLimitLen.vue'
-import MarkdownTranslator from './MarkdownTranslator.vue'
-import ProjectReviewForm from '../components/Forms/Project/ProjectReviewForm.vue'
+import UploadGUI from '../../components/Upload.vue'
+import ProgressBar from '../../components/ProgressBar.vue'
+import AddUser from '../../components/SubmitUserAdminConsole.vue'
+import PopupInputLimitLen from '../../components/Popups/PopupInputLimitLen.vue'
+import MarkdownTranslator from '../../components/Markdown.vue'
+import ProjectReviewForm from '../../components/Forms/Project/ProjectReviewForm.vue'
 
 export default {
   components: {

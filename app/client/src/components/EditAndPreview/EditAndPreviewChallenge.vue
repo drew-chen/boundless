@@ -9,7 +9,7 @@
 ## under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES
 ## OR CONDITIONS OF ANY KIND, either express or implied.
 
-Name:     components/EditAndPreviewChallenge.vue
+Name:     components/EditAndPreview/EditAndPreviewChallenge.vue
 Purpose:  The user interface to allow the admin to edit and preview the
           resulting edits of challenge before submitting
 Methods:
@@ -2023,15 +2023,14 @@ Methods:
 import firebase from 'firebase/app'
 import 'firebase/firestore'
 
-import productionDb, { productionStorage } from '../firebase/init_production'
-import testingDb, { testingStorage } from '../firebase/init_testing'
+import productionDb, { productionStorage } from '../../firebase/init_production'
+import testingDb, { testingStorage } from '../../firebase/init_testing'
 
-import UploadGUI from '../components/Upload'
-import ProjectTable from '../components/Tables/ProjectTable'
-import AddUser from '../components/SubmitUserAdminConsole'
-import PopupInputLimitLen from '../components/Popups/PopupInputLimitLen.vue'
-
-import MarkdownTranslator from './MarkdownTranslator'
+import UploadGUI from '../../components/Upload'
+import ProjectTable from '../../components/Tables/ProjectTable'
+import AddUser from '../../components/SubmitUserAdminConsole'
+import PopupInputLimitLen from '../../components/Popups/PopupInputLimitLen.vue'
+import MarkdownTranslator from '../../components/MarkdownTranslator.vue'
 
 export default {
   components: {
