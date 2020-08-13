@@ -293,7 +293,7 @@ export default {
       'submitQuestionTemplates',
       'submitCustomFormEnabled'
     ]),
-    /** Submits questionTemplates to vuex and to the db. */
+    /** Submits questionTemplates with non-empty labels to vuex and to the db. */
     async submit () {
       if (this.modified) {
         this.$refs.form.validate()

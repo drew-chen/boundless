@@ -104,14 +104,10 @@ Methods:
 import { main, notices } from '../../notices'
 
 export default {
-  created () {
-    this.main = main
-    this.notices = notices
-  },
   data () {
     return {
-      main: {},
-      notices: {}
+      main,
+      notices
     }
   },
   methods: {
