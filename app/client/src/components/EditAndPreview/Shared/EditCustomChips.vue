@@ -1,5 +1,5 @@
 // Modifies a local copy then syncs with parent data using v-model.
-
+// TODO: rename to EditCustomChip instead of Chips
 <template>
   <q-card class="q-pa-md">
     <div class="row" align="left">
@@ -10,30 +10,31 @@
     <!-- Chip label -->
     <q-input
       filled dense
-      class="q-mt-sm" label="Custom Chip Label"
+      label="Custom Chip Label"
       placeholder="Please enter the label for the custom chip."
-      v-model="chip.label"
+      :value="chip.label"
+      @input="updateLabel($event)"
       :rules="[val => !!val || 'Field is required']"
       :autofocus="addedChip"
-      @focus="addedChip = false"
+      @focus="$emit('focus')"
     />
     <!-- Chip url -->
     <q-input
       filled dense
-      class="q-mt-sm" label="Custom Chip URL"
+      label="Custom Chip URL"
       placeholder="Link to video goes here. (Currently only supports one.)"
-      v-model="chip.url"
+      :value="chip.url"
+      @input="updateUrl($event)"
       :rules="[val => !!val || 'Field is required']"
-      @focus="addedChip = false"
+      @focus="$emit('focus')"
     />
     <!-- Chip icon and label -->
     <q-select
       filled
-      v-model="chip.type"
+      :value="getIconLabel(chip.icon)"
+      @input="updateIcon($event)"
       :options="options"
       label="Chip Type"
-      class="q-mx-sm col-3"
-      :disable="!customFormEnabled"
     >
     <!-- show icon -->
       <template v-slot:option="scope">
@@ -42,7 +43,7 @@
           v-on="scope.itemEvents"
         >
           <q-item-section avatar>
-            <q-icon :name="scope.opt.icon"/>
+            <q-icon :name="scope.opt.value"/>
           </q-item-section>
           <q-item-section>
             <q-item-label v-html="scope.opt.label" />
@@ -55,6 +56,7 @@
 
 <script>
 export default {
+  // The change event notifies the parent to update chip's value.
   model: {
     prop: 'chip',
     event: 'change'
@@ -64,40 +66,56 @@ export default {
       type: Object,
       required: true,
       validator (val) {
-        return val.hasOwnProperty('icon') &&
-          val.hasOwnProperty('label') &&
+        return val.hasOwnProperty('label') &&
+          val.hasOwnProperty('icon') &&
+          val.hasOwnProperty('url') &&
           val.hasOwnProperty('type') &&
-          val.hasOwnProperty('url')
+          val.type === 'CUSTOM'
       }
     },
     options: {
-      type: Object,
+      type: Array,
       required: true
+    },
+    addedChip: {
+      type: Boolean,
+      default: true
     }
   },
   data () {
     return {
       // <Object>: The chip being modified by this component.
       inputChip: {
-        ...this.chip
+        label: this.chip.label, // <String> Name of the chip icon.
+        icon: this.chip.icon, // <String> Label for this chip.
+        url: this.chip.url // <String> Chip link.
       }
     }
   },
   methods: {
+    getIconLabel (iconValue) {
+      const { label } = this.options.find(option => option.value === iconValue)
+      return label
+    },
+    // May need to use vue.set
     /** Updates the chip label. */
     updateLabel (inputLabel) {
       this.inputChip.label = inputLabel
       this.$emit('change', this.inputChip)
+      this.$emit('updated')
     },
     /** Updates the chip url. */
     updateUrl (inputUrl) {
-      this.inputChip.label = inputUrl
+      this.inputChip.url = inputUrl
       this.$emit('change', this.inputChip)
+      this.$emit('updated')
     },
     /** Updates the chip icon. */
-    updateIcon (inputIcon) {
-      this.inputChip.label = inputIcon
+    updateIcon ({ value }) {
+      console.log(value)
+      this.inputChip.icon = value
       this.$emit('change', this.inputChip)
+      this.$emit('updated')
     }
   }
 }

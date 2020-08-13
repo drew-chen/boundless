@@ -684,81 +684,12 @@ Methods:
                             class="col q-mb-xs q-pa-sm"
                           >
                             <edit-custom-chips
-                              :options="configData.customChips"
+                              v-model="chipContent.content"
+                              :options="configData.customChips || []"
+                              :addedChip="addedChip"
+                              @focus="addedChip = false"
+                              @updated="updated = true"
                             />
-                            <q-card class="q-pa-md">
-                              <div class="row" align="left">
-                                <strong>Custom Chip</strong>
-                                <hr class="col q-ml-sm">
-                              </div>
-
-                              <q-input
-                                filled dense
-                                class="q-mt-sm" label="Custom Chip Label"
-                                placeholder="Please enter the label for the custom chip."
-                                v-model="chipContent.content.label"
-                                :rules="[val => !!val || 'Field is required']"
-                                :autofocus="addedChip"
-                                @focus="addedChip = false"
-                              />
-
-                              <q-input
-                                filled dense
-                                class="q-mt-sm" label="Custom Chip URL"
-                                placeholder="Link to video goes here. (Currently only supports one.)"
-                                v-model="chipContent.content.url"
-                                :rules="[val => !!val || 'Field is required']"
-                                @focus="addedChip = false"
-                              />
-
-                              <div class="row q-pa-sm" align="left">
-                                <div class="col">
-                                  <q-list bordered separator>
-                                    <q-item
-                                      v-for="
-                                        (val, ind) in configData.customChips
-                                      "
-                                      :key="ind"
-                                      clickable v-ripple
-                                      :active="
-                                        chipContent.content.icon === val.value
-                                      "
-                                      @click="
-                                        chipContent.content.icon = val.value
-                                      "
-                                      active-class="text-white bg-secondary"
-                                    >
-                                      <q-item-section avatar>
-                                        <q-icon :name="val.value" />
-                                      </q-item-section>
-
-                                      <q-item-section align="center">
-                                      </q-item-section>
-
-                                      <q-item-section side>
-                                        {{ val.label }}
-                                      </q-item-section>
-                                    </q-item>
-                                  </q-list>
-                                </div>
-
-                                <div
-                                  class="col" align="center"
-                                  style="
-                                    display: flex;
-                                    justify-content: center;
-                                    align-items: center;
-                                  "
-                                >
-                                  <q-chip
-                                    color="secondary" text-color="white"
-                                    :icon="chipContent.content.icon"
-                                  >
-                                    {{ chipContent.content.label || 'Sample goes here' }}
-                                  </q-chip>
-                                </div>
-                              </div>
-                            </q-card>
                           </div>
 
                           <!-- ----------- Chip Index & Delete ----------- -->

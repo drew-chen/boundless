@@ -659,9 +659,9 @@ Methods:
                               v-if="chipContent.content.type === 'CUSTOM'"
                               class="col q-mb-xs q-pa-sm"
                             >
-                              <edit-custom-chips
+                              <!-- <edit-custom-chips
                                 :options=
-                              />
+                              /> -->
                               <q-card class="q-pa-md">
                                 <div class="row" align="left">
                                   <strong>Custom Chip</strong>
@@ -2034,7 +2034,7 @@ import ProjectTable from '../../components/Tables/ProjectTable'
 import AddUser from '../../components/SubmitUserAdminConsole'
 import PopupInputLimitLen from '../../components/Popups/PopupInputLimitLen.vue'
 import MarkdownTranslator from '../../components/MarkdownTranslator.vue'
-import EditCustomChips from './Shared/EditCustomChips.vue'
+// import EditCustomChips from './Shared/EditCustomChips.vue'
 
 export default {
   components: {
@@ -2042,8 +2042,7 @@ export default {
     ProjectTable,
     AddUser,
     MarkdownTranslator,
-    PopupInputLimitLen,
-    EditCustomChips,
+    PopupInputLimitLen
   },
   props: {
     uuid: String,
