@@ -683,6 +683,9 @@ Methods:
                             v-if="chipContent.content.type === 'CUSTOM'"
                             class="col q-mb-xs q-pa-sm"
                           >
+                            <edit-custom-chips
+                              :options="configData.customChips"
+                            />
                             <q-card class="q-pa-md">
                               <div class="row" align="left">
                                 <strong>Custom Chip</strong>
@@ -1902,6 +1905,7 @@ import AddUser from '../../components/SubmitUserAdminConsole.vue'
 import PopupInputLimitLen from '../../components/Popups/PopupInputLimitLen.vue'
 import MarkdownTranslator from '../../components/Markdown.vue'
 import ProjectReviewForm from '../../components/Forms/Project/ProjectReviewForm.vue'
+import EditCustomChips from './Shared/EditCustomChips.vue'
 
 export default {
   components: {
@@ -1910,7 +1914,8 @@ export default {
     AddUser,
     MarkdownTranslator,
     PopupInputLimitLen,
-    ProjectReviewForm
+    ProjectReviewForm,
+    EditCustomChips
   },
   props: {
     uuid: String,

@@ -12,7 +12,7 @@
       filled dense
       class="q-mt-sm" label="Custom Chip Label"
       placeholder="Please enter the label for the custom chip."
-      v-model="chipContent.content.label"
+      v-model="chip.label"
       :rules="[val => !!val || 'Field is required']"
       :autofocus="addedChip"
       @focus="addedChip = false"
@@ -22,19 +22,20 @@
       filled dense
       class="q-mt-sm" label="Custom Chip URL"
       placeholder="Link to video goes here. (Currently only supports one.)"
-      v-model="chipContent.content.url"
+      v-model="chip.url"
       :rules="[val => !!val || 'Field is required']"
       @focus="addedChip = false"
     />
     <!-- Chip icon and label -->
     <q-select
       filled
-      v-model="questionTemplate.type"
+      v-model="chip.type"
       :options="options"
       label="Chip Type"
       class="q-mx-sm col-3"
       :disable="!customFormEnabled"
     >
+    <!-- show icon -->
       <template v-slot:option="scope">
         <q-item
           v-bind="scope.itemProps"
@@ -60,6 +61,16 @@ export default {
   },
   props: {
     chip: {
+      type: Object,
+      required: true,
+      validator (val) {
+        return val.hasOwnProperty('icon') &&
+          val.hasOwnProperty('label') &&
+          val.hasOwnProperty('type') &&
+          val.hasOwnProperty('url')
+      }
+    },
+    options: {
       type: Object,
       required: true
     }
