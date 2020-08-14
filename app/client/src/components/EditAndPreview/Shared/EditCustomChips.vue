@@ -11,9 +11,10 @@
     <div class="row q-col-gutter-sm">
       <div class="col">
         <q-input
-          filled
+          filled clearable
           label="Custom Chip Label"
           placeholder="Please enter the label for the custom chip."
+          clear-icon="close"
           :value="chip.label"
           @input="updateLabel($event)"
           :rules="[val => !!val || 'Field is required']"
@@ -56,9 +57,10 @@
     </div>
     <!-- Chip url -->
     <q-input
-      filled dense
+      filled dense clearable
       label="Custom Chip URL"
       placeholder="Link to video goes here. (Currently only supports one.)"
+      clear-icon="close"
       :value="chip.url"
       @input="updateUrl($event)"
       :rules="[val => !!val || 'Field is required']"
