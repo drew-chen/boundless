@@ -1,9 +1,26 @@
-// Modifies a local copy then syncs with parent data using v-model.
-// TODO: rename to EditCustomChip instead of Chips
+<!-- ##
+## Copyright (c) 2019 Wind River Systems, Inc.
+##
+## Licensed under the Apache License, Version 2.0 (the "License");
+## you may not use this file except in compliance with the License.
+## You may obtain a copy of the License at:
+##       http://www.apache.org/licenses/LICENSE-2.0
+## Unless required by applicable law or agreed to in writing, software  distributed
+## under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES
+## OR CONDITIONS OF ANY KIND, either express or implied.
+
+Name:     components/EditAndPreview/Shared/EditCustomChips.vue
+Purpose:  A view to edit a custom chip's label, url, and icon.
+Methods:
+
+  Works by using v-model. A chip object prop is displayed then copied. This
+  copy is edited locally whenever the user inputs. Then, an event is fired telling
+  the parent component to update the value of the chip prop.
+
+## -->
 <template>
   <q-card class="q-pa-md">
-    <div class="row" align="left">
-       <!-- Remove align left -->
+    <div class="row">
       <strong>Custom Chip</strong>
       <hr class="col q-ml-sm">
     </div>
@@ -71,7 +88,7 @@
 
 <script>
 export default {
-  // The change event notifies the parent to update chip's value.
+  // Emitting the change event notifies the parent to update chip's value.
   model: {
     prop: 'chip',
     event: 'change'
@@ -99,8 +116,7 @@ export default {
   },
   data () {
     return {
-      // <Object>: The chip being modified by this component.
-      inputChip: {
+      inputChip: { // <Object>: The chip being modified by this component.
         label: this.chip.label, // <String> Name of the chip icon.
         icon: this.chip.icon, // <String> Label for this chip.
         url: this.chip.url, // <String> Chip link.
@@ -109,6 +125,15 @@ export default {
     }
   },
   methods: {
+    /**
+     * The icon value is the string used by Quasar to identify a certain icon.
+     * The icon label is the name of the icon that we give to it and that is
+     * displayed as text beside the icon.
+     *
+     * Given an icon value, it return's the respective label.
+     * For ex: getIconLabel('video') === 'Video'
+     * @param {String} iconValue The name/identity of the icon.
+     */
     getIconLabel (iconValue) {
       if (!Array.isArray(this.options) || !this.options.length) {
         return ''
@@ -116,20 +141,29 @@ export default {
       const { label } = this.options.find(option => option.value === iconValue)
       return label
     },
-    // May need to use vue.set
-    /** Updates the chip label. */
+    /**
+     * Updates the chip label to the label that was inputted.
+     * @param {String} inputLabel The inputted label.
+     */
     updateLabel (inputLabel) {
       this.inputChip.label = inputLabel
       this.$emit('change', this.inputChip)
       this.$emit('updated')
     },
-    /** Updates the chip url. */
+    /**
+     * Updates the chip url to the value that was inputted.
+     * @param {String} inputUrl The inputted url.
+     */
     updateUrl (inputUrl) {
       this.inputChip.url = inputUrl
       this.$emit('change', this.inputChip)
       this.$emit('updated')
     },
-    /** Updates the chip icon. */
+    /**
+     * Updates the chip icon to the value selected.
+     * @param option {Object} The option selected from 'options'.
+     * @param option.value {String} The name of the icon.
+     */
     updateIcon ({ value }) {
       this.inputChip.icon = value
       this.$emit('change', this.inputChip)

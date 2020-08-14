@@ -2067,6 +2067,10 @@ export default {
       newUser.role = 'member'
       this.addMemberDialog.use.push(newUser)
     },
+    /**
+     * Sets the project name to the input value.
+     * @param {String} editedName The inputted name.
+     */
     saveEditedName (editedName) {
       this.updated = true
       this.curData.project = editedName
