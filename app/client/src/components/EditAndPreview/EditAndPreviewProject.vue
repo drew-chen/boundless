@@ -2880,7 +2880,8 @@ export default {
           content: {
             label: this.chipType.label,
             type: this.chipType.value,
-            icon: 'code'
+            icon: 'code',
+            url: ''
           }
         }
       } else if (this.chipType.value === 'VIDEO') {
@@ -2889,7 +2890,8 @@ export default {
           content: {
             label: this.chipType.label,
             type: this.chipType.value,
-            icon: 'movie'
+            icon: 'movie',
+            url: ''
           }
         }
       } else {
@@ -2898,7 +2900,8 @@ export default {
           content: {
             label: '',
             type: this.chipType.value,
-            icon: null
+            icon: null,
+            url: ''
           }
         }
       }

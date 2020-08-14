@@ -659,24 +659,13 @@ Methods:
                               v-if="chipContent.content.type === 'CUSTOM'"
                               class="col q-mb-xs q-pa-sm"
                             >
-                              <!-- <edit-custom-chips
-                                :options=
-                              /> -->
-                              <q-card class="q-pa-md">
-                                <div class="row" align="left">
-                                  <strong>Custom Chip</strong>
-                                  <hr class="col q-ml-sm">
-                                </div>
-
-                                <q-input
-                                  filled dense
-                                  class="q-mt-sm" label="Custom Chip Label"
-                                  placeholder="Please enter the label for the custom chip."
-                                  v-model="chipContent.content.label"
-                                  :rules="[val => !!val || 'Field is required']"
-                                  :autofocus="addedChip"
-                                  @focus="addedChip = false"
-                                />
+                              <edit-custom-chips
+                                v-model="chipContent.content"
+                                :options="configData.customChips || []"
+                                :addedChip="addedChip"
+                                @focus="addedChip = false"
+                                @updated="updated = true"
+                              />
 
                                 <q-input
                                   filled dense
@@ -734,7 +723,6 @@ Methods:
                                     </q-chip>
                                   </div>
                                 </div>
-                              </q-card>
                             </div>
 
                             <!-- ----------- Chip Index & Delete ----------- -->
@@ -2034,7 +2022,7 @@ import ProjectTable from '../../components/Tables/ProjectTable'
 import AddUser from '../../components/SubmitUserAdminConsole'
 import PopupInputLimitLen from '../../components/Popups/PopupInputLimitLen.vue'
 import MarkdownTranslator from '../../components/MarkdownTranslator.vue'
-// import EditCustomChips from './Shared/EditCustomChips.vue'
+import EditCustomChips from './Shared/EditCustomChips.vue'
 
 export default {
   components: {
@@ -2042,7 +2030,8 @@ export default {
     ProjectTable,
     AddUser,
     MarkdownTranslator,
-    PopupInputLimitLen
+    PopupInputLimitLen,
+    EditCustomChips
   },
   props: {
     uuid: String,
@@ -3178,7 +3167,8 @@ export default {
           content: {
             label: this.chipType.label,
             type: this.chipType.value,
-            icon: 'code'
+            icon: 'code',
+            url: ''
           }
         }
       } else if (this.chipType.value === 'VIDEO') {
@@ -3187,7 +3177,8 @@ export default {
           content: {
             label: this.chipType.label,
             type: this.chipType.value,
-            icon: 'movie'
+            icon: 'movie',
+            url: ''
           }
         }
       } else {
@@ -3196,7 +3187,8 @@ export default {
           content: {
             label: '',
             type: this.chipType.value,
-            icon: null
+            icon: null,
+            url: ''
           }
         }
       }
