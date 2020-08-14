@@ -36,7 +36,14 @@
       :options="options"
       label="Chip Type"
     >
-    <!-- show icon -->
+      <!-- Show icon with selected value -->
+      <template v-slot:selected>
+          <div>
+            <q-icon :name="chip.icon"/>
+            {{ getIconLabel(chip.icon) }}
+          </div>
+      </template>
+      <!-- show icon in selection options -->
       <template v-slot:option="scope">
         <q-item
           v-bind="scope.itemProps"
@@ -88,12 +95,16 @@ export default {
       inputChip: {
         label: this.chip.label, // <String> Name of the chip icon.
         icon: this.chip.icon, // <String> Label for this chip.
-        url: this.chip.url // <String> Chip link.
+        url: this.chip.url, // <String> Chip link.
+        type: this.chip.type // <String> Type of chip, which must always be 'CUSTOM'.
       }
     }
   },
   methods: {
     getIconLabel (iconValue) {
+      if (!Array.isArray(this.options) || !this.options.length) {
+        return ''
+      }
       const { label } = this.options.find(option => option.value === iconValue)
       return label
     },
@@ -112,7 +123,6 @@ export default {
     },
     /** Updates the chip icon. */
     updateIcon ({ value }) {
-      console.log(value)
       this.inputChip.icon = value
       this.$emit('change', this.inputChip)
       this.$emit('updated')
