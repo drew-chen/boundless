@@ -8,16 +8,52 @@
       <hr class="col q-ml-sm">
     </div>
     <!-- Chip label -->
-    <q-input
-      filled dense
-      label="Custom Chip Label"
-      placeholder="Please enter the label for the custom chip."
-      :value="chip.label"
-      @input="updateLabel($event)"
-      :rules="[val => !!val || 'Field is required']"
-      :autofocus="addedChip"
-      @focus="$emit('focus')"
-    />
+    <div class="row q-col-gutter-sm">
+      <div class="col">
+        <q-input
+          filled
+          label="Custom Chip Label"
+          placeholder="Please enter the label for the custom chip."
+          :value="chip.label"
+          @input="updateLabel($event)"
+          :rules="[val => !!val || 'Field is required']"
+          :autofocus="addedChip"
+          @focus="$emit('focus')"
+        />
+      </div>
+      <!-- Chip icon and label -->
+      <div class="col">
+        <q-select
+          filled
+          :value="getIconLabel(chip.icon)"
+          @input="updateIcon($event)"
+          :options="options"
+          label="Chip Type"
+        >
+          <!-- Show icon with selected value -->
+          <template v-slot:selected>
+              <div>
+                <q-icon :name="chip.icon"/>
+                {{ getIconLabel(chip.icon) }}
+              </div>
+          </template>
+          <!-- show icon in selection options -->
+          <template v-slot:option="scope">
+            <q-item
+              v-bind="scope.itemProps"
+              v-on="scope.itemEvents"
+            >
+              <q-item-section avatar>
+                <q-icon :name="scope.opt.value"/>
+              </q-item-section>
+              <q-item-section>
+                <q-item-label v-html="scope.opt.label" />
+              </q-item-section>
+            </q-item>
+          </template>
+        </q-select>
+      </div>
+    </div>
     <!-- Chip url -->
     <q-input
       filled dense
@@ -28,36 +64,6 @@
       :rules="[val => !!val || 'Field is required']"
       @focus="$emit('focus')"
     />
-    <!-- Chip icon and label -->
-    <q-select
-      filled
-      :value="getIconLabel(chip.icon)"
-      @input="updateIcon($event)"
-      :options="options"
-      label="Chip Type"
-    >
-      <!-- Show icon with selected value -->
-      <template v-slot:selected>
-          <div>
-            <q-icon :name="chip.icon"/>
-            {{ getIconLabel(chip.icon) }}
-          </div>
-      </template>
-      <!-- show icon in selection options -->
-      <template v-slot:option="scope">
-        <q-item
-          v-bind="scope.itemProps"
-          v-on="scope.itemEvents"
-        >
-          <q-item-section avatar>
-            <q-icon :name="scope.opt.value"/>
-          </q-item-section>
-          <q-item-section>
-            <q-item-label v-html="scope.opt.label" />
-          </q-item-section>
-        </q-item>
-      </template>
-    </q-select>
   </q-card>
 </template>
 
