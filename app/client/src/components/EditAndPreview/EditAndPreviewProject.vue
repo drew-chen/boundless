@@ -1958,7 +1958,6 @@ export default {
      * @param {String} key: alias of the file.
      * @param {String} pathToFile: path of file inside storage.
      * @param {String} type: name of the collection
-     * @return {Promise<Boolean>}
      */
     deleteAttachment: async function (key, pathToFile, type) {
       this.$q.dialog({
@@ -1966,31 +1965,21 @@ export default {
         message: `Delete ${key}?`,
         ok: true,
         cancel: true
+      }).onOk(async () => {
+        this.loading = true
+
+        await this.storage.ref().child(
+          `${type}/${pathToFile}`
+        ).delete()
+
+        delete this.curData.files[key]
+
+        await this.submitToDatabase()
+
+        this.loading = false
+
+        this.$forceUpdate()
       })
-        .onOk(async () => {
-          try {
-            this.loading = true
-
-            await this.storage.ref().child(
-              `${type}/${pathToFile}`
-            ).delete()
-
-            delete this.curData.files[key]
-
-            await this.submitToDatabase()
-
-            this.loading = false
-
-            this.$forceUpdate()
-
-            return true
-          } catch (error) {
-            return false
-          }
-        })
-        .onCancel(() => {
-          return false
-        })
     },
     /**
      * fetches the download url then download the file for the client
@@ -2021,8 +2010,6 @@ export default {
         a.click()
         URL.revokeObjectURL(bUrl)
         document.body.appendChild(a)
-
-        return true
       } catch (error) {
         this.$q.notify({
           message: 'File is either broken or missing!',
@@ -2039,14 +2026,13 @@ export default {
           ]
         })
 
-        return false
+        throw error
       }
     },
     /**
      * fetches the attachment url and open the url on a new tab
      * @param {String} pathToFile: path to file
      * @param {String} type: collection type
-     * @return {Promise<Boolean>}
      */
     fetchAttachmentURLAndOpen: async function (pathToFile, type) {
       try {
@@ -2055,8 +2041,6 @@ export default {
         ).getDownloadURL()
 
         window.open(url, '_blank', 'noopener')
-
-        return true
       } catch (error) {
         this.$q.notify({
           message: 'File is either broken or missing!',
@@ -2072,8 +2056,7 @@ export default {
             }
           ]
         })
-
-        return false
+        throw error
       }
     },
     /**
@@ -2257,7 +2240,6 @@ export default {
     /**
      * submit handler of the component; put images and files into storage;
      * update project's data to ToC as well as webpage; emit 'added' event
-     * @return {Promise<Boolean>}
      */
     onSubmit: function () {
       // edit, preview, and submit handler
@@ -2265,8 +2247,6 @@ export default {
         this.childMode = (this.childMode === 'preview') ? 'edit' : 'preview'
         this.curSortBody()
         this.curSortChip()
-
-        return true
       } else if (this.submitMode === 'database') {
         this.loading = true
 
@@ -2311,51 +2291,43 @@ export default {
         timestamp: timeOfUpdate
       }
 
-      try {
-        await this.db.collection('projects').doc('ToC').set({
-          [this.curData.uuid]: tocContent
-        }, { merge: true })
+      await this.db.collection('projects').doc('ToC').set({
+        [this.curData.uuid]: tocContent
+      }, { merge: true })
 
-        if (this.mainImage.file) {
-          this.curData.webpage.imgURL = `projects/${this.curData.uuid}`
-          this.curData.webpage.imgURL += `/main/${this.mainImage.file.name}`
+      if (this.mainImage.file) {
+        this.curData.webpage.imgURL = `projects/${this.curData.uuid}`
+        this.curData.webpage.imgURL += `/main/${this.mainImage.file.name}`
 
-          // update the file to storage
-          await this.storage.ref().child(
-            this.curData.webpage.imgURL
-          ).put(this.mainImage.file)
-        }
-        // adding color for main image
-        this.curData.webpage.imgBgColor = this.mainImage.color
-
-        await this.db.collection('projects').doc(this.curData.uuid).set({
-          webpage: this.curData.webpage || {}, // obj
-          logs: this.curData.logs || [], // array of obj
-          files: this.curData.files || {} // obj
-        })
-
-        if (this.submitMode === 'database') {
-          this.emitClose()
-        }
-
-        this.$q.notify({
-          type: 'positive',
-          message: '<div align="center">successful!<div>',
-          html: true,
-          timeout: 500
-        })
-
-        return true
-        // TODO: notify that the process was performed
-      } catch (error) {
-        return false
+        // update the file to storage
+        await this.storage.ref().child(
+          this.curData.webpage.imgURL
+        ).put(this.mainImage.file)
       }
+      // adding color for main image
+      this.curData.webpage.imgBgColor = this.mainImage.color
+
+      await this.db.collection('projects').doc(this.curData.uuid).set({
+        webpage: this.curData.webpage || {}, // obj
+        logs: this.curData.logs || [], // array of obj
+        files: this.curData.files || {} // obj
+      })
+
+      if (this.submitMode === 'database') {
+        this.emitClose()
+      }
+
+      this.$q.notify({
+        type: 'positive',
+        message: '<div align="center">successful!<div>',
+        html: true,
+        timeout: 500
+      })
     },
     /**
      * load firebase database reference
      * load firebase storage reference (if applicable)
      * load firebase cloud functions reference (if applicable)
-     * @return {Promise<Boolean>}
      */
     loadFireRefs: async function () {
       if (this.$q.localStorage.has('boundless_db')) {
@@ -2368,8 +2340,6 @@ export default {
           this.db = productionDb
           this.storage = productionStorage
         }
-
-        return true
       } else {
         try {
           let doc = await productionDb.collection('config').doc('project').get()
@@ -2382,8 +2352,6 @@ export default {
               this.db = productionDb
               this.$q.localStorage.set('boundless_db', 'production')
             }
-
-            return true
           } else {
             let msg = '"/config/project" path does not exists!'
 
@@ -2393,7 +2361,7 @@ export default {
           this.db = productionDb
           this.$q.localStorage.set('boundless_db', 'production')
 
-          return false
+          throw error
         }
       }
     },
@@ -2403,70 +2371,63 @@ export default {
      * @return {Promise<Boolean>}
      */
     loadConfig: async function () {
-      try {
-        let doc = await this.db.collection('config').doc('project').get()
+      let doc = await this.db.collection('config').doc('project').get()
 
-        if (doc.exists) {
-          let data = doc.data()
+      if (doc.exists) {
+        let data = doc.data()
 
-          for (let key in data['keywords']) {
-            this.keywordOptions.push({
-              label: key,
-              value: data['keywords'][key]
-            })
-          }
-
-          this.configData = cloneDeep(data)
-
-          this.configData.customChips = this.configData.customChips || []
-
-          // TODO: write this to the db
-          if (
-            !JSON.stringify(
-              this.configData.bodyContentType
-            ).includes('MARKDOWN')
-          ) {
-            this.configData.bodyContentType.unshift({
-              label: 'Markdown/HTML', value: 'MARKDOWN'
-            })
-          }
-
-          // TODO: update on the db to avoid this
-          let tmpBodyContentType = []
-          this.configData.bodyContentType.forEach(type => {
-            if (
-              type.value !== 'UNORDERED_LIST' &&
-              type.value !== 'EVENT_LIST' &&
-              type.value !== 'TEXT_BOX'
-            ) {
-              if (type.value !== 'ORDERED_LIST') {
-                tmpBodyContentType.push(type)
-              } else {
-                tmpBodyContentType.push({
-                  label: 'URL List',
-                  value: 'ORDERED_LIST'
-                })
-              }
-            }
+        for (let key in data['keywords']) {
+          this.keywordOptions.push({
+            label: key,
+            value: data['keywords'][key]
           })
-          this.configData.bodyContentType = tmpBodyContentType
-
-          // 'None' to be highlighted as chip gets created
-          this.configData.customChips.push({
-            label: 'None',
-            value: null
-          })
-          // this.allowedDomain = data['allowedDomain'] // TODO
         }
 
-        return true
-      } catch (error) {
-        return false
+        this.configData = cloneDeep(data)
+
+        this.configData.customChips = this.configData.customChips || []
+
+        // TODO: write this to the db
+        if (
+          !JSON.stringify(
+            this.configData.bodyContentType
+          ).includes('MARKDOWN')
+        ) {
+          this.configData.bodyContentType.unshift({
+            label: 'Markdown/HTML', value: 'MARKDOWN'
+          })
+        }
+
+        // TODO: update on the db to avoid this
+        let tmpBodyContentType = []
+        this.configData.bodyContentType.forEach(type => {
+          if (
+            type.value !== 'UNORDERED_LIST' &&
+            type.value !== 'EVENT_LIST' &&
+            type.value !== 'TEXT_BOX'
+          ) {
+            if (type.value !== 'ORDERED_LIST') {
+              tmpBodyContentType.push(type)
+            } else {
+              tmpBodyContentType.push({
+                label: 'URL List',
+                value: 'ORDERED_LIST'
+              })
+            }
+          }
+        })
+        this.configData.bodyContentType = tmpBodyContentType
+
+        // 'None' to be highlighted as chip gets created
+        this.configData.customChips.push({
+          label: 'None',
+          value: null
+        })
+        // this.allowedDomain = data['allowedDomain'] // TODO
       }
     },
     /**
      * load required information from the database
-     * @return {Promise<Boolean>}
      */
     loadInformation: async function () {
       this.loading = true
@@ -2476,97 +2437,91 @@ export default {
       promises.push(this.db.collection('projects').doc('ToC').get())
       promises.push(this.db.collection('users').doc('ToC').get())
 
-      try {
-        let res = await Promise.all(promises)
+      let res = await Promise.all(promises)
 
-        for (let objField in res[0].data()) {
-          this.data[objField] = res[0].data()[objField]
-        }
+      for (let objField in res[0].data()) {
+        this.data[objField] = res[0].data()[objField]
+      }
 
-        for (let objField in res[1].data()[this.uuid]) {
-          this.data[objField] = res[1].data()[this.uuid][objField]
-        }
+      for (let objField in res[1].data()[this.uuid]) {
+        this.data[objField] = res[1].data()[this.uuid][objField]
+      }
 
-        for (let objField in res[2].data()) {
-          let tmpRef = res[2].data()[objField]
+      for (let objField in res[2].data()) {
+        let tmpRef = res[2].data()[objField]
 
-          this.userEmailToObjMap[tmpRef.email] = tmpRef
-        }
+        this.userEmailToObjMap[tmpRef.email] = tmpRef
+      }
 
-        this.sortBody()
-        this.sortChip()
+      this.sortBody()
+      this.sortChip()
 
-        this.curData = cloneDeep(this.data)
-        this.curData.customFormResponse = this.curData.customFormResponse || []
-        this.childMode = this.mode
-        this.data = {} // to save memory
+      this.curData = cloneDeep(this.data)
+      this.curData.customFormResponse = this.curData.customFormResponse || []
+      this.childMode = this.mode
+      this.data = {} // to save memory
 
-        // seamless fix to from old members data to new member data
-        let tmpMembers = []
+      // seamless fix to from old members data to new member data
+      let tmpMembers = []
 
-        if (this.curData.members[0].email) {
-          let newMembersDataType = []
-          this.curData.members.forEach(member => {
-            newMembersDataType.push({
-              uuid: member.email,
-              role: member.role
-            })
-            tmpMembers.push({
-              ...res[2].data()[member.email],
-              role: member.role
-            })
+      if (this.curData.members[0].email) {
+        let newMembersDataType = []
+        this.curData.members.forEach(member => {
+          newMembersDataType.push({
+            uuid: member.email,
+            role: member.role
           })
-
-          // this.db.collection('projects').doc('ToC').set({
-          //   [this.curData.uuid]: {
-          //     members: newMembersDataType
-          //   }
-          // }, { merge: true })
-        } else {
-          this.curData.members.forEach(member => {
-            tmpMembers.push({
-              ...res[2].data()[member.uuid],
-              role: member.role
-            })
+          tmpMembers.push({
+            ...res[2].data()[member.email],
+            role: member.role
           })
-        }
-        this.curData.members = tmpMembers
+        })
 
-        // loading imgURL
-        if (!this.curData.webpage.imgURL) {
+        // this.db.collection('projects').doc('ToC').set({
+        //   [this.curData.uuid]: {
+        //     members: newMembersDataType
+        //   }
+        // }, { merge: true })
+      } else {
+        this.curData.members.forEach(member => {
+          tmpMembers.push({
+            ...res[2].data()[member.uuid],
+            role: member.role
+          })
+        })
+      }
+      this.curData.members = tmpMembers
+
+      // loading imgURL
+      if (!this.curData.webpage.imgURL) {
+        this.mainImage.cur = this.getMainPhoto()
+        this.mainImage.prev = this.mainImage.cur
+      } else {
+        try {
+          // get photo from storage
+          let url = await this.storage.ref().child(
+            this.curData.webpage.imgURL
+          ).getDownloadURL()
+
+          this.mainImage.cur = url
+          this.mainImage.prev = url
+        } catch (error) {
           this.mainImage.cur = this.getMainPhoto()
           this.mainImage.prev = this.mainImage.cur
-        } else {
-          try {
-            // get photo from storage
-            let url = await this.storage.ref().child(
-              this.curData.webpage.imgURL
-            ).getDownloadURL()
-
-            this.mainImage.cur = url
-            this.mainImage.prev = url
-          } catch (error) {
-            this.mainImage.cur = this.getMainPhoto()
-            this.mainImage.prev = this.mainImage.cur
-          }
         }
-
-        if (this.curData.webpage.imgBgColor) {
-          this.mainImage.color = this.curData.webpage.imgBgColor
-        }
-
-        this.aliasMap = res[1].data().alias || {}
-        this.aliasKeys = Object.keys(this.aliasMap)
-        this.aliasVals = Object.values(this.aliasMap)
-
-        setTimeout(() => {
-          this.loading = false
-
-          return true
-        }, 100)
-      } catch (error) {
-        return false
       }
+
+      if (this.curData.webpage.imgBgColor) {
+        this.mainImage.color = this.curData.webpage.imgBgColor
+      }
+
+      this.aliasMap = res[1].data().alias || {}
+      this.aliasKeys = Object.keys(this.aliasMap)
+      this.aliasVals = Object.values(this.aliasMap)
+
+      setTimeout(() => {
+        this.loading = false
+      }, 100)
     },
     /**
      * helper function to popup advanced settings dialog
@@ -2586,7 +2541,6 @@ export default {
     },
     /**
      * helper function for advance setting setter
-     * @return {Promise<Boolean>}
      */
     advancedSettingSet: async function () {
       let alias = ''
@@ -2615,25 +2569,19 @@ export default {
 
       this.loading = true
 
-      try {
-        await this.db.collection('projects').doc('ToC').set({
-          [this.curData.uuid]: tmpTocContent,
-          alias: tmpAliasMap
-        }, { merge: true })
+      await this.db.collection('projects').doc('ToC').set({
+        [this.curData.uuid]: tmpTocContent,
+        alias: tmpAliasMap
+      }, { merge: true })
 
-        this.$q.notify({
-          type: 'positive',
-          message: 'Submitted successfully!'
-        })
+      this.$q.notify({
+        type: 'positive',
+        message: 'Submitted successfully!'
+      })
 
-        this.emitAdded()
+      this.emitAdded()
 
-        this.loading = false
-
-        return true
-      } catch (error) {
-        return false
-      }
+      this.loading = false
     },
     /**
      * covert title as default alias
