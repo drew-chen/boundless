@@ -1956,6 +1956,7 @@ Methods:
 <script>
 import firebase from 'firebase/app'
 import 'firebase/firestore'
+import cloneDeep from 'lodash.cloneDeep'
 
 import productionDb, { productionStorage } from '../../firebase/init_production'
 import testingDb, { testingStorage } from '../../firebase/init_testing'
@@ -2544,7 +2545,7 @@ export default {
             })
           }
 
-          this.configData = this.deepObjCopy(data)
+          this.configData = cloneDeep(data)
 
           this.configData.customChips = this.configData.customChips || []
 
@@ -2594,7 +2595,6 @@ export default {
     },
     /**
      * load required information from the database
-     * @param {void}
      * @returns {Promise<Boolean>}
      */
     loadInformation: async function () {
@@ -2625,7 +2625,7 @@ export default {
         this.sortBody()
         this.sortChip()
 
-        this.curData = this.deepObjCopy(this.data)
+        this.curData = cloneDeep(this.data)
         this.childMode = this.mode
         this.data = {} // to save memory
 
@@ -2788,8 +2788,6 @@ export default {
     },
     /**
      * helper function to convert alias from the title
-     * @param {void}
-     * @returns {void}
      */
     addToAliasKeys: function () {
       let initName = this.curData.challenge.split(' ').join('_').toLowerCase()
@@ -3260,26 +3258,6 @@ export default {
      */
     openNewTab: function (url) {
       window.open(url, '_blank', 'noopener')
-    },
-    /**
-     * https://stackoverflow.com/questions/4459928/how-to-deep-clone-in-javascript/34624648#34624648
-     * creates a deep copy of the input
-     * @param {Object} aObject: the object to be cloned
-     * @returns {Object}
-     */
-    deepObjCopy: function (aObject) {
-      if (!aObject) {
-        return aObject
-      }
-
-      let v
-      let bObject = Array.isArray(aObject) ? [] : {}
-      for (const k in aObject) {
-        v = aObject[k]
-        bObject[k] = (typeof v === 'object') ? this.deepObjCopy(v) : v
-      }
-
-      return bObject
     },
     /**
      * helper function to notify error has occurred
