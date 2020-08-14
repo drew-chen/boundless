@@ -73,7 +73,7 @@ Methods:
             :projectMembers="projectMembers"
             :keywordOptions="keywordOptions"
             :projectKeywords="projectKeywords"
-            :customFormQuestions="questions"
+            :customFormResponse="questions"
             :customFormEnabled="customFormEnabled"
           />
         </q-step>

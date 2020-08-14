@@ -1481,16 +1481,24 @@ Methods:
 
               <!-- -------------------- Form Response -------------------- -->
               <q-tab-panel name="formResponse">
-                <div class="tab-content shadow-2 q-py-lg row justify-center">
+                <div class="tab-content shadow-2 q-py-lg column items-center">
                   <project-review-form
                     id="project-review-form"
+                    class="col"
                     :projectName="curData.project"
                     :projectDescription="curData.description"
                     :projectMembers="curData.members"
                     :keywordOptions="keywordOptions"
                     :projectKeywords="curData.keywords"
-                    :customFormQuestions="curData.customFormResponse || []"
+                    :customFormResponse="curData.customFormResponse || []"
                     :customFormEnabled="true"
+                  />
+                  <!-- Export custom form as markdown -->
+                  <q-btn no-caps
+                    class="col"
+                    label="Copy additional questions as markdown"
+                    :disable="isExportCustomFormBtnDisabled"
+                    @click="exportCustomFormResponse"
                   />
                 </div>
               </q-tab-panel>
@@ -1825,7 +1833,7 @@ Methods:
 <script>
 import firebase from 'firebase/app'
 import 'firebase/firestore'
-import cloneDeep from 'lodash.clonedeep'
+import { cloneDeep, isEmpty } from 'lodash'
 
 import productionDb, { productionStorage } from '../../firebase/init_production'
 import testingDb, { testingStorage } from '../../firebase/init_testing'
@@ -1869,6 +1877,16 @@ export default {
   },
   beforeUpdate () {
     this.loadProgressBarConf()
+  },
+  computed: {
+    /**
+     * Whether or not the export custom form button should be disabled.
+     * Note: isEmpty also returns true for 'undefined'.
+     * @returns <BooleanThe>: BooleanThe flag for disabling.
+     */
+    isExportCustomFormBtnDisabled () {
+      return isEmpty(this.curData) || isEmpty(this.curData.customFormResponse)
+    }
   },
   data () {
     return {
@@ -3128,8 +3146,13 @@ export default {
         message: 'Field is required!',
         icon: 'warning'
       })
-
       return ''
+    },
+    exportCustomFormResponse () {
+      const customFormRespose = curData.customFormResponse || []
+      for (question in this.customFormQuestions) {
+
+      }
     }
   }
 }

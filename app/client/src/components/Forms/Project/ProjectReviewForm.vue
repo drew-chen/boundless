@@ -124,9 +124,9 @@ Methods:
 
         <h6>Additional questions</h6>
 
-        <div v-if="customFormQuestions && customFormQuestions.length > 0">
+        <div v-if="customFormResponse && customFormResponse.length > 0">
           <div
-            v-for="question in customFormQuestions"
+            v-for="question in customFormResponse"
             :key="question.label"
           >
             <q-input
@@ -176,7 +176,7 @@ export default {
       required: true
     },
     // Each element is an object with a custom question and its response.
-    customFormQuestions: {
+    customFormResponse: {
       type: Array,
       required: true
     },
