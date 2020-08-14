@@ -1495,9 +1495,8 @@ Methods:
                   />
                   <!-- Export custom form as markdown -->
                   <q-btn no-caps
-                    class="col"
+                    class="col q-my-sm"
                     label="Copy additional questions as markdown"
-                    :disable="isExportCustomFormBtnDisabled"
                     @click="exportCustomFormResponse"
                   />
                 </div>
@@ -2175,7 +2174,7 @@ export default {
       }
     },
     /**
-     * helper funciton to handle file attachment and its alias
+     * helper function to handle file attachment and its alias
      * @param {Object} data: record containing files
      */
     updateAttachments: function (data) {
@@ -2308,9 +2307,10 @@ export default {
       this.curData.webpage.imgBgColor = this.mainImage.color
 
       await this.db.collection('projects').doc(this.curData.uuid).set({
-        webpage: this.curData.webpage || {}, // obj
-        logs: this.curData.logs || [], // array of obj
-        files: this.curData.files || {} // obj
+        customFormResponse: this.curData.customFormResponse,
+        webpage: this.curData.webpage,
+        logs: this.curData.logs,
+        files: this.curData.files
       })
 
       if (this.submitMode === 'database') {
@@ -2455,9 +2455,10 @@ export default {
 
       this.sortBody()
       this.sortChip()
-
       this.curData = cloneDeep(this.data)
       this.curData.customFormResponse = this.curData.customFormResponse || []
+      this.curData.logs = this.curData.logs || []
+      this.curData.files = this.curData.files || {}
       this.childMode = this.mode
       this.data = {} // to save memory
 
@@ -2784,7 +2785,6 @@ export default {
      */
     projectNameValidation: function () {
       if (this.$v.curData.project.maxLength && this.$v.curData.project.required) {
-        console.log(this.$v)
         return true
       }
       return false
@@ -3099,9 +3099,10 @@ export default {
     },
     exportCustomFormResponse () {
       const customFormResponse = this.curData.customFormResponse || []
-      let markdownStr = '### Additional Q&A\n'
+      let markdownStr = '## Additional Q&A\n'
       for (let question of customFormResponse) {
-        markdownStr += `**${question.label}**
+        markdownStr += `
+### **${question.label}**
 ${question.response}
 
         `
