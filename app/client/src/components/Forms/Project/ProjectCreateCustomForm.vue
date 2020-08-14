@@ -89,7 +89,7 @@ Methods:
             >
               <q-card
                 flat
-                class="row items-center full-height"
+                class="row q-col-gutter-x-sm items-center full-height"
                 v-for="(questionTemplate, index) in questionTemplates"
                 :key="questionTemplate.order"
               >
@@ -105,7 +105,7 @@ Methods:
                 <q-input
                   filled clearable
                   clear-icon="close"
-                  class="q-mx-sm col-3 col-md-5 question-template-label-centering"
+                  class="col-3 col-md-5 question-template-label-centering"
                   label="Question Label"
                   v-model="questionTemplate.label"
                   placeholder="Untitled Question"
@@ -118,7 +118,7 @@ Methods:
                   v-model="questionTemplate.type"
                   :options="options"
                   label="Response Type"
-                  class="q-mx-sm col-3"
+                  class="col-3"
                   :disable="!customFormEnabled"
                 >
                   <!-- Display option's icon and label. -->
@@ -143,7 +143,7 @@ Methods:
                   class="col-2 col-sm-auto"
                   :disable="!customFormEnabled"
                 />
-                <div class="q-mx-sm col-1">
+                <div class="col-1">
                   <q-btn
                     round flat
                     @click="deleteQuestionTemplate(index)"
