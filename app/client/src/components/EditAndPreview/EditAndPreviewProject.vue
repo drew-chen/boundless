@@ -1490,7 +1490,7 @@ Methods:
                     :projectMembers="curData.members"
                     :keywordOptions="keywordOptions"
                     :projectKeywords="curData.keywords"
-                    :customFormResponse="curData.customFormResponse || []"
+                    :customFormResponse="curData.customFormResponse"
                     :customFormEnabled="true"
                   />
                   <!-- Export custom form as markdown -->
@@ -2497,6 +2497,7 @@ export default {
         this.sortChip()
 
         this.curData = cloneDeep(this.data)
+        this.curData.customFormResponse = this.curData.customFormResponse || []
         this.childMode = this.mode
         this.data = {} // to save memory
 
@@ -3149,10 +3150,15 @@ export default {
       return ''
     },
     exportCustomFormResponse () {
-      const customFormRespose = curData.customFormResponse || []
-      for (question in this.customFormQuestions) {
+      const customFormResponse = this.curData.customFormResponse || []
+      let markdownStr = '### Additional Q&A\n'
+      for (let question of customFormResponse) {
+        markdownStr += `**${question.label}**
+${question.response}
 
+        `
       }
+      this.copyTextToClipboard(markdownStr)
     }
   }
 }

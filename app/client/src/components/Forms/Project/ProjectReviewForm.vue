@@ -132,7 +132,7 @@ Methods:
             <q-input
               filled readonly stack-label
               class="q-mt-sm"
-              :label="question.label ? question.label : 'Untitled'"
+              :label="question.label"
               :type="question.type.value"
               :value="question.response"
             />
