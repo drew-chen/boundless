@@ -1496,7 +1496,8 @@ Methods:
                   <!-- Export custom form as markdown -->
                   <q-btn no-caps
                     class="col q-my-sm"
-                    label="Copy additional questions as markdown"
+                    label="Copy additional questions"
+                    color="accent"
                     @click="exportCustomFormResponse"
                   />
                 </div>
@@ -2012,7 +2013,6 @@ export default {
       } catch (error) {
         this.$q.notify({
           message: 'File is either broken or missing!',
-          position: 'bottom',
           timeout: 2000,
           color: 'negative',
           textColor: 'white',
@@ -2043,7 +2043,6 @@ export default {
       } catch (error) {
         this.$q.notify({
           message: 'File is either broken or missing!',
-          position: 'bottom',
           timeout: 2000,
           color: 'negative',
           textColor: 'white',
@@ -2149,7 +2148,6 @@ export default {
 
       this.$q.notify({
         message: 'The file path has been copied to the clipboard.',
-        position: 'top',
         timeout: 2000,
         type: 'positive',
         actions: [
@@ -2319,9 +2317,8 @@ export default {
 
       this.$q.notify({
         type: 'positive',
-        message: '<div align="center">successful!<div>',
-        html: true,
-        timeout: 500
+        message: 'Successful!',
+        timeout: 2000
       })
     },
     /**
@@ -2577,7 +2574,8 @@ export default {
 
       this.$q.notify({
         type: 'positive',
-        message: 'Submitted successfully!'
+        message: 'Submitted successfully!',
+        timeout: 2000
       })
 
       this.emitAdded()
@@ -3099,15 +3097,17 @@ export default {
     },
     exportCustomFormResponse () {
       const customFormResponse = this.curData.customFormResponse || []
-      let markdownStr = '## Additional Q&A\n'
+      let markdownStr = '## Additional Q&A\n\n'
       for (let question of customFormResponse) {
-        markdownStr += `
-### **${question.label}**
-${question.response}
-
-        `
+        // Not using multiline string template since indenting messes with format.
+        markdownStr += `**${question.label}**\n${question.response}\n\n`
       }
       this.copyTextToClipboard(markdownStr)
+      this.$q.notify({
+        message: 'Additional questions and responses have been copied.',
+        type: 'positive',
+        timeout: 2000
+      })
     }
   }
 }
