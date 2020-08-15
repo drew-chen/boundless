@@ -895,7 +895,7 @@ Methods:
                                     v-if="!bodyContent.content.text"
                                     class="q-mt-sm"
                                   >
-                                    BODY TEXT IS REQUIED!
+                                    BODY TEXT IS REQUIRED!
                                   </p>
 
                                   <MarkdownTranslator
@@ -1842,7 +1842,7 @@ import UploadGUI from '../../components/Upload.vue'
 import ProgressBar from '../../components/ProgressBar.vue'
 import AddUser from '../../components/SubmitUserAdminConsole.vue'
 import PopupInputLimitLen from '../../components/Popups/PopupInputLimitLen.vue'
-import MarkdownTranslator from '../../components/Markdown.vue'
+import MarkdownTranslator from '../../components/MarkdownTranslator.vue'
 import ProjectReviewForm from '../../components/Forms/Project/ProjectReviewForm.vue'
 import EditCustomChips from './Shared/EditCustomChips.vue'
 
