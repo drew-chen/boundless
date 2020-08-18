@@ -14,6 +14,9 @@ same search bar for project names you could look for projects by contributor nam
 
 ### Behind the scenes
 
+* Add support for a custom backend instead of Firebase
+* Add user, groups, and permissions
+* When supported by Quasar, switch to Vue 3 with Typescript.
 * Reduce code repetition. For example, the same 'loadFireRefs' method is present
 in 19 files, with little change between them. Solutions include:
   * Use more Vuex modules and Vue mixins.
