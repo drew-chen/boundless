@@ -28,6 +28,8 @@ import productionDb from '../../firebase/init_production'
 import DbException from '../../errors/DbException'
 import { LocalStorage } from 'quasar'
 
+const DATABASE = 'firebase'
+
 /**
  * Sets up the Firebase reference getter. This should be called foremost before
  * setting or getting any Vuex state related to the db.
@@ -248,14 +250,20 @@ export async function submitQuestions ({ getters }) {
  * @param {Array<Object>} questionTemplates The new state of questionTemplates.
  */
 export async function submitQuestionTemplates ({ commit, getters }, questionTemplates) {
-  await getters.db.collection('config')
-    .doc('project')
-    .set({
-      projectsConfig: {
-        questionTemplates
-      }
-    }, { merge: true })
-  commit('setQuestionTemplates', questionTemplates)
+  switch (DATABASE) {
+    case 'firebase':
+      await getters.db.collection('config')
+        .doc('project')
+        .set({
+          projectsConfig: {
+            questionTemplates
+          }
+        }, { merge: true })
+      break
+    default:
+      throw DbException('db not set')
+    commit('setQuestionTemplates', questionTemplates)
+  }
 }
 
 /**
@@ -268,6 +276,9 @@ export async function submitQuestionTemplates ({ commit, getters }, questionTemp
  * @param {Array<Object>} questionTemplates The new state of questionTemplates.
  */
 export async function submitCustomFormEnabled ({ commit, getters }, customFormEnabled) {
+  switch (DATABASE) {
+    case 
+  }
   await getters.db.collection('config')
     .doc('project')
     .set({
