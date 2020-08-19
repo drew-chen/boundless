@@ -42,26 +42,32 @@ import { backendEnum, CURRENT_BACKEND } from '../../../backends.config'
  * @param {Object} context.commit Allows this action to commit mutations
  */
 export async function loadFireRefs ({ commit }) {
-  if (LocalStorage.has('boundless_db')) {
-    const sessionDb = LocalStorage.getItem('boundless_db')
-    commit('setIsTestingDb', sessionDb === 'testing')
-  } else {
-    const doc = await productionDb.collection('config').doc('project').get()
-
-    if (doc.exists) {
-      if (doc.data().db === 'testing') {
-        commit('setIsTestingDb', true)
-        LocalStorage.set('boundless_db', 'testing')
+  switch (CURRENT_BACKEND) {
+    case backendEnum.FIREBASE:
+      if (LocalStorage.has('boundless_db')) {
+        const sessionDb = LocalStorage.getItem('boundless_db')
+        commit('setIsTestingDb', sessionDb === 'testing')
       } else {
-        commit('setIsTestingDb', false)
-        LocalStorage.set('boundless_db', 'production')
+        const doc = await productionDb.collection('config').doc('project').get()
+
+        if (doc.exists) {
+          if (doc.data().db === 'testing') {
+            commit('setIsTestingDb', true)
+            LocalStorage.set('boundless_db', 'testing')
+          } else {
+            commit('setIsTestingDb', false)
+            LocalStorage.set('boundless_db', 'production')
+          }
+        } else {
+          commit('setIsTestingDb', false)
+          LocalStorage.set('boundless_db', 'production')
+          const msg = '"/config/project" path does not exists!'
+          throw new DbException(msg)
+        }
       }
-    } else {
-      commit('setIsTestingDb', false)
-      LocalStorage.set('boundless_db', 'production')
-      const msg = '"/config/project" path does not exists!'
-      throw new DbException(msg)
-    }
+      break
+    default:
+      throw DbException('No matching backend type.')
   }
 }
 
@@ -231,13 +237,16 @@ export async function submitProject ({ commit, dispatch, getters }) {
     })
   })
   commit('setSubmittedProjectMembers', tmpMembers)
-  let newProjectUuid
   switch (CURRENT_BACKEND) {
     case backendEnum.FIREBASE:
       // create a reference to a new project in the db
       const projectDoc = getters.db.collection('projects').doc()
-      newProjectUuid = projectDoc.id
+      const newProjectUuid = projectDoc.id
+      const submitTime = new Date(Date.now()).toISOString()
+      commit('setProjectSubmitTime', submitTime)
+      commit('setProjectUuid', newProjectUuid)
       await projectDoc.set({
+        customFormResponse: [],
         webpage: getters.webpage,
         files: {}
       })
@@ -248,9 +257,6 @@ export async function submitProject ({ commit, dispatch, getters }) {
     default:
       throw DbException('No matching backend type.')
   }
-  const submitTime = new Date(Date.now()).toISOString()
-  commit('setProjectSubmitTime', submitTime)
-  commit('setProjectUuid', newProjectUuid)
 }
 
 /**
