@@ -170,7 +170,11 @@ export async function loadUserList ({ commit, getters }) {
  * @param {Object} context.getters Gives access to state.
  */
 export async function submitNewUsers ({ commit, getters }) {
-  getters.projectMembers.forEach(async (member) => {
+  /*
+  Cannot use Array.forEach with an async callback here, as it will not wait for the
+  first iteration to finish before moving onto the second one.
+  */
+  for (const member of getters.projectMembers) {
     const email = member.email
     if (!(email in getters.emailToUuidMap)) {
       const name = member.name
@@ -210,7 +214,7 @@ export async function submitNewUsers ({ commit, getters }) {
         name
       })
     }
-  })
+  }
 }
 
 /**
@@ -227,6 +231,8 @@ export async function submitNewUsers ({ commit, getters }) {
  * @param {Object} context.getters Gives access to state.
  */
 export async function submitProject ({ commit, dispatch, getters }) {
+  console.log('0 reached')
+
   await dispatch('submitNewUsers')
 
   const tmpMembers = []
@@ -237,26 +243,37 @@ export async function submitProject ({ commit, dispatch, getters }) {
     })
   })
   commit('setSubmittedProjectMembers', tmpMembers)
+  console.log('----1 reached', tmpMembers)
   switch (CURRENT_BACKEND) {
     case backendEnum.FIREBASE:
       // create a reference to a new project in the db
       const projectDoc = getters.db.collection('projects').doc()
       const newProjectUuid = projectDoc.id
       const submitTime = new Date(Date.now()).toISOString()
-      commit('setProjectSubmitTime', submitTime)
-      commit('setProjectUuid', newProjectUuid)
       await projectDoc.set({
         customFormResponse: [],
         webpage: getters.webpage,
         files: {}
       })
-      await getters.db.collection('projects').doc('ToC').set({
-        [newProjectUuid]: getters.project
-      }, { merge: true })
+      console.log('2 reached')
+
+      commit('setProjectSubmitTime', submitTime)
+      commit('setProjectUuid', newProjectUuid)
+      try {
+        await getters.db.collection('projects').doc('ToC').set({
+          [newProjectUuid]: getters.project
+        }, { merge: true })
+      } catch (error) {
+        debugger
+        console.error(error)
+        console.log('---', newProjectUuid, getters.project)
+        throw error
+      }
       break
     default:
       throw DbException('No matching backend type.')
   }
+  console.log('3 reached')
 }
 
 /**

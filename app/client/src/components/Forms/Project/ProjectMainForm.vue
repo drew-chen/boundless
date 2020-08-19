@@ -684,9 +684,6 @@ export default {
      * the user on both success and failure.
      */
     saveToVuex () {
-      if (this.chosenKeywords.length === 0) {
-        this.chosenKeywords.push('tbd')
-      }
       const newProject = {
         uuid: null,
         project: this.projectName,
