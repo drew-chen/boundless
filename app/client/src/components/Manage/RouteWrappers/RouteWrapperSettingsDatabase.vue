@@ -9,11 +9,11 @@
 ## under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES
 ## OR CONDITIONS OF ANY KIND, either express or implied.
 
-Name:     components/Manage/Settings/SettingsDatabase.vue
+Name:     components/Manage/RouteWrapper/RouteWrapperSettingsDatabase.vue
 Purpose:  Manage database settings and guard navigation.
 Methods:
 
-  This component wraps around 'GetDataFromFirestore.vue', where most of the
+  This component wraps around 'SettingsDatabase.vue', where most of the
   actual functionality is located. This wrapping is needed so that
   'ManageSettings.vue' can pass different props and listen to different events
   depending on the route.
@@ -35,7 +35,7 @@ Methods:
       ({{ settingProps.dbId }})
     </div>
     <q-page>
-      <get-data-from-firestore
+      <settings-database
         @importingToDB="settingProps.consoleLoading"
         @databaseId="settingProps.setDatabaseId"
         ref="settings"
@@ -64,7 +64,7 @@ Methods:
 </template>
 
 <script>
-import GetDataFromFirestore from './Components/GetDataFromFirestore.vue'
+import SettingsDatabase from '../Settings/SettingsDatabase.vue'
 import mixinSettingNavGuard from '../../../mixins/mixinSettingNavGuard'
 
 export default {
@@ -80,7 +80,7 @@ export default {
     }
   },
   components: {
-    GetDataFromFirestore
+    SettingsDatabase
   }
 }
 </script>

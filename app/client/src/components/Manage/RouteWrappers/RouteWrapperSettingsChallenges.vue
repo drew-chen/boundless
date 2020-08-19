@@ -9,21 +9,22 @@
 ## under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES
 ## OR CONDITIONS OF ANY KIND, either express or implied.
 
-Name:     components/Manage/Settings/SettingsChallenges.vue
+Name:     components/Manage/RouteWrappers/RouteWrappersSettingsChallenges.vue
 Purpose:  Manage challenge settings and guard navigation.
 Methods:
 
-  This component wraps around 'AdminSettings.vue', where the actual functionality
-  is located. This wrapping is needed so that 'ManageSettings.vue' can pass
-  different props and listen to different events depending on the route.
+  This component wraps around the 'SettingsProjectsAndChallenges.vue' where the
+  actual functionality is located. This wrapping is needed so that
+  'ManageSettings.vue' can pass different props and listen to different events
+  depending on the route.
 
 ## -->
 
 <template>
-  <admin-settings
+  <settings-projects-and-challenges
     v-if="settingProps.name === 'challenges'"
-    :keywords="settingProps.keywords"
     type="challenges"
+    :keywords="settingProps.keywords"
     :ratio="settingProps.previewRatio"
     @submitting="settingProps.consoleLoading"
     @submitted="settingProps.setChallengeConfig"
@@ -32,7 +33,7 @@ Methods:
 </template>
 
 <script>
-import AdminSettings from './Components/AdminSettings.vue'
+import SettingsProjectsAndChallenges from '../Settings/SettingsProjectsAndChallenges'
 import mixinSettingNavGuard from '../../../mixins/mixinSettingNavGuard'
 
 export default {
@@ -48,7 +49,7 @@ export default {
     }
   },
   components: {
-    AdminSettings
+    SettingsProjectsAndChallenges
   }
 }
 </script>

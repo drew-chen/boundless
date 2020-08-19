@@ -13,14 +13,15 @@ Name:     components/Manage/Settings/SettingsProject.vue
 Purpose:  Manage project settings and guard navigation.
 Methods:
 
-  This component wraps around 'AdminSettings.vue', where most of the actual
-  functionality is located. This wrapping is needed so that 'ManageSettings.vue'
-  can pass different props and listen to different events depending on the route.
+  This component wraps around 'SettingsProjectsAndChallenges.vue', where most of
+  the actual functionality is located. This wrapping is needed so that
+  'ManageSettings.vue' can pass different props and listen to different events
+  depending on the route.
 
 ## -->
 
 <template>
-  <admin-settings
+  <settings-projects-and-challenges
     v-if="settingProps.name === 'projects'"
     :keywords="settingProps.keywords"
     type="projects"
@@ -32,7 +33,7 @@ Methods:
 </template>
 
 <script>
-import AdminSettings from './Components/AdminSettings.vue'
+import SettingsProjectsAndChallenges from '../Settings/SettingsProjectsAndChallenges'
 import mixinSettingNavGuard from '../../../mixins/mixinSettingNavGuard'
 
 export default {
@@ -48,7 +49,7 @@ export default {
     }
   },
   components: {
-    AdminSettings
+    SettingsProjectsAndChallenges
   }
 }
 </script>

@@ -9,18 +9,18 @@
 ## under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES
 ## OR CONDITIONS OF ANY KIND, either express or implied.
 
-Name:     components/Manage/Settings/SettingsGeneral.vue
+Name:     components/Manage/RouteWrapper/RouteWrapperSettingsGeneral.vue
 Purpose:  Manage general settings and guard navigation.
 Methods:
 
-  This component wraps around 'SystemSettings.vue', where most of the actual
+  This component wraps around 'GeneralSettings.vue', where most of the actual
   functionality is located. This wrapping is needed so that 'ManageSettings.vue'
   can pass different props and listen to different events depending on the route.
 
 ## -->
 
 <template>
-  <system-settings
+  <settings-general
     v-if="settingProps.name === 'general'"
     @usersConfigInfo="settingProps.setUserConfig"
     @challengesConfigInfo="settingProps.setChallengeConfig"
@@ -32,7 +32,7 @@ Methods:
 </template>
 
 <script>
-import SystemSettings from './Components/SystemSettings.vue'
+import SettingsGeneral from '../Settings/SettingsGeneral'
 import mixinSettingNavGuard from '../../../mixins/mixinSettingNavGuard'
 
 export default {
@@ -48,7 +48,7 @@ export default {
     }
   },
   components: {
-    SystemSettings
+    SettingsGeneral
   }
 }
 </script>

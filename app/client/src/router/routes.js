@@ -80,19 +80,19 @@ const routes = [
             children: [
               {
                 path: 'general',
-                component: () => import('components/Manage/Settings/SettingsGeneral.vue')
+                component: () => import('components/Manage/RouteWrappers/RouteWrapperSettingsGeneral.vue')
               },
               {
                 path: 'database',
-                component: () => import('components/Manage/Settings/SettingsDatabase.vue')
+                component: () => import('components/Manage/RouteWrappers/RouteWrapperSettingsDatabase.vue')
               },
               {
                 path: 'projects',
-                component: () => import('components/Manage/Settings/SettingsProjects.vue')
+                component: () => import('components/Manage/RouteWrappers/RouteWrapperSettingsProjects.vue')
               },
               {
                 path: 'challenges',
-                component: () => import('components/Manage/Settings/SettingsChallenges.vue')
+                component: () => import('components/Manage/RouteWrappers/RouteWrapperSettingsChallenges.vue')
               }
             ]
           }
