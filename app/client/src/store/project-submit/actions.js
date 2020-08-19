@@ -27,7 +27,7 @@ Methods:
 import productionDb from '../../firebase/init_production'
 import DbException from '../../errors/DbException'
 import { LocalStorage } from 'quasar'
-import { backendEnum, CURRENT_BACKEND } from '../../../../config/backends'
+import { backendEnum, CURRENT_BACKEND } from '../../../backends.config'
 
 /**
  * Sets up the Firebase reference getter. This should be called foremost before
