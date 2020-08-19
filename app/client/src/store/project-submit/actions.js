@@ -66,74 +66,92 @@ export async function loadFireRefs ({ commit }) {
 }
 
 /**
-  * Load the config from the db.
-  * TODO: this should be replaced now that config/project
-  *       is cached in session
-  *
-  * Previous versions of this functions return true if there was an error
-  * and false other wise. This has been removed on 7/22/2020 since the purpose
-  * of those return values were unknown.
-  *
-  * @param {*} { commit, getters } Allows this action to
-  *  commit mutations and retrieve state.
-  */
+ * Load the config from the db.
+ * TODO: this should be replaced now that config/project
+ *       is cached in session
+ *
+ * Previous versions of this functions return true if there was an error
+ * and false other wise. This has been removed on 7/22/2020 since the purpose
+ * of those return values were unknown.
+ *
+ * @param {Object} context Exposes the same set of methods/properties on the
+ *   store instance.
+ * @param {Object} context.commit Allows this action to commit mutations
+ * @param {Object} context.getters Gives access to state.
+ */
 export async function loadConfig ({ commit, getters }) {
-  const doc = await getters.db.collection('config').doc('project').get()
+  let keywordOptions, questionTemplates, customFormEnabled, allowedDomain,
+    bodyTypeOptions, chipTypeOptions
+  switch (CURRENT_BACKEND) {
+    case backendEnum.FIREBASE:
+      const doc = await getters.db.collection('config').doc('project').get()
 
-  if (doc.exists) {
-    const data = doc.data()
-    const keywordOptions = []
-    for (let key in data['keywords']) {
-      keywordOptions.push({
-        label: key,
-        value: data['keywords'][key]
-      })
-    }
-    let questionTemplates = data.projectsConfig.questionTemplates
-    questionTemplates = (questionTemplates === undefined) ? [] : questionTemplates
-    let customFormEnabled = data.projectsConfig.customFormEnabled
-    customFormEnabled = (customFormEnabled === undefined) ? false : customFormEnabled
-
-    commit('setKeywordOptions', keywordOptions)
-    commit('setQuestionTemplates', questionTemplates)
-    commit('setQuestions', [])
-    commit('setCustomFormEnabled', customFormEnabled)
-    commit('setAllowedDomain', data.allowedDomain)
-    commit('setBodyTypeOptions', data.bodyContentType)
-    commit('setChipTypeOptions', data.chipContentType)
-  } else {
-    throw new DbException('Required document not found!')
+      if (doc.exists) {
+        const data = doc.data()
+        keywordOptions = []
+        for (let key in data['keywords']) {
+          keywordOptions.push({
+            label: key,
+            value: data['keywords'][key]
+          })
+        }
+        questionTemplates = data.projectsConfig.questionTemplates
+        questionTemplates = (questionTemplates === undefined) ? [] : questionTemplates
+        customFormEnabled = data.projectsConfig.customFormEnabled
+        customFormEnabled = (customFormEnabled === undefined) ? false : customFormEnabled
+        allowedDomain = data.allowedDomain
+        bodyTypeOptions = data.bodyContentType
+        chipTypeOptions = data.chipContentType
+      } else {
+        throw new DbException('Required document not found!')
+      }
+      break
+    default:
+      throw DbException('No matching backend type.')
   }
+  commit('setKeywordOptions', keywordOptions)
+  commit('setQuestionTemplates', questionTemplates)
+  commit('setQuestions', [])
+  commit('setCustomFormEnabled', customFormEnabled)
+  commit('setAllowedDomain', allowedDomain)
+  commit('setBodyTypeOptions', bodyTypeOptions)
+  commit('setChipTypeOptions', chipTypeOptions)
 }
 
 /**
-  * Load the user list from the db and store the data into component state.
-  *
-  * Previous versions of this functions return true if there was an error
-  * and false other wise. This has been removed on 7/22/2020 since the purpose
-  * of those return values were unknown.
-  *
-  * @param {Object} context Exposes the same set of methods/properties on the
-  *   store instance.
-  * @param {Object} context.commit Allows this action to commit mutations
-  * @param {Object} context.getters Gives access to state.
-  */
+ * Load the user list from the db and store the data into component state.
+ *
+ * Previous versions of this functions return true if there was an error
+ * and false other wise. This has been removed on 7/22/2020 since the purpose
+ * of those return values were unknown.
+ *
+ * @param {Object} context Exposes the same set of methods/properties on the
+ *   store instance.
+ * @param {Object} context.commit Allows this action to commit mutations
+ * @param {Object} context.getters Gives access to state.
+ */
 export async function loadUserList ({ commit, getters }) {
-  const doc = await getters.db.collection('users').doc('ToC').get()
+  const emailToUuidMap = {}
+  const emailToNameMap = {}
+  switch (CURRENT_BACKEND) {
+    case backendEnum.FIREBASE:
+      const doc = await getters.db.collection('users').doc('ToC').get()
 
-  if (doc.exists) {
-    const tocUserData = doc.data()
-    const emailToUuidMap = {}
-    const emailToNameMap = {}
-    for (let uuid in tocUserData) {
-      emailToUuidMap[tocUserData[uuid].email] = uuid
-      emailToNameMap[tocUserData[uuid].email] = tocUserData[uuid].name
-    }
-    commit('setEmailToUuidMap', emailToUuidMap)
-    commit('setEmailToNameMap', emailToNameMap)
-  } else {
-    throw new DbException('users/ToC not found!')
+      if (doc.exists) {
+        const tocUserData = doc.data()
+        for (let uuid in tocUserData) {
+          emailToUuidMap[tocUserData[uuid].email] = uuid
+          emailToNameMap[tocUserData[uuid].email] = tocUserData[uuid].name
+        }
+      } else {
+        throw new DbException('users/ToC not found!')
+      }
+      break
+    default:
+      throw DbException('No matching backend type.')
   }
+  commit('setEmailToUuidMap', emailToUuidMap)
+  commit('setEmailToNameMap', emailToNameMap)
 }
 
 /**
@@ -147,39 +165,44 @@ export async function loadUserList ({ commit, getters }) {
  */
 export async function submitNewUsers ({ commit, getters }) {
   getters.projectMembers.forEach(async (member) => {
-    if (!(member.email in getters.emailToUuidMap)) {
-      const timeOfSubmit = new Date(Date.now()).toISOString()
-      const userDoc = getters.db.collection('users').doc()
-      const uuid = userDoc.id
-
-      let newUser = {
-        uuid,
-        name: member.name,
-        email: member.email,
-        title: '',
-        imgURL: '',
-        timestamp: timeOfSubmit,
-        created: timeOfSubmit
+    const email = member.email
+    if (!(email in getters.emailToUuidMap)) {
+      const name = member.name
+      let uuid
+      switch (CURRENT_BACKEND) {
+        case backendEnum.FIREBASE:
+          const timeOfSubmit = new Date(Date.now()).toISOString()
+          const userDoc = getters.db.collection('users').doc()
+          uuid = userDoc.id
+          let newUser = {
+            uuid,
+            name,
+            email,
+            title: '',
+            imgURL: '',
+            timestamp: timeOfSubmit,
+            created: timeOfSubmit
+          }
+          await getters.db.collection('users').doc(uuid).set({
+            socialNetwork: {},
+            projects: [],
+            achievements: {}
+          })
+          await getters.db.collection('users').doc('ToC').set({
+            [uuid]: newUser
+          }, { merge: true })
+          break
+        default:
+          throw DbException('No matching backend type.')
       }
-
       commit('addEntryToEmailToUuidMap', {
-        email: newUser.email,
+        email,
         uuid
       })
       commit('addEntryToEmailToNameMap', {
-        email: newUser.email,
-        name: newUser.name
+        email,
+        name
       })
-
-      await getters.db.collection('users').doc(uuid).set({
-        socialNetwork: {},
-        projects: [],
-        achievements: {}
-      })
-
-      await getters.db.collection('users').doc('ToC').set({
-        [uuid]: newUser
-      }, { merge: true })
     }
   })
 }

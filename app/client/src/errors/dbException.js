@@ -10,7 +10,7 @@
 ## OR CONDITIONS OF ANY KIND, either express or implied.
 
 Name:     errors/DbException.js
-Purpose:  Exception related to Firebase.
+Purpose:  Exception related to the database.
 Methods:  Inherits from Error and can be detected using 'instanceof'.
 
 ## */
