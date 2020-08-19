@@ -182,7 +182,10 @@ export default {
       }
     }
   },
-  /** Initialize data from the store. Cloning is needed for non-primitive types. */
+  /**
+   * Initialize data from the store. Cloning is needed for non-primitive types
+   * so that Vuex store isn't modified unintentionally.
+   */
   async created () {
     this.questionTemplates = cloneDeep(this.storeQuestionTemplates)
     this.customFormEnabled = this.storeCustomFormEnabled

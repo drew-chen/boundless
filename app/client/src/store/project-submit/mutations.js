@@ -21,6 +21,7 @@ Methods:
   the input payload can be copied so that the caller doesn't
   accidentally mutate state without first going through here.
 
+  Vue.set is used instead of '=' to make sure assignment is reactive.
 ## */
 
 import Vue from 'vue'

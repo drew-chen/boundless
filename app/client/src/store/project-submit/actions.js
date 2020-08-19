@@ -17,7 +17,7 @@ Purpose:
 
 Methods:
 
-  Firebase and Vuex are    both modified here and should be in sync.
+  Firebase and Vuex are both modified here and should be in sync.
   The general flow is to load information from the database then
   commit mutations to keep the state up to date. Or, to commit mutations
   then update Firebase to keep Firebase up to date.

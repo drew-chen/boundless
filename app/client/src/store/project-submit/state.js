@@ -74,10 +74,10 @@ export default function () {
         label: 'Short Answer' // <String>: Question type label displayed.
       },
       required: false, // <String>: Whether a response is necessary
-      /**
-        * <Integer>: Index which is only unique within an individual
-        * 'questionTemplates' instance.
-        */
+      /*
+      <Integer>: Index which is only unique within an individual
+      'questionTemplates' instance.
+       */
       order: 0
     }],
     /*
