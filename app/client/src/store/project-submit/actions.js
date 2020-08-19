@@ -27,8 +27,7 @@ Methods:
 import productionDb from '../../firebase/init_production'
 import DbException from '../../errors/DbException'
 import { LocalStorage } from 'quasar'
-
-const DATABASE = 'firebase'
+import { backendEnum, CURRENT_BACKEND } from '../../../../config/backends'
 
 /**
  * Sets up the Firebase reference getter. This should be called foremost before
@@ -209,20 +208,26 @@ export async function submitProject ({ commit, dispatch, getters }) {
     })
   })
   commit('setSubmittedProjectMembers', tmpMembers)
-
-  // create a reference to a new project in the db
-  const projectDoc = getters.db.collection('projects').doc()
+  let newProjectUuid
+  switch (CURRENT_BACKEND) {
+    case backendEnum.FIREBASE:
+      // create a reference to a new project in the db
+      const projectDoc = getters.db.collection('projects').doc()
+      newProjectUuid = projectDoc.id
+      await projectDoc.set({
+        webpage: getters.webpage,
+        files: {}
+      })
+      await getters.db.collection('projects').doc('ToC').set({
+        [newProjectUuid]: getters.project
+      }, { merge: true })
+      break
+    default:
+      throw DbException('No matching backend type.')
+  }
   const submitTime = new Date(Date.now()).toISOString()
-
-  commit('setProjectUuid', projectDoc.id)
   commit('setProjectSubmitTime', submitTime)
-  await projectDoc.set({
-    webpage: getters.webpage,
-    files: {}
-  })
-  await getters.db.collection('projects').doc('ToC').set({
-    [getters.projectUuid]: getters.project
-  }, { merge: true })
+  commit('setProjectUuid', newProjectUuid)
 }
 
 /**
@@ -234,10 +239,16 @@ export async function submitProject ({ commit, dispatch, getters }) {
  */
 export async function submitQuestions ({ getters }) {
   const uuid = getters.projectUuid
-  const projectDoc = getters.db.collection('projects').doc(uuid)
-  await projectDoc.update({
-    customFormResponse: getters.questions
-  })
+  switch (CURRENT_BACKEND) {
+    case backendEnum.FIREBASE:
+      const projectDoc = getters.db.collection('projects').doc(uuid)
+      await projectDoc.update({
+        customFormResponse: getters.questions
+      })
+      break
+    default:
+      throw DbException('No matching backend type.')
+  }
 }
 
 /**
@@ -250,8 +261,8 @@ export async function submitQuestions ({ getters }) {
  * @param {Array<Object>} questionTemplates The new state of questionTemplates.
  */
 export async function submitQuestionTemplates ({ commit, getters }, questionTemplates) {
-  switch (DATABASE) {
-    case 'firebase':
+  switch (CURRENT_BACKEND) {
+    case backendEnum.FIREBASE:
       await getters.db.collection('config')
         .doc('project')
         .set({
@@ -261,9 +272,9 @@ export async function submitQuestionTemplates ({ commit, getters }, questionTemp
         }, { merge: true })
       break
     default:
-      throw DbException('db not set')
-    commit('setQuestionTemplates', questionTemplates)
+      throw DbException('No matching backend type.')
   }
+  commit('setQuestionTemplates', questionTemplates)
 }
 
 /**
@@ -276,16 +287,19 @@ export async function submitQuestionTemplates ({ commit, getters }, questionTemp
  * @param {Array<Object>} questionTemplates The new state of questionTemplates.
  */
 export async function submitCustomFormEnabled ({ commit, getters }, customFormEnabled) {
-  switch (DATABASE) {
-    case 
+  switch (CURRENT_BACKEND) {
+    case backendEnum.FIREBASE:
+      await getters.db.collection('config')
+        .doc('project')
+        .set({
+          projectsConfig: {
+            customFormEnabled
+          }
+        }, { merge: true })
+      break
+    default:
+      throw DbException('No matching backend type.')
   }
-  await getters.db.collection('config')
-    .doc('project')
-    .set({
-      projectsConfig: {
-        customFormEnabled
-      }
-    }, { merge: true })
   commit('setCustomFormEnabled', customFormEnabled)
 }
 

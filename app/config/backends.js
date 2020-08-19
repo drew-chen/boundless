@@ -1,6 +1,6 @@
-const backends = Object.freeze({
+export const backendEnum = Object.freeze({
   FIREBASE: 'firebase',
   CUSTOM: 'custom',
 })
 
-export default backends
+export const CURRENT_BACKEND = backendType.FIREBASE
