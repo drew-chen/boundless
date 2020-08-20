@@ -242,7 +242,7 @@ export default {
       },
       haltConsole: false, // <Boolean>: flag for loading animation
       // <String>: The path of this component and the parent path of child routes.
-      basePath: '/admin/console/settings',
+      basePath: '/admin/settings',
       /*
       Possible improvement: move the following variables into a new vuex module
       dedicated to settings or into a mixin.

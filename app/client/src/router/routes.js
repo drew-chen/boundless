@@ -55,9 +55,9 @@ const routes = [
     component: () => import('layouts/BoundlessLayout.vue'),
     children: [
       {
-        path: 'console',
+        path: '',
         // Default route.
-        redirect: 'console/manage-projects',
+        redirect: 'manage-projects',
         component: () => import('pages/AdminPage.vue'),
         children: [
           {

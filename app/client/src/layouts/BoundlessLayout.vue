@@ -87,7 +87,7 @@ Methods:
 
         <q-route-tab
           v-if="$q.sessionStorage.has('admin_token')"
-          to="/admin/console" icon="widgets"
+          to="/admin" icon="widgets"
         />
 
         <q-space />

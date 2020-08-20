@@ -48,7 +48,7 @@ Methods:
             no-caps exact
             icon="img:statics/images/projects-icon.png"
             label="Projects"
-            to="/admin/console/manage-projects"
+            to="/admin/manage-projects"
           />
 
           <q-route-tab
@@ -56,21 +56,21 @@ Methods:
             v-if="layoutConfig && layoutConfig.challenges"
             icon="img:statics/images/challenge-icon1.png"
             label="Challenges"
-            to="/admin/console/manage-challenges"
+            to="/admin/manage-challenges"
           />
 
           <q-route-tab
             no-caps
             label="Users"
             icon="person"
-            to="/admin/console/manage-users"
+            to="/admin/manage-users"
           />
 
           <q-route-tab
             no-caps
             label="Settings"
             icon="settings"
-            to="/admin/console/settings"
+            to="/admin/settings"
           />
 
         </q-tabs>
