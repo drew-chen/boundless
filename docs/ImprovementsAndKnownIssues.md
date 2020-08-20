@@ -25,7 +25,9 @@ in 19 files, with little change between them. Solutions include:
 * Use Vuelidate in existing complex validations (ie, 'emailDomainCheck' func).
 * Validate email format, not just domain.
 * Use more session caching.
-* Improve error handling. Examples of error handling that can be improved:
+* Improve error handling.
+
+<ins>Examples of error handling that can be improved:</ins>
 
 
 ```JavaScript
@@ -42,7 +44,7 @@ try {
   /* code */
 } catch (error) {
   /*
-  Immediately throwing errors (without error handling) is the same as not
+  Catching and immediately throwing errors (without error handling) is the same as not
   using try and catch.
   */
   throw error
@@ -61,15 +63,19 @@ try {
 try {
   /* code that affects the database */
 } catch (error) {
-  /*
-  It would be preferred to check what type of error this is and handle
-  conditionally.
-  */
   handleDbError(error)
 }
-
-
 ```
+<ins>How to do error handling.</ins>
+
+0. Avoid the examples of bad error handling above.
+1. Add error identifiers, error classes, and other error utilities in app/client/src/errors.
+2. Add global error handling in app/client/src/boot/errorHandler.js.
+3. If possible, be specific about which errors are caught by using your error utilities.
+4. To handle errors, either do so at the component level or through the global
+error handler depending on your needs. Thus, try to avoid putting error handling
+in the vuex store. Errors themselves can be thrown anywhere.
+
 
 ### Appearance
 
