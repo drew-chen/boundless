@@ -64,34 +64,39 @@ Methods:
         class="text-secondary shadow-1"
         align="left" style="background: #F5F5F5;"
       >
-        <q-route-tab to="/" label="About" />
-
-        <q-route-tab to="/project/display" label="Projects" />
-
-        <q-route-tab to="/project/add" label="Add Project" />
-
+        <q-route-tab
+          to="/"
+          label="About"
+        />
+        <q-route-tab
+          to="/project/display"
+          label="Projects"
+        />
+        <q-route-tab
+          to="/project/add"
+          label="Add Project"
+        />
         <q-route-tab
           v-if="layoutConfig && layoutConfig.challenges"
-          to="/challenge/display" label="Challenges"
+          to="/challenge/display"
+          label="Challenges"
         />
-
         <q-route-tab
           v-if="layoutConfig && layoutConfig.challenges"
-          to="/challenge/add" label="Add Challenge"
+          to="/challenge/add"
+          label="Add Challenge"
         />
-
         <q-route-tab
           v-if="layoutConfig && layoutConfig.hairCut"
-          to="/haircut" icon="fas fa-cut"
+          to="/haircut"
+          icon="fas fa-cut"
         />
-
         <q-route-tab
           v-if="$q.sessionStorage.has('admin_token')"
-          to="/admin" icon="widgets"
+          to="/admin"
+          label="Admin"
         />
-
         <q-space />
-
         <q-tab
           :label="
             $q.sessionStorage.has('admin_token') ? 'Log Out' : 'Admin Log In'
