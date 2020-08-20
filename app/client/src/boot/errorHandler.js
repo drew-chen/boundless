@@ -17,7 +17,8 @@ Purpose:
 
 Methods:
 
-  A Vue error handler is configured on boot.
+  A Vue error handler is configured on boot. File is placed in /boot directory
+  so it is run when the app starts up.
   NOTE: Async errors currently can only be caught here if awaited!
 
 ## */

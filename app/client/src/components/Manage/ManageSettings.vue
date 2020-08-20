@@ -21,10 +21,17 @@ Methods:
   navigation through routing tabs. In addition, this component dynamically
   sets up the props needed for the child components.
 
+  To add another settings tab, the following changes need to be made:
+    0. (Look at files in /Settings and /RouteWrappers for examples.)
+    1. Create the settings component in /Settings.
+    2. Create the route wrapper to handle props and events in /RouteWrappers.
+    3. Create a new route and link the route wrapper to it in routes.js.
+    4. Pass the appropriate props in this component's 'settingProps'.
+    5. Add another q-route-tab in the this template.
+
 ## -->
 
 <template>
-
   <div>
     <q-splitter
       disable
@@ -135,6 +142,16 @@ export default {
      * Returns the name of the tab selected by slicing off the path of this
      * component from the url. The + 1 is needed to also slice off the
      * '/' before the child path.
+     *
+     * Once this component is created, this computed property is recalculated
+     * for any /admin route since 'ManageSettings.vue' is kept alive in
+     * 'AdminPage.vue'.
+     *
+     * For example, visit the /settings route, and then the /manage-projects route.
+     * While in /manage-projects, 'this.tabSelected' is equal to a substring
+     * of the /manage-projects route path. Therefore, the value of 'tabSelected'
+     * is not guaranteed to be one of 'general', 'database', 'projects', etc,
+     * when visiting other /admin routes.
      */
     tabSelected () {
       return this.$route.path.slice(this.basePath.length + 1)

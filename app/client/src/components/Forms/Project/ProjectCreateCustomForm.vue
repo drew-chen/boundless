@@ -165,6 +165,7 @@ import Vue from 'vue'
 import draggable from 'vuedraggable'
 import cloneDeep from 'lodash.clonedeep'
 import { createNamespacedHelpers } from 'vuex'
+// Ensures mapActions and mapGetters can only use the 'store/project-submit' module.
 const { mapActions, mapGetters } = createNamespacedHelpers('projectSubmit')
 
 export default {
