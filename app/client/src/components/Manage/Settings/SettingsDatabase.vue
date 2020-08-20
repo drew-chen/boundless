@@ -9,7 +9,7 @@
 ## under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES
 ## OR CONDITIONS OF ANY KIND, either express or implied.
 
-Name:     components/Manage/Settings/Components/GetDataFromFirestore.vue
+Name:     components/Manage/Settings/SettingsDatabase.vue
 Purpose:  To allow the user to export data from firestore and import data
           into firestore
 Methods:
@@ -87,12 +87,12 @@ Methods:
 </template>
 
 <script>
-import productionDb from '../../../../firebase/init_production'
-import testingDb from '../../../../firebase/init_testing'
+import productionDb from '../../../firebase/init_production'
+import testingDb from '../../../firebase/init_testing'
 
-import { dbMeta } from '../../../../../../client/boundless.config.js'
+import { dbMeta } from '../../../../../client/boundless.config'
 
-import DialogConfirmLeave from '../../../Dialogs/DialogConfirmLeave.vue'
+import DialogConfirmLeave from '../../Dialogs/DialogConfirmLeave'
 
 export default {
   components: {

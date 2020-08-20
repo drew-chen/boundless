@@ -9,7 +9,7 @@
 ## under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES
 ## OR CONDITIONS OF ANY KIND, either express or implied.
 
-Name:     components/Manage/Settings/Components/SystemSettings.vue
+Name:     components/Manage/Settings/GeneralSettings.vue
 Purpose:  To allow the admin to customize general settings from
           the admin console.
 Methods:
@@ -548,15 +548,15 @@ import deepClone from 'lodash.clonedeep'
 import Vue from 'vue'
 import sha256 from 'sha256'
 
-import productionDb, { productionStorage } from '../../../../firebase/init_production.js'
-import testingDb, { testingStorage } from '../../../../firebase/init_testing'
-import { layoutConfig } from '../../../../../../client/boundless.config'
+import productionDb, { productionStorage } from '../../../firebase/init_production'
+import testingDb, { testingStorage } from '../../../firebase/init_testing'
+import { layoutConfig } from '../../../../../client/boundless.config'
 
-import Markdown from '../../../../components/Markdown.vue'
-import DialogConfirmLeave from '../../../../components/Dialogs/DialogConfirmLeave.vue'
-import ButtonUndoAndSave from '../../../Buttons/ButtonUndoAndSave.vue'
+import Markdown from '../../../components/Markdown.vue'
+import DialogConfirmLeave from '../../../components/Dialogs/DialogConfirmLeave.vue'
+import ButtonUndoAndSave from '../../Buttons/ButtonUndoAndSave.vue'
 
-import mixinConfirmUnload from '../../../../mixins/mixinConfirmUnload'
+import mixinConfirmUnload from '../../../mixins/mixinConfirmUnload'
 
 export default {
   components: {

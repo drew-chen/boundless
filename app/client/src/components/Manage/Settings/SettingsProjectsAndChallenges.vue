@@ -9,7 +9,7 @@
 ## under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES
 ## OR CONDITIONS OF ANY KIND, either express or implied.
 
-Name:     components/Manage/Settings/Components/AdminSettings.vue
+Name:     components/Manage/Settings/SettingsProjectsAndChallenges.vue
 Purpose:
 
   To allow the user configure project/challenge UI via a config panel
@@ -559,17 +559,17 @@ Methods:
 <script>
 import deepClone from 'lodash.clonedeep'
 import Vue from 'vue'
-import isFirebaseError from '../../../../errors/isFirebaseError'
-import { defaultImages } from '../../../../../../client/boundless.config'
+import isFirebaseError from '../../../errors/isFirebaseError'
+import { defaultImages } from '../../../../../client/boundless.config'
 
-import productionDb, { productionStorage } from '../../../../firebase/init_production'
-import testingDb, { testingStorage } from '../../../../firebase/init_testing'
+import productionDb, { productionStorage } from '../../../firebase/init_production'
+import testingDb, { testingStorage } from '../../../firebase/init_testing'
 
-import ProjectCreateCustomForm from '../../../Forms/Project/ProjectCreateCustomForm.vue'
-import ButtonUndoAndSave from '../../../Buttons/ButtonUndoAndSave.vue'
-import DialogConfirmLeave from '../../../Dialogs/DialogConfirmLeave.vue'
+import ProjectCreateCustomForm from '../../Forms/Project/ProjectCreateCustomForm.vue'
+import ButtonUndoAndSave from '../../Buttons/ButtonUndoAndSave.vue'
+import DialogConfirmLeave from '../../Dialogs/DialogConfirmLeave.vue'
 
-import mixinConfirmUnload from '../../../../mixins/mixinConfirmUnload'
+import mixinConfirmUnload from '../../../mixins/mixinConfirmUnload'
 
 export default {
   props: {
@@ -667,7 +667,7 @@ export default {
        */
       updated: false,
       // <String>: Relative path of the statics directory
-      staticsPath: '../../../../../statics'
+      staticsPath: '../../../statics'
     }
   },
   methods: {
