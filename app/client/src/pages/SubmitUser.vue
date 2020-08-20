@@ -18,7 +18,7 @@ Methods:
 ## -->
 
 <template>
-  <div>
+  <q-page>
     <!-- -------------------- Page Loader -------------------- -->
     <div v-if="loading" class="absolute-center">
       <q-spinner
@@ -116,7 +116,7 @@ Methods:
       </q-form>
       <br><br><br>
     </q-card>
-  </div>
+  </q-page>
 </template>
 
 <script>
