@@ -41,17 +41,10 @@ Methods:
     >
       <template v-slot:top-left>
         <div class="row">
-          <q-btn
-            rounded
-            color="accent"
-            icon="add"
-            :label="`Add ${rowType}`"
-            @click="dialog = true; dialogOption = 'add'"
-          />
           <transition name="fade">
             <q-btn
-              flat rounded
-              class="q-ml-sm"
+              flat round
+              class="q-mr-sm"
               color="accent"
               icon="delete"
               key="delete"
@@ -65,7 +58,7 @@ Methods:
 
           <transition name="fade">
             <q-btn
-              flat rounded
+              flat round
               color="accent" icon="edit"
               v-if="selected.length === 1"
               @click="editRow()">
@@ -209,17 +202,7 @@ Methods:
       v-model="dialog"
     >
       <q-card>
-
-        <q-card-section
-          v-if="dialogOption === 'add'"
-        >
-          <component :is="getAddRowComponent"
-            @added="updateAllRowsAndClose"
-            @close="dialog = false"
-          />
-        </q-card-section>
-
-        <q-card-section v-if="dialogOption === 'edit'">
+        <q-card-section>
           <br>
           <component :is="getEditRowComponent"
             :uuid="uuid"
@@ -239,9 +222,6 @@ Methods:
 import firebase from 'firebase/app'
 import 'firebase/firestore'
 
-import AddProject from '../../../components/SubmitProjectAdminConsole.vue'
-import AddChallenge from '../../../components/SubmitChallengeAdminConsole.vue'
-import AddUser from '../../../components/SubmitUserAdminConsole.vue'
 import EditProject from '../../../components/EditAndPreview/EditAndPreviewProject.vue'
 import EditChallenge from '../../../components/EditAndPreview/EditAndPreviewChallenge.vue'
 import EditUser from '../../../components/EditAndPreview/EditAndPreviewUser.vue'
@@ -279,21 +259,11 @@ export default {
     }
   },
   components: {
-    AddChallenge,
-    AddProject,
-    AddUser,
     EditChallenge,
     EditProject,
     EditUser
   },
   computed: {
-    /**
-     * Gets the name of the imported component which adds a row to the admin table.
-     * @return {String} The component name
-     */
-    getAddRowComponent () {
-      return `Add${this.capitalizeFirst(this.rowType)}`
-    },
     /**
      * Gets the name of the imported component which edits a row of the admin table.
      * @return {String} The component name
@@ -324,7 +294,6 @@ export default {
       emailSet: new Set(), // <Set<String>>: set of user email (not for projects or challenges)
 
       dialog: false, // <Boolean>: flag to invoke dialog
-      dialogOption: '', // <String>: mode of the dialog
       rowList: [], // <Array<Object>>: list of rows of the same rowType (project, challenges, or users) from ToC
       uuidList: [], // <Array<String>>: list of uid from ToC
       filter: '', // <String>: value of the search
@@ -614,7 +583,6 @@ export default {
         uuidAssigned = true
       }
       if (uuidAssigned) {
-        this.dialogOption = 'edit'
         setTimeout(() => {
           this.dialog = true
         }, 200)
