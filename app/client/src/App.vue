@@ -51,6 +51,10 @@ export default {
 </script>
 
 <style lang="stylus">
+
+.q-page
+  padding 30px 5vw
+
 // https://tobiasahlin.com/blog/how-to-animate-box-shadow/
 .hoverable {
   cursor: pointer;
