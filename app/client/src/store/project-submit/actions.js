@@ -29,6 +29,18 @@ import DbException from '../../errors/DbException'
 import { LocalStorage } from 'quasar'
 import { backendEnum, CURRENT_BACKEND } from '../../../backends.config'
 
+export async function initStoreProjectSubmit ({ dispatch }) {
+  switch (CURRENT_BACKEND) {
+    case backendEnum.FIREBASE:
+      await dispatch('loadFireRefs')
+      await dispatch('loadConfig')
+      await dispatch('loadUserList')
+      break
+    default:
+      throw DbException('No matching backend type.')
+  }
+}
+
 /**
  * Sets up the Firebase reference getter. This should be called foremost before
  * setting or getting any Vuex state related to the db.
@@ -42,32 +54,26 @@ import { backendEnum, CURRENT_BACKEND } from '../../../backends.config'
  * @param {Object} context.commit Allows this action to commit mutations
  */
 export async function loadFireRefs ({ commit }) {
-  switch (CURRENT_BACKEND) {
-    case backendEnum.FIREBASE:
-      if (LocalStorage.has('boundless_db')) {
-        const sessionDb = LocalStorage.getItem('boundless_db')
-        commit('setIsTestingDb', sessionDb === 'testing')
-      } else {
-        const doc = await productionDb.collection('config').doc('project').get()
+  if (LocalStorage.has('boundless_db')) {
+    const sessionDb = LocalStorage.getItem('boundless_db')
+    commit('setIsTestingDb', sessionDb === 'testing')
+  } else {
+    const doc = await productionDb.collection('config').doc('project').get()
 
-        if (doc.exists) {
-          if (doc.data().db === 'testing') {
-            commit('setIsTestingDb', true)
-            LocalStorage.set('boundless_db', 'testing')
-          } else {
-            commit('setIsTestingDb', false)
-            LocalStorage.set('boundless_db', 'production')
-          }
-        } else {
-          commit('setIsTestingDb', false)
-          LocalStorage.set('boundless_db', 'production')
-          const msg = '"/config/project" path does not exists!'
-          throw new DbException(msg)
-        }
+    if (doc.exists) {
+      if (doc.data().db === 'testing') {
+        commit('setIsTestingDb', true)
+        LocalStorage.set('boundless_db', 'testing')
+      } else {
+        commit('setIsTestingDb', false)
+        LocalStorage.set('boundless_db', 'production')
       }
-      break
-    default:
-      throw DbException('No matching backend type.')
+    } else {
+      commit('setIsTestingDb', false)
+      LocalStorage.set('boundless_db', 'production')
+      const msg = '"/config/project" path does not exists!'
+      throw new DbException(msg)
+    }
   }
 }
 
