@@ -38,12 +38,12 @@ export async function initStoreProjectSubmit (context) {
   switch (CURRENT_BACKEND) {
     case backendEnum.FIREBASE:
       await loadFireRefs(context)
-      await loadConfig(context)
-      await loadUserList(context)
       break
     default:
       throw DbException('No matching backend type.')
   }
+  await loadConfig(context)
+  await loadUserList(context)
 }
 
 /**
@@ -84,6 +84,22 @@ async function loadFireRefs ({ commit }) {
 
 /**
  * Load the config from the db.
+ *
+ * @param {Object} context Exposes the same set of methods/properties as the
+ *   store instance.
+ */
+async function loadConfig (context) {
+  switch (CURRENT_BACKEND) {
+    case backendEnum.FIREBASE:
+      await firebaseLoadConfig(context)
+      break
+    default:
+      throw DbException('No matching backend type.')
+  }
+}
+
+/**
+ * Load the config from firebase.
  * TODO: this should be replaced now that config/project
  *       is cached in session
  *
@@ -96,43 +112,32 @@ async function loadFireRefs ({ commit }) {
  * @param {Object} context.commit Allows this action to commit mutations
  * @param {Object} context.getters Gives access to state.
  */
-async function loadConfig ({ commit, getters }) {
-  let keywordOptions, questionTemplates, customFormEnabled, allowedDomain,
-    bodyTypeOptions, chipTypeOptions
-  switch (CURRENT_BACKEND) {
-    case backendEnum.FIREBASE:
-      const doc = await getters.db.collection('config').doc('project').get()
+async function firebaseLoadConfig ({ commit, getters }) {
+  const doc = await getters.db.collection('config').doc('project').get()
+  if (doc.exists) {
+    const data = doc.data()
+    const keywordOptions = []
+    for (let key in data['keywords']) {
+      keywordOptions.push({
+        label: key,
+        value: data['keywords'][key]
+      })
+    }
+    let questionTemplates = data.projectsConfig.questionTemplates
+    questionTemplates = (questionTemplates === undefined) ? [] : questionTemplates
+    let customFormEnabled = data.projectsConfig.customFormEnabled
+    customFormEnabled = (customFormEnabled === undefined) ? false : customFormEnabled
 
-      if (doc.exists) {
-        const data = doc.data()
-        keywordOptions = []
-        for (let key in data['keywords']) {
-          keywordOptions.push({
-            label: key,
-            value: data['keywords'][key]
-          })
-        }
-        questionTemplates = data.projectsConfig.questionTemplates
-        questionTemplates = (questionTemplates === undefined) ? [] : questionTemplates
-        customFormEnabled = data.projectsConfig.customFormEnabled
-        customFormEnabled = (customFormEnabled === undefined) ? false : customFormEnabled
-        allowedDomain = data.allowedDomain
-        bodyTypeOptions = data.bodyContentType
-        chipTypeOptions = data.chipContentType
-      } else {
-        throw new DbException('Required document not found!')
-      }
-      break
-    default:
-      throw DbException('No matching backend type.')
+    commit('setKeywordOptions', keywordOptions)
+    commit('setQuestionTemplates', questionTemplates)
+    commit('setQuestions', [])
+    commit('setCustomFormEnabled', customFormEnabled)
+    commit('setAllowedDomain', data.allowedDomain)
+    commit('setBodyTypeOptions', data.bodyContentType)
+    commit('setChipTypeOptions', data.chipContentType)
+  } else {
+    throw new DbException('Required document not found!')
   }
-  commit('setKeywordOptions', keywordOptions)
-  commit('setQuestionTemplates', questionTemplates)
-  commit('setQuestions', [])
-  commit('setCustomFormEnabled', customFormEnabled)
-  commit('setAllowedDomain', allowedDomain)
-  commit('setBodyTypeOptions', bodyTypeOptions)
-  commit('setChipTypeOptions', chipTypeOptions)
 }
 
 /**
@@ -147,7 +152,7 @@ async function loadConfig ({ commit, getters }) {
  * @param {Object} context.commit Allows this action to commit mutations
  * @param {Object} context.getters Gives access to state.
  */
-export async function loadUserList ({ commit, getters }) {
+async function loadUserList ({ commit, getters }) {
   const emailToUuidMap = {}
   const emailToNameMap = {}
   switch (CURRENT_BACKEND) {
