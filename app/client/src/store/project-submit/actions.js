@@ -28,13 +28,18 @@ import productionDb from '../../firebase/init_production'
 import DbException from '../../errors/DbException'
 import { LocalStorage } from 'quasar'
 import { backendEnum, CURRENT_BACKEND } from '../../../backends.config'
-
-export async function initStoreProjectSubmit ({ dispatch }) {
+/**
+ * @param {Object} context Exposes the same set of methods/properties as the
+ *   store instance.
+ *   For all the properties of the context object, see:
+ *   https://vuex.vuejs.org/api/#actions.
+ */
+export async function initStoreProjectSubmit (context) {
   switch (CURRENT_BACKEND) {
     case backendEnum.FIREBASE:
-      await dispatch('loadFireRefs')
-      await dispatch('loadConfig')
-      await dispatch('loadUserList')
+      await loadFireRefs(context)
+      await loadConfig(context)
+      await loadUserList(context)
       break
     default:
       throw DbException('No matching backend type.')
@@ -49,11 +54,11 @@ export async function initStoreProjectSubmit ({ dispatch }) {
  * and false other wise. This has been removed on 7/22/2020 since the purpose
  * of those return values were unknown.
  *
- * @param {Object} context Exposes the same set of methods/properties on the
- *  store instance.
+ * @param {Object} context Exposes the same set of methods/properties as the
+ *   store instance.
  * @param {Object} context.commit Allows this action to commit mutations
  */
-export async function loadFireRefs ({ commit }) {
+async function loadFireRefs ({ commit }) {
   if (LocalStorage.has('boundless_db')) {
     const sessionDb = LocalStorage.getItem('boundless_db')
     commit('setIsTestingDb', sessionDb === 'testing')
@@ -86,12 +91,12 @@ export async function loadFireRefs ({ commit }) {
  * and false other wise. This has been removed on 7/22/2020 since the purpose
  * of those return values were unknown.
  *
- * @param {Object} context Exposes the same set of methods/properties on the
+ * @param {Object} context Exposes the same set of methods/properties as the
  *   store instance.
  * @param {Object} context.commit Allows this action to commit mutations
  * @param {Object} context.getters Gives access to state.
  */
-export async function loadConfig ({ commit, getters }) {
+async function loadConfig ({ commit, getters }) {
   let keywordOptions, questionTemplates, customFormEnabled, allowedDomain,
     bodyTypeOptions, chipTypeOptions
   switch (CURRENT_BACKEND) {
@@ -137,7 +142,7 @@ export async function loadConfig ({ commit, getters }) {
  * and false other wise. This has been removed on 7/22/2020 since the purpose
  * of those return values were unknown.
  *
- * @param {Object} context Exposes the same set of methods/properties on the
+ * @param {Object} context Exposes the same set of methods/properties as the
  *   store instance.
  * @param {Object} context.commit Allows this action to commit mutations
  * @param {Object} context.getters Gives access to state.
@@ -170,7 +175,7 @@ export async function loadUserList ({ commit, getters }) {
  * Submits the new users related to the project as the user submits
  * the project to the database.
  *
- * @param {Object} context Exposes the same set of methods/properties on the
+ * @param {Object} context Exposes the same set of methods/properties as the
  *  store instance.
  * @param {Object} context.commit Allows this action to commit mutations
  * @param {Object} context.getters Gives access to state.
@@ -230,7 +235,7 @@ export async function submitNewUsers ({ commit, getters }) {
  * Unlike most other fields, the project id, submission time and users list
  * are finalized in here instead of in ProjectMainForm.vue
  *
- * @param {Object} context Exposes the same set of methods/properties on the
+ * @param {Object} context Exposes the same set of methods/properties as the
  *  store instance.
  * @param {Object} context.commit Allows this action to commit mutations.
  * @param {Object} context.dispatch Used to call other actions.
@@ -285,7 +290,7 @@ export async function submitProject ({ commit, dispatch, getters }) {
 /**
  * Save custom form responses under a field named 'createInfo'.
  *
- * @param {Object} context Exposes the same set of methods/properties on the
+ * @param {Object} context Exposes the same set of methods/properties as the
  *  store instance.
  * @param {Object} context.getters Gives access to state.
  */
@@ -306,7 +311,7 @@ export async function submitQuestions ({ getters }) {
 /**
  * Save questionTemplates to vuex and Firestore.
  *
- * @param {Object} context Exposes the same set of methods/properties on the
+ * @param {Object} context Exposes the same set of methods/properties as the
  *  store instance.
  * @param {Object} context.commit Allows this action to commit mutations
  * @param {Object} context.getters Gives access to state.
@@ -332,7 +337,7 @@ export async function submitQuestionTemplates ({ commit, getters }, questionTemp
 /**
  * Save customFormEnabled to vuex and Firestore.
  *
- * @param {Object} context Exposes the same set of methods/properties on the
+ * @param {Object} context Exposes the same set of methods/properties as the
  *  store instance.
  * @param {Object} context.commit Allows this action to commit mutations
  * @param {Object} context.getters Gives access to state.
@@ -358,7 +363,7 @@ export async function submitCustomFormEnabled ({ commit, getters }, customFormEn
 /**
  * Helper function which resets the vuex store to the initial state.
  *
- * @param {Object} context Exposes the same set of methods/properties on the
+ * @param {Object} context Exposes the same set of methods/properties as the
  *  store instance.
  * @param {Object} context.commit Allows this action to commit mutations
  */
