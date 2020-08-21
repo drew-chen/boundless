@@ -36,7 +36,4 @@ Methods:  See route.js or other views in /pages for usage.
 </template>
 
 <script>
-export default {
-  name: 'NotFound'
-}
 </script>

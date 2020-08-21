@@ -156,7 +156,7 @@ if (process.env.MODE !== 'ssr') {
     children: [
       {
         path: '',
-        component: () => import('pages/Error404.vue')
+        component: () => import('pages/NotFound.vue')
       }
     ]
   })
