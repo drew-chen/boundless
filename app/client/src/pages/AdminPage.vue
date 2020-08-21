@@ -87,7 +87,7 @@ Methods:
 <script>
 import { layoutConfig } from '../../boundless.config'
 
-import NotFound from './Error404'
+import NotFound from './NotFound'
 
 export default {
   components: {

@@ -550,7 +550,7 @@ import Banner from '../components/Banners/Banner'
 import ProjectTable from '../components/Tables/ProjectTable'
 import MarkdownTranslator from '../components/MarkdownTranslator'
 
-import NotFound from './Error404'
+import NotFound from './NotFound'
 
 export default {
   components: {
