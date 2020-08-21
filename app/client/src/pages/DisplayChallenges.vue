@@ -293,7 +293,7 @@ Methods:
 
           <q-separator />
 
-          <q-card-section style="width: 50vh; height: 40vh; overflow: auto">
+          <q-card-section style="height: 40vh; overflow: auto">
             <p>
               {{ rowMessage }}
             </p>

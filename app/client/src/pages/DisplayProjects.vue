@@ -248,7 +248,7 @@ Methods:
             <q-td
               key="members"
               :props="props"
-              style="max-width: 150px; overflow: hidden;"
+              style="max-width: 90px; overflow: hidden;"
             >
               <div align="left">
                 {{ displayMembers(props.row.members) }}
@@ -280,7 +280,7 @@ Methods:
 
           <q-separator />
 
-          <q-card-section style="width: 50vh; height: 40vh; overflow: auto">
+          <q-card-section style="height: 40vh; overflow: auto">
             <p>
               {{ rowMessage }}
             </p>
