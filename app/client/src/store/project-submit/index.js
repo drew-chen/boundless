@@ -1,5 +1,5 @@
-<!-- ##
-## Copyright (c) 2019 Wind River Systems, Inc.
+/* ##
+## Copyright (c) 2020 Wind River Systems, Inc.
 ##
 ## Licensed under the Apache License, Version 2.0 (the "License");
 ## you may not use this file except in compliance with the License.
@@ -9,26 +9,21 @@
 ## under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES
 ## OR CONDITIONS OF ANY KIND, either express or implied.
 
-Name:     components/SettingPanels/Users.vue
-Purpose:  Currently empty and for future release
-Methods:
+Name:     store/project-submit/index.js
+Purpose:  Glues the module together.
+Methods:  Imports separate files then exports them together.
 
-## -->
+## */
 
-<template>
-  
-</template>
+import state from './state'
+import * as getters from './getters'
+import * as mutations from './mutations'
+import * as actions from './actions'
 
-<script>
 export default {
-  data () {
-    return {
-
-    }
-  }
+  namespaced: true,
+  state,
+  getters,
+  mutations,
+  actions
 }
-</script>
-
-<style lang="stylus">
-
-</style>

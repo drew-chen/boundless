@@ -5,9 +5,9 @@ module.exports = function (ctx) {
     // app boot file (/src/boot)
     // --> boot files are part of "main.js"
     boot: [
+      'errorHandler',
       'vuelidate'
     ],
-
     css: [
       'app.styl'
     ],
@@ -80,7 +80,10 @@ module.exports = function (ctx) {
         'QKnob',
         'QColor',
         'QPopupProxy',
-        'QBtnDropdown'
+        'QBtnDropdown',
+        'QStepper',
+        'QStep',
+        'QStepperNavigation'
       ],
 
       directives: [
@@ -117,7 +120,13 @@ module.exports = function (ctx) {
           loader: 'eslint-loader',
           exclude: /node_modules/
         })
-      }
+      },
+      /*
+        This is a configuration passed on
+        to the underlying Webpack.
+        For debugging purposes.
+      */
+      devtool: 'source-map'
     },
 
     devServer: {
@@ -127,7 +136,7 @@ module.exports = function (ctx) {
     },
 
     // animations: 'all', // --- includes all animations
-    animations: [],
+    animations: ['fadeIn', 'fadeOut'],
 
     ssr: {
       pwa: false

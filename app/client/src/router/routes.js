@@ -10,9 +10,15 @@
 ## OR CONDITIONS OF ANY KIND, either express or implied.
 
 Name:     router/routes.js
-Purpose:
+Purpose:  To handle routing.
 Methods:
-  *
+
+  Routes are handled by using Vue Router. Components are imported through
+  functions for lazy loading. Routes are also used to take advantage of
+  navigation guards. For example, leaving project settings with unsaved changes
+  triggers a navigation guard to make sure the user deals with the changes.
+  That guard is placed 'SettingsProject.vue' instead of here since that
+  specific guard needs '$refs' to work.
 
 ## */
 
@@ -44,13 +50,53 @@ const routes = [
       }
     ]
   },
-  { // might need to amend this
-    path: '/admin/console',
+  {
+    path: '/admin',
     component: () => import('layouts/BoundlessLayout.vue'),
     children: [
       {
         path: '',
-        component: () => import('pages/AdminPage.vue')
+        // Default route.
+        redirect: 'manage-projects',
+        component: () => import('pages/AdminPage.vue'),
+        children: [
+          {
+            path: 'manage-projects',
+            component: () => import('components/Manage/ManageProjects.vue')
+          },
+          {
+            path: 'manage-challenges',
+            component: () => import('components/Manage/ManageChallenges.vue')
+          },
+          {
+            path: 'manage-users',
+            component: () => import('components/Manage/ManageUsers.vue')
+          },
+          {
+            path: 'settings',
+            // Default route.
+            redirect: 'settings/general',
+            component: () => import('components/Manage/ManageSettings.vue'),
+            children: [
+              {
+                path: 'general',
+                component: () => import('components/Manage/RouteWrappers/RouteWrapperSettingsGeneral.vue')
+              },
+              {
+                path: 'database',
+                component: () => import('components/Manage/RouteWrappers/RouteWrapperSettingsDatabase.vue')
+              },
+              {
+                path: 'projects',
+                component: () => import('components/Manage/RouteWrappers/RouteWrapperSettingsProjects.vue')
+              },
+              {
+                path: 'challenges',
+                component: () => import('components/Manage/RouteWrappers/RouteWrapperSettingsChallenges.vue')
+              }
+            ]
+          }
+        ]
       }
     ]
   },
@@ -100,24 +146,19 @@ const routes = [
       }
     ]
   }
-  // {
-  //   path: '/inject',
-  //   component: () => import('layouts/BoundlessLayout.vue'),
-  //   children: [
-  //     {
-  //       path: '',
-  //       component: () => import('pages/util/Injection.vue')
-  //     }
-  //   ]
-  // }
 ]
 
 // Always leave this as last one
 if (process.env.MODE !== 'ssr') {
   routes.push({
     path: '*',
-    component: () => import('pages/Error404.vue')
+    component: () => import('layouts/EmptyLayout.vue'),
+    children: [
+      {
+        path: '',
+        component: () => import('pages/NotFound.vue')
+      }
+    ]
   })
 }
-
 export default routes

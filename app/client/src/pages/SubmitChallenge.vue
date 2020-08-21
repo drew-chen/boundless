@@ -21,569 +21,398 @@ Methods:
 ## -->
 
 <template>
-  <div style="margin-bottom: 3em;">
-    <!-- -------------------- Page Loader -------------------- -->
-    <div v-if="loading" class="absolute-center">
-      <q-spinner
-        color="primary"
-        size="8em"
-      />
-    </div>
+  <q-page>
+    <div style="margin-bottom: 3em;">
+      <!-- -------------------- Page Loader -------------------- -->
+      <div v-if="loading" class="absolute-center">
+        <q-spinner
+          color="primary"
+          size="8em"
+        />
+      </div>
 
-    <!-- -------------------- Main Content -------------------- -->
-    <q-card
-      v-else
-      align="center"
-      style="margin: auto; max-width: 1000px;"
-    >
-      <br class="small">
-      <h4>New Challenge</h4>
-
-      <q-form
-        @submit="onSubmit"
-        class="q-pd-md"
-        style="max-width: 80%;"
+      <!-- -------------------- Main Content -------------------- -->
+      <q-card
+        v-else
+        align="center"
+        style="margin: auto; max-width: 1000px;"
       >
+        <br class="small">
+        <h4>New Challenge</h4>
 
-        If you have a problem or challenge you would like others to consider solving  you can post it here.
-        <br><br>
-
-        <hr class="newLine2">
-
-        <!-- -------------------- Challenge Name -------------------- -->
-        <q-input
-          class="q-mt-sm"
-          filled
-          ref="challengeName"
-          v-model="challengeName"
-          placeholder="Please enter the name of the challenge..."
-          label="Challenge Name"
-          lazy-rules
-          :rules="[
-            val => $v.challengeName.required || 'Field is required',
-            val => $v.challengeName.maxLength || 'Max length is 60 characters'
-          ]"
-          @input="$v.challengeName.$touch()"
-          @keydown.ctrl.shift.65="activateAdmin"
+        <q-form
+          @submit="onSubmit"
+          class="q-pd-md"
+          style="max-width: 80%;"
         >
-          <template v-slot:prepend>
-            <q-icon name="fas fa-project-diagram" />
-          </template>
-        </q-input>
 
-        <!-- -------------------- Challenge Description -------------------- -->
-        <q-input
-          class="q-mt-sm"
-          filled
-          autogrow
-          ref="challengeDescription"
-          v-model="challengeDescription"
-          placeholder="Please give 2-5 sentences on what the challenge is about. (Grows automatically.)"
-          label="Description/Overview"
-          type="textarea"
-          lazy-rules
-          @input="$v.challengeDescription.$touch()"
-          :rules="[val => $v.challengeDescription.required || 'Field is required']"
-        >
-          <template v-slot:prepend>
-            <q-icon name="far fa-comment-alt" />
-          </template>
-        </q-input>
+          If you have a problem or challenge you would like others to consider solving  you can post it here.
+          <br><br>
 
-        <!-- ---------------- Challenge Business Rationale ---------------- -->
-        <q-input
-          class="q-my-sm"
-          filled
-          autogrow
-          ref="challengeRationale"
-          v-model="challengeRationale"
-          placeholder="Please give 2-5 sentences on why and how this impact the company or the orgnization. (Grows automatically.)"
-          label="Business Rationale"
-          type="textarea"
-        >
-          <template v-slot:prepend>
-            <q-icon name="device_hub" />
-          </template>
-        </q-input>
-
-        <hr class="newLine2">
-
-        <!--  -------------------- Keywords -------------------- -->
-        <div class="row q-pa-sm" align="left">
-          <p class="col-4 header">Keywords:</p>
-
-          <q-option-group
-            dense inline
-            class="col" type="checkbox"
-            v-model="chosenKeywords"
-            :options="keywordsOptions"
-          />
-        </div>
-
-        <hr class="newLine2">
-
-        <!-- -------------------- Sponsors -------------------- -->
-        <div>
-          <div class="row">
-            <p class="col q-pa-sm header" align="left">
-              Sponsors:
-            </p>
-            <span class="col-1 q-mt-sm" >
-              <q-btn
-                dense round
-                color="accent" icon="add"
-                @click="addSponsor"
-              />
-            </span>
-          </div>
-
-          <div
-            v-for="(member, index) in sponsors"
-            :key="index"
-            class="row q-mb-sm"
-          >
-            <q-input
-              filled lazy-rules
-              class="col q-mr-xs"
-              placeholder="ie. john.doe@gmail.com"
-              label="Sponsor's Email" type="email"
-              v-model="sponsors[index].email"
-              :ref="`memberEmail${index}`"
-              :autofocus="index > 0"
-              :rules="[val => $v.sponsors.$each[index].email.required || 'Field is required']"
-              @input="$v.sponsors.$each[index].email.$touch()"
-              @blur="emailDomainCheck(sponsors[index].email, index)"
-            >
-              <template v-slot:prepend>
-                <q-icon name="email" />
-              </template>
-            </q-input>
-
-            <q-input
-              :disable="sponsors[index].email in emailToUuidMap"
-              filled lazy-rules
-              class="col q-mr-xs"
-              placeholder="ie. John Doe" label="Contributor's Full Name"
-              v-model="sponsors[index].name"
-              :ref="`memberName${index}`"
-              :rules="[
-                val => $v.sponsors.$each[index].name.required || 'Field is required',
-                val => $v.sponsors.$each[index].name.maxLength || 'Max length is 60 characters'
-              ]"
-              @input="$v.sponsors.$each[index].name.$touch()"
-              @blur="capitalizeFirstChar(index)"
-            >
-              <template v-slot:prepend>
-                <q-icon name="group" />
-              </template>
-            </q-input>
-
-            <!-- <div class="col-1">
-              <q-card flat align="center">
-                Lead
-                <q-toggle
-                  color="secondary"
-                  v-model="sponsors[index].role"
-                  true-value="lead"
-                  false-value="member"
-                />
-              </q-card>
-            </div> -->
-
-            <div class="col-1 q-mt-sm">
-              <q-btn
-                :hidden="index < 1"
-                round flat
-                icon="delete"
-                @click="sponsors.splice(index, 1)"
-              />
-            </div>
-          </div>
-        </div>
-
-        <!-- -------------------- Admin Mode -------------------- -->
-        <div :hidden="!adminMode">
           <hr class="newLine2">
-          <!-- -------------------- Chips -------------------- -->
+
+          <!-- -------------------- Challenge Name -------------------- -->
+          <q-input
+            class="q-mt-sm"
+            filled
+            ref="challengeName"
+            v-model="challengeName"
+            placeholder="Please enter the name of the challenge..."
+            label="Challenge Name"
+            lazy-rules
+            :rules="[
+              val => $v.challengeName.required || 'Field is required',
+              val => $v.challengeName.maxLength || 'Max length is 60 characters'
+            ]"
+            @input="$v.challengeName.$touch()"
+            @keydown.ctrl.shift.65="activateAdmin"
+          >
+            <template v-slot:prepend>
+              <q-icon name="fas fa-project-diagram" />
+            </template>
+          </q-input>
+
+          <!-- -------------------- Challenge Description -------------------- -->
+          <q-input
+            class="q-mt-sm"
+            filled
+            autogrow
+            ref="challengeDescription"
+            v-model="challengeDescription"
+            placeholder="Please give 2-5 sentences on what the challenge is about. (Grows automatically.)"
+            label="Description/Overview"
+            type="textarea"
+            lazy-rules
+            @input="$v.challengeDescription.$touch()"
+            :rules="[val => $v.challengeDescription.required || 'Field is required']"
+          >
+            <template v-slot:prepend>
+              <q-icon name="far fa-comment-alt" />
+            </template>
+          </q-input>
+
+          <!-- ---------------- Challenge Business Rationale ---------------- -->
+          <q-input
+            class="q-my-sm"
+            filled
+            autogrow
+            ref="challengeRationale"
+            v-model="challengeRationale"
+            placeholder="Please give 2-5 sentences on why and how this impact the company or the organization. (Grows automatically.)"
+            label="Business Rationale"
+            type="textarea"
+          >
+            <template v-slot:prepend>
+              <q-icon name="device_hub" />
+            </template>
+          </q-input>
+          <hr class="newLine2">
+          <!--  -------------------- Keywords -------------------- -->
+          <div class="row q-pa-sm" align="left">
+            <p class="col-4 header">Keywords:</p>
+
+            <q-option-group
+              dense inline
+              class="col" type="checkbox"
+              v-model="chosenKeywords"
+              :options="keywordsOptions"
+            />
+          </div>
+          <hr class="newLine2">
+          <!-- -------------------- Sponsors -------------------- -->
           <div>
-            <div class="row" align="left">
-              <p class="col q-pa-sm header">
-                Add Chips:
+            <div class="row">
+              <p class="col q-pa-sm header" align="left">
+                Sponsors:
               </p>
-
-              <q-select
-                dense outlined options-dense
-                class="col-3"
-                label="Chip Type" style="overflow: auto;"
-                v-model="chipType"
-                :options="chipTypeOptions"
-              />
-
-              <div class="col-1 q-mt-sm" align="center" >
+              <span class="col-1 q-mt-sm" >
                 <q-btn
-                  :disable="chipType === ''"
                   dense round
                   color="accent" icon="add"
-                  @click="addChip(); addedChip = true"
+                  @click="addSponsor"
                 />
-              </div>
+              </span>
             </div>
 
             <div
-              v-for="(chipContent, chipInd) in webpage.chips"
-              :key="chipInd"
-              class="row q-mt-sm q-mb-sm"
+              v-for="(member, index) in sponsors"
+              :key="index"
+              class="row q-mb-sm"
             >
-              <!-- -------------------- Chip Type SOURCE -------------------- -->
-              <div
-                v-if="chipContent.content.type === 'SOURCE'"
-                class="col q-mb-xs q-pa-sm"
+              <q-input
+                filled lazy-rules
+                class="col q-mr-xs"
+                placeholder="ie. john.doe@gmail.com"
+                label="Sponsor's Email" type="email"
+                v-model="sponsors[index].email"
+                :ref="`memberEmail${index}`"
+                :autofocus="index > 0"
+                :rules="[val => $v.sponsors.$each[index].email.required || 'Field is required']"
+                @input="$v.sponsors.$each[index].email.$touch()"
+                @blur="emailDomainCheck(sponsors[index].email, index)"
               >
-                <q-card class="q-pa-md">
-                  <div class="row" align="left">
-                    <strong>Source Chip</strong>
-                    <hr class="col q-ml-sm">
-                  </div>
+                <template v-slot:prepend>
+                  <q-icon name="email" />
+                </template>
+              </q-input>
 
-                  <q-input
-                    filled
-                    class="q-mt-sm"
-                    label="Source" placeholder="Link to source code goes here."
-                    v-model="chipContent.content.url"
-                    :autofocus="addedChip"
-                    :rules="[val => !!val || 'Field is required']"
-                    @focus="addedChip = false"
+              <q-input
+                :disable="sponsors[index].email in emailToUuidMap"
+                filled lazy-rules
+                class="col q-mr-xs"
+                placeholder="ie. John Doe" label="Contributor's Full Name"
+                v-model="sponsors[index].name"
+                :ref="`memberName${index}`"
+                :rules="[
+                  val => $v.sponsors.$each[index].name.required || 'Field is required',
+                  val => $v.sponsors.$each[index].name.maxLength || 'Max length is 60 characters'
+                ]"
+                @input="$v.sponsors.$each[index].name.$touch()"
+                @blur="capitalizeFirstChar(index)"
+              >
+                <template v-slot:prepend>
+                  <q-icon name="group" />
+                </template>
+              </q-input>
+
+              <!-- <div class="col-1">
+                <q-card flat align="center">
+                  Lead
+                  <q-toggle
+                    color="secondary"
+                    v-model="sponsors[index].role"
+                    true-value="lead"
+                    false-value="member"
                   />
                 </q-card>
-              </div>
+              </div> -->
 
-              <!-- -------------------- Chip Type VIDEO -------------------- -->
-              <div
-                v-if="chipContent.content.type === 'VIDEO'"
-                class="col q-mb-xs q-pa-sm"
-              >
-                <q-card class="q-pa-md">
-                  <div class="row" align="left">
-                    <strong>Video Chip</strong>
-                    <hr class="col q-ml-sm">
-                  </div>
-
-                  <q-input
-                    filled
-                    class="q-mt-sm" label="Video"
-                    placeholder="Link to video goes here. (Currently only supports one.)"
-                    v-model="chipContent.content.url"
-                    :autofocus="addedChip"
-                    :rules="[val => !!val || 'Field is required']"
-                    @focus="addedChip = false"
-                  />
-                </q-card>
-              </div>
-
-              <!-- ------------------ Chip Index & Delete ------------------ -->
-              <div class="col-1" style="margin: auto;" >
-                <q-checkbox
-                  dense
-                  class="q-pa-sm q-mb-sm"
-                  label="Hide"
-                  v-model="webpage.chips[chipInd].hidden"
-                />
-
-                <q-input
-                  dense filled
-                  class="q-pa-xs q-mb-sm"
-                  label="Index" type="number"
-                  v-model="webpage.chips[chipInd].index"
-                  @blur="webpage.chips[chipInd].index = webpage.chips[chipInd].index < 1 ?  1 : parseInt(webpage.chips[chipInd].index)"
-                />
-
+              <div class="col-1 q-mt-sm">
                 <q-btn
-                  dense round
-                  class="bottom"
-                  color="accent" icon="delete"
-                  @click="webpage.chips.splice(chipInd, 1)"
+                  :hidden="index < 1"
+                  round flat
+                  icon="delete"
+                  @click="sponsors.splice(index, 1)"
                 />
               </div>
             </div>
           </div>
 
-          <hr>
+          <!-- -------------------- Admin Mode -------------------- -->
+          <div :hidden="!adminMode">
+            <hr class="newLine2">
+            <!-- -------------------- Chips -------------------- -->
+            <div>
+              <div class="row" align="left">
+                <p class="col q-pa-sm header">
+                  Add Chips:
+                </p>
 
-          <!-- -------------------- Custom Field -------------------- -->
-          <div>
-            <div class="row" align="left">
-              <p class="col q-pa-sm header">
-                Add Content:
-              </p>
-
-              <q-select
-                dense outlined options-dense
-                class="col-3"
-                label="Content Type" style="overflow: auto;"
-                v-model="bodyType"
-                :options="bodyTypeOptions"
-              />
-
-              <div class="col-1 q-mt-sm" align="center" >
-                <q-btn
-                  :disable="bodyType === ''"
-                  dense round
-                  color="accent" icon="add"
-                  @click="addCustomField(); addedContent = true"
+                <q-select
+                  dense outlined options-dense
+                  class="col-3"
+                  label="Chip Type" style="overflow: auto;"
+                  v-model="chipType"
+                  :options="chipTypeOptions"
                 />
+
+                <div class="col-1 q-mt-sm" align="center" >
+                  <q-btn
+                    :disable="chipType === ''"
+                    dense round
+                    color="accent" icon="add"
+                    @click="addChip(); addedChip = true"
+                  />
+                </div>
+              </div>
+
+              <div
+                v-for="(chipContent, chipInd) in webpage.chips"
+                :key="chipInd"
+                class="row q-mt-sm q-mb-sm"
+              >
+                <!-- -------------------- Chip Type SOURCE -------------------- -->
+                <div
+                  v-if="chipContent.content.type === 'SOURCE'"
+                  class="col q-mb-xs q-pa-sm"
+                >
+                  <q-card class="q-pa-md">
+                    <div class="row" align="left">
+                      <strong>Source Chip</strong>
+                      <hr class="col q-ml-sm">
+                    </div>
+
+                    <q-input
+                      filled
+                      class="q-mt-sm"
+                      label="Source" placeholder="Link to source code goes here."
+                      v-model="chipContent.content.url"
+                      :autofocus="addedChip"
+                      :rules="[val => !!val || 'Field is required']"
+                      @focus="addedChip = false"
+                    />
+                  </q-card>
+                </div>
+
+                <!-- -------------------- Chip Type VIDEO -------------------- -->
+                <div
+                  v-if="chipContent.content.type === 'VIDEO'"
+                  class="col q-mb-xs q-pa-sm"
+                >
+                  <q-card class="q-pa-md">
+                    <div class="row" align="left">
+                      <strong>Video Chip</strong>
+                      <hr class="col q-ml-sm">
+                    </div>
+
+                    <q-input
+                      filled
+                      class="q-mt-sm" label="Video"
+                      placeholder="Link to video goes here. (Currently only supports one.)"
+                      v-model="chipContent.content.url"
+                      :autofocus="addedChip"
+                      :rules="[val => !!val || 'Field is required']"
+                      @focus="addedChip = false"
+                    />
+                  </q-card>
+                </div>
+
+                <!-- ------------------ Chip Index & Delete ------------------ -->
+                <div class="col-1" style="margin: auto;" >
+                  <q-checkbox
+                    dense
+                    class="q-pa-sm q-mb-sm"
+                    label="Hide"
+                    v-model="webpage.chips[chipInd].hidden"
+                  />
+
+                  <q-input
+                    dense filled
+                    class="q-pa-xs q-mb-sm"
+                    label="Index" type="number"
+                    v-model="webpage.chips[chipInd].index"
+                    @blur="webpage.chips[chipInd].index = webpage.chips[chipInd].index < 1 ?  1 : parseInt(webpage.chips[chipInd].index)"
+                  />
+
+                  <q-btn
+                    dense round
+                    class="bottom"
+                    color="accent" icon="delete"
+                    @click="webpage.chips.splice(chipInd, 1)"
+                  />
+                </div>
               </div>
             </div>
 
-            <div
-              v-for="(bodyContent, ind) in webpage.body"
-              :key="ind"
-              class="row q-mt-sm q-mb-sm"
-            >
+            <hr>
 
-              <!-- ----------------- Custom Type TEXT_BOX ----------------- -->
-              <div
-                v-if="bodyContent.content.type === 'TEXT_BOX'"
-                class="col q-mb-xs q-pa-sm"
-              >
-                <q-card class="q-pa-md">
-                  <div class="row" align="left">
-                    <strong>Text Box</strong>
-                    <hr class="col q-ml-sm">
-                  </div>
+            <!-- -------------------- Custom Field -------------------- -->
+            <div>
+              <div class="row" align="left">
+                <p class="col q-pa-sm header">
+                  Add Content:
+                </p>
 
-                  <q-input
-                    filled
-                    class="q-mt-sm"
-                    label="Label" placeholder="Title"
-                    v-model="bodyContent.content.label"
-                    :autofocus="addedContent"
-                    :rules="[val => !!val || 'Field is required']"
-                    @focus="addedContent = false"
+                <q-select
+                  dense outlined options-dense
+                  class="col-3"
+                  label="Content Type" style="overflow: auto;"
+                  v-model="bodyType"
+                  :options="bodyTypeOptions"
+                />
+
+                <div class="col-1 q-mt-sm" align="center" >
+                  <q-btn
+                    :disable="bodyType === ''"
+                    dense round
+                    color="accent" icon="add"
+                    @click="addCustomField(); addedContent = true"
                   />
-
-                  <q-input
-                    filled autogrow
-                    class="q-mt-sm" label="Body/Text Description"
-                    placeholder="Please enter the body for the respective label."
-                    v-model="bodyContent.content.text"
-                    :rules="[val => !!val || 'Field is required']"
-                  />
-                </q-card>
+                </div>
               </div>
 
-              <!-- -------------- Custom Type UNORDERED_LIST -------------- -->
               <div
-                v-else-if="bodyContent.content.type === 'UNORDERED_LIST'"
-                class="col q-mb-xs q-pa-sm"
+                v-for="(bodyContent, ind) in webpage.body"
+                :key="ind"
+                class="row q-mt-sm q-mb-sm"
               >
-                <q-card class="q-pa-md">
-                  <div class="row" align="left">
-                    <strong>Unordered List</strong>
-                    <hr class="col q-ml-sm">
-                  </div>
 
-                  <q-input
-                    filled
-                    class="q-mt-sm"
-                    label="Label" placeholder="Title"
-                    v-model="bodyContent.content.label"
-                    :autofocus="addedContent"
-                    :rules="[val => !!val || 'Field is required']"
-                    @focus="addedContent = false"
-                  />
-
-                  <div class="row inline full-width q-pa-md">
-                    <strong>List</strong>
-                    <hr class="col q-ml-sm q-mr-sm">
-                    <div>
-                      <q-btn
-                        dense round
-                        color="accent" icon="add"
-                        @click="bodyContent.content.list.push({})"
-                      />
+                <!-- ----------------- Custom Type TEXT_BOX ----------------- -->
+                <div
+                  v-if="bodyContent.content.type === 'TEXT_BOX'"
+                  class="col q-mb-xs q-pa-sm"
+                >
+                  <q-card class="q-pa-md">
+                    <div class="row" align="left">
+                      <strong>Text Box</strong>
+                      <hr class="col q-ml-sm">
                     </div>
-                  </div>
 
-                  <ul>
-                    <li
-                      v-for="(link, ulIndex) in bodyContent.content.list"
-                      :key="ulIndex"
-                      align="left"
-                    >
-                      <div class="row inline full-width q-gutter-xs q-mb-sm">
-                        <q-input
-                          dense filled
-                          class="col" label="URL Name"
-                          placeholder="Please enter the alias for the URL."
-                          v-model="link.item"
-                          :rules="[val => !!val || 'Field is required']"
-                        />
+                    <q-input
+                      filled
+                      class="q-mt-sm"
+                      label="Label" placeholder="Title"
+                      v-model="bodyContent.content.label"
+                      :autofocus="addedContent"
+                      :rules="[val => !!val || 'Field is required']"
+                      @focus="addedContent = false"
+                    />
 
-                        <q-input
-                          dense filled
-                          class="col" label="URL"
-                          placeholder="https://www.google.com"
-                          v-model="link.url"
-                          :rules="[val => true]"
-                        />
+                    <q-input
+                      filled autogrow
+                      class="q-mt-sm" label="Body/Text Description"
+                      placeholder="Please enter the body for the respective label."
+                      v-model="bodyContent.content.text"
+                      :rules="[val => !!val || 'Field is required']"
+                    />
+                  </q-card>
+                </div>
 
+                <!-- -------------- Custom Type UNORDERED_LIST -------------- -->
+                <div
+                  v-else-if="bodyContent.content.type === 'UNORDERED_LIST'"
+                  class="col q-mb-xs q-pa-sm"
+                >
+                  <q-card class="q-pa-md">
+                    <div class="row" align="left">
+                      <strong>Unordered List</strong>
+                      <hr class="col q-ml-sm">
+                    </div>
+
+                    <q-input
+                      filled
+                      class="q-mt-sm"
+                      label="Label" placeholder="Title"
+                      v-model="bodyContent.content.label"
+                      :autofocus="addedContent"
+                      :rules="[val => !!val || 'Field is required']"
+                      @focus="addedContent = false"
+                    />
+
+                    <div class="row inline full-width q-pa-md">
+                      <strong>List</strong>
+                      <hr class="col q-ml-sm q-mr-sm">
+                      <div>
                         <q-btn
-                          :disable="bodyContent.content.list.length === 1"
-                          dense flat round
-                          icon="delete"
-                          @click="bodyContent.content.list.splice(ulIndex, 1)"
+                          dense round
+                          color="accent" icon="add"
+                          @click="bodyContent.content.list.push({})"
                         />
                       </div>
-                    </li>
-                  </ul>
-                </q-card>
-              </div>
-
-              <!-- --------------- Custom Type ORDERED_LIST --------------- -->
-              <div
-                v-else-if="bodyContent.content.type === 'ORDERED_LIST'"
-                class="col q-mb-xs q-pa-sm"
-              >
-                <q-card class="q-pa-md">
-                  <div class="row" align="left">
-                    <strong>Ordered List</strong>
-                    <hr class="col q-ml-sm">
-                  </div>
-
-                  <q-input
-                    filled
-                    class="q-mt-sm"
-                    label="Label" placeholder="Title"
-                    v-model="bodyContent.content.label"
-                    :autofocus="addedContent"
-                    :rules="[val => !!val || 'Field is required']"
-                    @focus="addedContent = false"
-                  />
-
-                  <div class="row inline full-width q-pa-md">
-                    <strong>List</strong>
-                    <hr class="col q-ml-sm q-mr-sm">
-                    <div>
-                      <q-btn
-                        dense round
-                        color="accent" icon="add"
-                        @click="bodyContent.content.list.push({index: bodyContent.content.list.length + 1})"
-                      />
                     </div>
-                  </div>
 
-                  <ul>
-                    <li
-                      v-for="(link, olIndex) in bodyContent.content.list"
-                      :key="olIndex"
-                      align="left"
-                    >
-                      <div class="row inline full-width q-gutter-xs q-mb-sm">
-                        <q-input
-                          dense filled
-                          class="col-1"
-                          type="number" label="Index"
-                          v-model="link.index"
-                          @blur="link.index = link.index > 0 ? parseInt(link.index) : 1"
-                          :rules="[val => !!val]"
-                        />
-
-                        <q-input
-                          dense filled
-                          class="col" label="URL Name"
-                          placeholder="Please enter the alias for the URL."
-                          v-model="link.item"
-                          :rules="[val => !!val || 'Field is required']"
-                        />
-
-                        <q-input
-                          dense filled
-                          class="col" label="URL"
-                          placeholder="https://www.google.com"
-                          v-model="link.url"
-                          :rules="[val => true]"
-                        />
-
-                        <q-btn
-                          :disable="bodyContent.content.list.length === 1"
-                          dense flat round
-                          icon="delete"
-                          @click="bodyContent.content.list.splice(olIndex, 1)"
-                        />
-                      </div>
-                    </li>
-                  </ul>
-                </q-card>
-              </div>
-
-              <!-- ---------------- Custom Type EVENT_LIST ---------------- -->
-              <div
-                v-else
-                class="col q-mb-xs q-pa-sm"
-              >
-                <q-card class="q-pa-md">
-                  <div class="row" align="left">
-                    <strong>Event List</strong>
-                    <hr class="col q-ml-sm">
-                  </div>
-
-                  <q-input
-                    filled
-                    class="q-mt-sm"
-                    label="Label" placeholder="Title"
-                    v-model="bodyContent.content.label"
-                    :autofocus="addedContent"
-                    :rules="[val => !!val || 'Field is required']"
-                    @focus="addedContent = false"
-                  />
-
-                  <div class="row inline full-width q-pa-md">
-                    <strong>List</strong>
-                    <hr class="col q-ml-sm q-mr-sm">
-                    <div>
-                      <q-btn
-                        dense round
-                        color="accent" icon="add"
-                        @click="bodyContent.content.list.push({})"
-                      />
-                    </div>
-                  </div>
-
-                  <ul>
-                    <li
-                      v-for="(link, evIndex) in bodyContent.content.list"
-                      :key="evIndex"
-                      align="left"
-                    >
-                      <div class="row inline full-width">
-                        <div class="row inline full-width q-gutter-xs">
+                    <ul>
+                      <li
+                        v-for="(link, ulIndex) in bodyContent.content.list"
+                        :key="ulIndex"
+                        align="left"
+                      >
+                        <div class="row inline full-width q-gutter-xs q-mb-sm">
                           <q-input
                             dense filled
-                            class="col" label="Subject"
-                            placeholder="Please enter the subject matter here."
-                            v-model="link.subject"
-                            :rules="[val => !!val || 'Field is required']"
-                          />
-
-                          <q-input
-                            dense filled
-                            class="col" label="Date and Time"
-                            placeholder="2019:06:02.00:00"
-                            v-model="link.date"
-                            :rules="[val => !!val || 'Field is required']"
-                          />
-
-                          <q-btn
-                            disable dense flat round
-                            @click="bodyContent.content.list.splice(evIndex, 1)"
-                          />
-                        </div>
-                        <div class="row inline full-width q-gutter-xs">
-                          <q-input
-                            dense filled
-                            class="col" label="Body"
-                            placeholder="Please enter the details regarding the subject matter."
-                            v-model="link.body"
+                            class="col" label="URL Name"
+                            placeholder="Please enter the alias for the URL."
+                            v-model="link.item"
                             :rules="[val => !!val || 'Field is required']"
                           />
 
@@ -592,63 +421,232 @@ Methods:
                             class="col" label="URL"
                             placeholder="https://www.google.com"
                             v-model="link.url"
-                            :rules="[val => !!val || 'Field is required']"
+                            :rules="[val => true]"
                           />
 
                           <q-btn
                             :disable="bodyContent.content.list.length === 1"
                             dense flat round
                             icon="delete"
-                            @click="bodyContent.content.list.splice(evIndex, 1)"
+                            @click="bodyContent.content.list.splice(ulIndex, 1)"
                           />
                         </div>
+                      </li>
+                    </ul>
+                  </q-card>
+                </div>
+
+                <!-- --------------- Custom Type ORDERED_LIST --------------- -->
+                <div
+                  v-else-if="bodyContent.content.type === 'ORDERED_LIST'"
+                  class="col q-mb-xs q-pa-sm"
+                >
+                  <q-card class="q-pa-md">
+                    <div class="row" align="left">
+                      <strong>Ordered List</strong>
+                      <hr class="col q-ml-sm">
+                    </div>
+
+                    <q-input
+                      filled
+                      class="q-mt-sm"
+                      label="Label" placeholder="Title"
+                      v-model="bodyContent.content.label"
+                      :autofocus="addedContent"
+                      :rules="[val => !!val || 'Field is required']"
+                      @focus="addedContent = false"
+                    />
+
+                    <div class="row inline full-width q-pa-md">
+                      <strong>List</strong>
+                      <hr class="col q-ml-sm q-mr-sm">
+                      <div>
+                        <q-btn
+                          dense round
+                          color="accent" icon="add"
+                          @click="bodyContent.content.list.push({index: bodyContent.content.list.length + 1})"
+                        />
                       </div>
-                    </li>
-                  </ul>
+                    </div>
 
-                </q-card>
-              </div>
+                    <ul>
+                      <li
+                        v-for="(link, olIndex) in bodyContent.content.list"
+                        :key="olIndex"
+                        align="left"
+                      >
+                        <div class="row inline full-width q-gutter-xs q-mb-sm">
+                          <q-input
+                            dense filled
+                            class="col-1"
+                            type="number" label="Index"
+                            v-model="link.index"
+                            @blur="link.index = link.index > 0 ? parseInt(link.index) : 1"
+                            :rules="[val => !!val]"
+                          />
 
-              <!-- ------------- Custom Field Index & Delete --------------- -->
-              <div class="col-1" style="margin: auto;" >
-                <q-checkbox
-                  dense
-                  class="q-pa-sm q-mb-sm" label='Hide'
-                  v-model="webpage.body[ind].hidden"
-                />
+                          <q-input
+                            dense filled
+                            class="col" label="URL Name"
+                            placeholder="Please enter the alias for the URL."
+                            v-model="link.item"
+                            :rules="[val => !!val || 'Field is required']"
+                          />
 
-                <q-input
-                  dense filled
-                  class="q-pa-xs q-mb-md"
-                  label="Index" type="number"
-                  v-model="webpage.body[ind].index"
-                  @blur="webpage.body[ind].index = webpage.body[ind].index < 1 ?  1 : parseInt(webpage.body[ind].index)"
-                />
+                          <q-input
+                            dense filled
+                            class="col" label="URL"
+                            placeholder="https://www.google.com"
+                            v-model="link.url"
+                            :rules="[val => true]"
+                          />
 
-                <q-btn
-                  dense round
-                  class="bottom" color="accent" icon="delete"
-                  @click="webpage.body.splice(ind, 1)"
-                />
+                          <q-btn
+                            :disable="bodyContent.content.list.length === 1"
+                            dense flat round
+                            icon="delete"
+                            @click="bodyContent.content.list.splice(olIndex, 1)"
+                          />
+                        </div>
+                      </li>
+                    </ul>
+                  </q-card>
+                </div>
+
+                <!-- ---------------- Custom Type EVENT_LIST ---------------- -->
+                <div
+                  v-else
+                  class="col q-mb-xs q-pa-sm"
+                >
+                  <q-card class="q-pa-md">
+                    <div class="row" align="left">
+                      <strong>Event List</strong>
+                      <hr class="col q-ml-sm">
+                    </div>
+
+                    <q-input
+                      filled
+                      class="q-mt-sm"
+                      label="Label" placeholder="Title"
+                      v-model="bodyContent.content.label"
+                      :autofocus="addedContent"
+                      :rules="[val => !!val || 'Field is required']"
+                      @focus="addedContent = false"
+                    />
+
+                    <div class="row inline full-width q-pa-md">
+                      <strong>List</strong>
+                      <hr class="col q-ml-sm q-mr-sm">
+                      <div>
+                        <q-btn
+                          dense round
+                          color="accent" icon="add"
+                          @click="bodyContent.content.list.push({})"
+                        />
+                      </div>
+                    </div>
+
+                    <ul>
+                      <li
+                        v-for="(link, evIndex) in bodyContent.content.list"
+                        :key="evIndex"
+                        align="left"
+                      >
+                        <div class="row inline full-width">
+                          <div class="row inline full-width q-gutter-xs">
+                            <q-input
+                              dense filled
+                              class="col" label="Subject"
+                              placeholder="Please enter the subject matter here."
+                              v-model="link.subject"
+                              :rules="[val => !!val || 'Field is required']"
+                            />
+
+                            <q-input
+                              dense filled
+                              class="col" label="Date and Time"
+                              placeholder="2019:06:02.00:00"
+                              v-model="link.date"
+                              :rules="[val => !!val || 'Field is required']"
+                            />
+
+                            <q-btn
+                              disable dense flat round
+                              @click="bodyContent.content.list.splice(evIndex, 1)"
+                            />
+                          </div>
+                          <div class="row inline full-width q-gutter-xs">
+                            <q-input
+                              dense filled
+                              class="col" label="Body"
+                              placeholder="Please enter the details regarding the subject matter."
+                              v-model="link.body"
+                              :rules="[val => !!val || 'Field is required']"
+                            />
+
+                            <q-input
+                              dense filled
+                              class="col" label="URL"
+                              placeholder="https://www.google.com"
+                              v-model="link.url"
+                              :rules="[val => !!val || 'Field is required']"
+                            />
+
+                            <q-btn
+                              :disable="bodyContent.content.list.length === 1"
+                              dense flat round
+                              icon="delete"
+                              @click="bodyContent.content.list.splice(evIndex, 1)"
+                            />
+                          </div>
+                        </div>
+                      </li>
+                    </ul>
+
+                  </q-card>
+                </div>
+
+                <!-- ------------- Custom Field Index & Delete --------------- -->
+                <div class="col-1" style="margin: auto;" >
+                  <q-checkbox
+                    dense
+                    class="q-pa-sm q-mb-sm" label='Hide'
+                    v-model="webpage.body[ind].hidden"
+                  />
+
+                  <q-input
+                    dense filled
+                    class="q-pa-xs q-mb-md"
+                    label="Index" type="number"
+                    v-model="webpage.body[ind].index"
+                    @blur="webpage.body[ind].index = webpage.body[ind].index < 1 ?  1 : parseInt(webpage.body[ind].index)"
+                  />
+
+                  <q-btn
+                    dense round
+                    class="bottom" color="accent" icon="delete"
+                    @click="webpage.body.splice(ind, 1)"
+                  />
+                </div>
               </div>
             </div>
           </div>
-        </div>
 
-        <hr>
+          <hr>
 
-        <!-- -------------------- Submit Button -------------------- -->
-        <q-btn
-          no-caps
-          label="Submit Project" type="submit" color="secondary"
-          class="half-width"
-        />
+          <!-- -------------------- Submit Button -------------------- -->
+          <q-btn
+            no-caps
+            label="Submit Project" type="submit" color="secondary"
+            class="half-width"
+          />
 
-      </q-form>
-      <br><br><br>
+        </q-form>
+        <br><br><br>
 
-    </q-card>
-  </div>
+      </q-card>
+    </div>
+  </q-page>
 </template>
 
 <script>
@@ -684,7 +682,7 @@ export default {
         this.$router.push('/err')
       }
     } catch (error) {
-      throw new Error(error)
+      throw error
     }
   },
   data () {
@@ -906,13 +904,13 @@ export default {
 
         this.onReset()
       } catch (error) {
-        throw new Error(error)
+        throw error
       }
     },
     onReset: function () {
       /**
        * helper function which resets the input fields of the form and
-       * emits 'added' event when the component is a child componenet
+       * emits 'added' event when the component is a child component
        * @param {void}
        * @return {void}
        */
@@ -937,7 +935,7 @@ export default {
 
       this.$q.notify({
         type: 'positive',
-        message: 'Submitted sucessfully!'
+        message: 'Submitted successfully!'
       })
 
       this.$emit('added')
@@ -982,7 +980,7 @@ export default {
           }
         })
       } catch (error) {
-        throw new Error(error)
+        throw error
       }
     },
     emailDomainCheck: function (indexEmail, index) {
@@ -1042,7 +1040,7 @@ export default {
             data = data.toLowerCase()
             if (data !== indexEmail) {
               this.$q.notify({
-                message: 'The emails must be indentical.',
+                message: 'The emails must be identical.',
                 color: 'negative'
               })
               this.sponsors[index].email = ''
@@ -1058,7 +1056,7 @@ export default {
     },
     capitalizeFirstChar: function (index) {
       /**
-       * healper function to help capitalize first character of
+       * helper function to help capitalize first character of
        * the input at a given index and notifies the user on fail
        * @param {Integer} index: index of the input DOM
        * @return {void}

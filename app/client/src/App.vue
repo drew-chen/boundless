@@ -1,5 +1,5 @@
 <!-- ##
-## Copyright (c) 2019 Wind River Systems, Inc.
+## Copyright (c) 2020 Wind River Systems, Inc.
 ##
 ## Licensed under the Apache License, Version 2.0 (the "License");
 ## you may not use this file except in compliance with the License.
@@ -12,7 +12,9 @@
 Name:     App.vue
 Purpose:  Main starting code block of the application.
 Methods:
-  * The application global CSS declarations are found here.
+
+  The application global CSS declarations are found here.
+  Also initializes Vuex.
 
 ##-->
 
@@ -23,12 +25,36 @@ Methods:
 </template>
 
 <script>
+import { createNamespacedHelpers } from 'vuex'
+const { mapActions } = createNamespacedHelpers('projectSubmit')
+
 export default {
-  name: 'App'
+  name: 'App',
+  /**
+   * Initializes the projectSubmit Vuex module's store.
+   * This is done here instead of a boot file so errors can be handled
+   * by Vue's errorHandler, which needs the Vue instance.
+   */
+  async mounted () {
+    await this.loadFireRefs()
+    await this.loadConfig()
+    await this.loadUserList()
+  },
+  methods: {
+    ...mapActions([
+      'loadFireRefs',
+      'loadConfig',
+      'loadUserList'
+    ])
+  }
 }
 </script>
 
 <style lang="stylus">
+
+.q-page
+  padding 30px 5vw
+
 // https://tobiasahlin.com/blog/how-to-animate-box-shadow/
 .hoverable {
   cursor: pointer;
@@ -215,6 +241,12 @@ h4 {
   padding: 10px;
 }
 
+h5
+  margin 10px
+
+h6
+  margin 0
+
 .header {
   font-size: 16px;
   font-weight: bold;
@@ -238,4 +270,21 @@ pre {
   word-wrap: break-word;
   font-family: inherit;
 }
+
+.fade-enter-active, .fade-leave-active {
+  transition: opacity .15s;
+}
+.fade-enter, .fade-leave-to {
+  opacity: 0;
+}
+// Normalize Font Awesome icons to be similar to Material icons.
+.fas
+  font-size 17px !important
+  left 3px
+
+// This styles the notification that appears when input is not valid.
+.q-field__bottom
+  // Ensures that the error message isn't hidden under other elements.
+  z-index 1
+
 </style>

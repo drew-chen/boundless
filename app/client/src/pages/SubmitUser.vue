@@ -18,7 +18,7 @@ Methods:
 ## -->
 
 <template>
-  <div>
+  <q-page>
     <!-- -------------------- Page Loader -------------------- -->
     <div v-if="loading" class="absolute-center">
       <q-spinner
@@ -116,7 +116,7 @@ Methods:
       </q-form>
       <br><br><br>
     </q-card>
-  </div>
+  </q-page>
 </template>
 
 <script>
@@ -131,7 +131,7 @@ export default {
       await this.loadUserList()
       await this.loadAllowedDomain()
     } catch (error) {
-      throw new Error(error)
+      throw error
     }
   },
   data () {
@@ -196,7 +196,7 @@ export default {
     onReset: function () {
       /**
        * helper function which resets the input fields of the form and
-       * emits 'added' event when the component is a child componenet
+       * emits 'added' event when the component is a child component
        * @param {void}
        * @return {void}
        */
@@ -207,7 +207,7 @@ export default {
 
       this.$q.notify({
         type: 'positive',
-        message: 'Submitted sucessfully!'
+        message: 'Submitted successfully!'
       })
 
       this.loading = false

@@ -9,7 +9,7 @@
 ## under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES
 ## OR CONDITIONS OF ANY KIND, either express or implied.
 
-Name:     components/EditAndPreviewChallenge.vue
+Name:     components/EditAndPreview/EditAndPreviewChallenge.vue
 Purpose:  The user interface to allow the admin to edit and preview the
           resulting edits of challenge before submitting
 Methods:
@@ -411,11 +411,11 @@ Methods:
                                 <q-icon
                                   size=".8em" color="accent" name="edit"
                                 />
-                                  <limited-len-input-popup
-                                  title="Edit Challenge Name"
-                                  :lenLimit="60"
-                                  :initialValue="curData.challenge"
-                                  @save="saveEditedName($event)"
+                                  <popup-input-limit-len
+                                    title="Edit Challenge Name"
+                                    :lenLimit="60"
+                                    :initialValue="curData.challenge"
+                                    @save="saveEditedName($event)"
                                 />
                               </div>
                               <q-separator color="secondary" />
@@ -544,8 +544,7 @@ Methods:
 
                           <div class="q-mt-sm">
                             <q-knob
-                              show-value
-                              readonly
+                              show-value readonly
                               :angle="225"
                               :max="360"
                               :thickness="0.4"
@@ -660,79 +659,13 @@ Methods:
                               v-if="chipContent.content.type === 'CUSTOM'"
                               class="col q-mb-xs q-pa-sm"
                             >
-                              <q-card class="q-pa-md">
-                                <div class="row" align="left">
-                                  <strong>Custom Chip</strong>
-                                  <hr class="col q-ml-sm">
-                                </div>
-
-                                <q-input
-                                  filled dense
-                                  class="q-mt-sm" label="Custom Chip Label"
-                                  placeholder="Please enter the label for the custom chip."
-                                  v-model="chipContent.content.label"
-                                  :rules="[val => !!val || 'Field is required']"
-                                  :autofocus="addedChip"
-                                  @focus="addedChip = false"
-                                />
-
-                                <q-input
-                                  filled dense
-                                  class="q-mt-sm" label="Custom Chip URL"
-                                  placeholder="Link to video goes here. (Currently only supports one.)"
-                                  v-model="chipContent.content.url"
-                                  :rules="[val => !!val || 'Field is required']"
-                                  @focus="addedChip = false"
-                                />
-
-                                <div class="row q-pa-sm" align="left">
-                                  <div class="col">
-                                    <q-list bordered separator>
-                                      <q-item
-                                        v-for="
-                                          (val, ind) in configData.customChips
-                                        "
-                                        :key="ind"
-                                        clickable v-ripple
-                                        :active="
-                                          chipContent.content.icon === val.value
-                                        "
-                                        @click="
-                                          chipContent.content.icon = val.value
-                                        "
-                                        active-class="text-white bg-secondary"
-                                      >
-                                        <q-item-section avatar>
-                                          <q-icon :name="val.value" />
-                                        </q-item-section>
-
-                                        <q-item-section align="center">
-                                        </q-item-section>
-
-                                        <q-item-section side>
-                                          {{ val.label }}
-                                        </q-item-section>
-                                      </q-item>
-                                    </q-list>
-                                  </div>
-
-                                  <div
-                                    class="col" align="center"
-                                    style="
-                                      display: flex;
-                                      justify-content: center;
-                                      align-items: center;
-                                    "
-                                  >
-                                    <q-chip
-                                      color="secondary" text-color="white"
-                                      :icon="chipContent.content.icon"
-                                    >
-                                      {{ chipContent.content.label || 'Sample goes here' }}
-                                    </q-chip>
-                                  </div>
-                                </div>
-                              </q-card>
+                              <edit-custom-chips
+                                v-model="chipContent.content"
+                                :options="configData.customChips || []"
+                                :addedChip="addedChip"
+                                @focus="addedChip = false"
+                                @updated="updated = true"
+                              />
                             </div>
 
                             <!-- ----------- Chip Index & Delete ----------- -->
@@ -979,7 +912,7 @@ Methods:
                                       v-if="!bodyContent.content.text"
                                       class="q-mt-sm"
                                     >
-                                      BODY TEXT IS REQUIED!
+                                      BODY TEXT IS REQUIRED!
                                     </p>
 
                                     <MarkdownTranslator
@@ -1955,7 +1888,7 @@ Methods:
                 @input="addMemberDialog.edited = true"
               />
 
-              <!-- ---------- Member Dispaly ---------- -->
+              <!-- ---------- Member Display ---------- -->
               <div>
                 <div class="q-mt-sm">
                   <b>Current Members</b>
@@ -2023,16 +1956,17 @@ Methods:
 <script>
 import firebase from 'firebase/app'
 import 'firebase/firestore'
+import cloneDeep from 'lodash.cloneDeep'
 
-import productionDb, { productionStorage } from '../firebase/init_production'
-import testingDb, { testingStorage } from '../firebase/init_testing'
+import productionDb, { productionStorage } from '../../firebase/init_production'
+import testingDb, { testingStorage } from '../../firebase/init_testing'
 
-import UploadGUI from '../components/Upload'
-import ProjectTable from '../components/Tables/ProjectTable'
-import AddUser from '../components/SubmitUserAdminConsole'
-import LimitedLenInputPopup from '../components/LimitedLenInputPopup.vue'
-
-import MarkdownTranslator from './MarkdownTranslator'
+import UploadGUI from '../../components/Upload'
+import ProjectTable from '../../components/Tables/ProjectTable'
+import AddUser from '../../components/SubmitUserAdminConsole'
+import PopupInputLimitLen from '../../components/Popups/PopupInputLimitLen.vue'
+import MarkdownTranslator from '../../components/MarkdownTranslator.vue'
+import EditCustomChips from './Shared/EditCustomChips.vue'
 
 export default {
   components: {
@@ -2040,20 +1974,24 @@ export default {
     ProjectTable,
     AddUser,
     MarkdownTranslator,
-    LimitedLenInputPopup
+    PopupInputLimitLen,
+    EditCustomChips
   },
   props: {
-    challengeId: String,
-    mode: String
+    uuid: String,
+    mode: {
+      type: String,
+      default: 'edit'
+    }
   },
   async created () {
     try {
-      // fetech data from database
+      // fetch data from database
       await this.loadFireRefs()
       await this.loadInformation()
       await this.loadConfig()
     } catch (error) {
-      throw new Error(error)
+      throw error
     }
   },
   data () {
@@ -2069,7 +2007,7 @@ export default {
         message: '' // <String>: error message
       },
       advancedDialog: false, // <Boolean>: flag to pop-up advanced dialog
-      oldAdvancedSettings: {}, // <Object>: old settings to reasign on cancel
+      oldAdvancedSettings: {}, // <Object>: old settings to reassign on cancel
       fileAttachmentDialog: {
         visible: false // <Boolean>: flag to pop-up file upload
       },
@@ -2086,7 +2024,7 @@ export default {
       configData: {}, // <Object>: object storing configs of the application
       chipType: '', // <String>: type of the chip that the admin is inserting
       bodyType: '', // <String>: type of the body that the admin is inserting
-      // keywordsOptions <Array<Object>>: { value, lable } object to
+      // keywordsOptions <Array<Object>>: { value,label } object to
       //                                  fit q-option
       keywordsOptions: [],
       addedTeam: false, // <Boolean>: flag for added member
@@ -2129,20 +2067,19 @@ export default {
       },
       // extraSponsorInfo <Object>: extra information associated with sponsors
       extraSponsorInfo: {
-        img: {} // <Object>: dictionary of sponsor uid to avater image
+        img: {} // <Object>: dictionary of sponsor uid to avatar image
       }
     }
   },
   methods: {
+    /**
+     * prompt a confirmation dialog on delete
+     * @param {String} key: alias of the file
+     * @param {String} pathToFile: path of file inside storage
+     * @param {String} type: name of the collection
+     * @returns {Promise<Boolean>}
+     */
     deleteAttachment: async function (key, pathToFile, type) {
-      /**
-       * prompt a confirmation dialog on delete
-       * @param {String} key: alais of the file
-       * @param {String} pathToFile: path of file inside storage
-       * @param {String} type: name of the collection
-       * @return {Promise<Boolean>}
-       */
-
       this.$q.dialog({
         title: 'Confirmation to Delete',
         message: `Delete ${key}?`,
@@ -2172,15 +2109,14 @@ export default {
           return false
         })
     },
+    /**
+     * fetches the download url then download the file for the client
+     * @param {String} alias: shown filename on the web
+     * @param {String} pathToFile: file path on the cloud storage
+     * @param {String} type: type of the collection inside storage
+     * @returns {Promise<Boolean>}
+     */
     downloadAttachment: async function (alias, pathToFile, type) {
-      /**
-       * fetches the download url then download the file for the client
-       * @param {String} alias: shown filename on the web
-       * @param {String} pathToFile: file path on the cloud storage
-       * @param {String} type: type of the collection inside storage
-       * @return {Promise<Boolean>}
-       */
-
       try {
         let url = await this.storage.ref().child(
           `${type}/${pathToFile}`
@@ -2222,14 +2158,13 @@ export default {
         return false
       }
     },
+    /**
+     * fetches the attachment url and open the url on a new tab
+     * @param {String} pathToFile: path to file
+     * @param {String} type: collection type
+     * @returns {Promise<Boolean>}
+    */
     fetchAttachmentURLAndOpen: async function (pathToFile, type) {
-      /**
-      // fetches the attachment url and open the url on a new tab
-      // @param {String} pathToFile: path to file
-      // @param {String} type: collection type
-      // @return {Promise<Boolean>}
-      */
-
       try {
         let url = await this.storage.ref().child(
           `${type}/${pathToFile}`
@@ -2257,27 +2192,26 @@ export default {
         return false
       }
     },
+    /**
+     * helper function to update users in add user dialog
+     * @param {Object} newUser: user record to be added to the project
+     */
     updateUsers: function (newUser) {
-      /**
-       * helper function to update users in add user dialog
-       * @param {Object} newUser: user record to be added to the project
-       * @return {void}
-       */
-
       this.userEmailToObjMap[newUser.email] = newUser
       this.addMemberDialog.use.push(newUser)
     },
+    /**
+     * Sets the challenge name to the input value.
+     * @param {String} editedName The inputted name.
+     */
     saveEditedName (editedName) {
       this.updated = true
       this.curData.challenge = editedName
     },
+    /**
+     * helper function to add members to the project
+     */
     submitAddMembers: function () {
-      /**
-       * helper function to add members to the project
-       * @param {void}
-       * @return: <void>
-       */
-
       let members = []
 
       this.addMemberDialog.use.forEach(member => {
@@ -2286,15 +2220,13 @@ export default {
       this.curData.sponsors = members
       this.updated = true
     },
+    /**
+     * modified version of source code from quasr.dev
+     * helper function for filtering q-select
+     * @param {String} val: value to filter for
+     * @param {Function} update: callback function to be modified
+     */
     filterFnSponsors: function (val, update) {
-      /**
-       * modified version of source code from quasr.dev
-       * helper function for filtering q-select
-       * @param {String} val: value to filter for
-       * @param {Function} update: callback function to be modified
-       * @return {void}
-       */
-
       update(() => {
         if (val === '') {
           this.addMemberDialog.filter = this.addMemberDialog.options
@@ -2307,14 +2239,12 @@ export default {
         }
       })
     },
+    /**
+     * https://stackoverflow.com/questions/400212/how-do-i-copy-to-the-clipboard-in-javascript
+     * fallback url copy to clipboard if not hosted on https
+     * @param {String} entry: url to be copied back to clipboard
+     */
     fallbackCopyTextToClipboard: function (entry) {
-      /**
-       * https://stackoverflow.com/questions/400212/how-do-i-copy-to-the-clipboard-in-javascript
-       * fallback url copy to clipboard if not hosted on https
-       * @param {String} entry: url to be copied back to clipboard
-       * @return {void}
-       */
-
       let textArea = document.createElement('textarea')
       textArea.value = entry
       document.body.prepend(textArea)
@@ -2331,28 +2261,24 @@ export default {
 
       document.body.removeChild(textArea)
     },
+    /**
+     * https://stackoverflow.com/questions/400212/how-do-i-copy-to-the-clipboard-in-javascript
+     * logic handler to call either fallback or built-in
+     * @param {String} entry: current url
+     */
     copyTextToClipboard: function (entry) {
-      /**
-       * https://stackoverflow.com/questions/400212/how-do-i-copy-to-the-clipboard-in-javascript
-       * logic handler to call either fallback or built-in
-       * @param {String} entry: current url
-       * @return {void}
-       */
-
       if (!navigator.clipboard) {
         this.fallbackCopyTextToClipboard(entry)
       } else {
         navigator.clipboard.writeText(entry)
       }
     },
+    /**
+     * fetches the attachment url and copy the url to nav.clipboard
+     * @param  {String} pathToFile: path to file
+     * @param {String} type: collection type
+     */
     fetchAttachmentURL: function (pathToFile, type) {
-      /**
-       * fetches the attachment url and copy the url to nav.clipboard
-       * @param  {String} pathToFile: path to file
-       * @param {String} type: collection type
-       * @return {void}
-       */
-
       let url = `local://${type}/${pathToFile}`
 
       this.copyTextToClipboard(url)
@@ -2371,27 +2297,23 @@ export default {
         ]
       })
     },
+    /**
+     * delete the project from the list if the project was removed in
+     * child component
+     * @param {String} value: name of the project to be removed
+     */
     projectDeleteByChild: function (value) {
-      /**
-       * delete the project from the list if the project was removed in
-       * child component
-       * @param {String} value: name of the project to be removed
-       * @return {void}
-       */
-
       this.projectList.projects = this.projectList.projects.filter(
         project => project.label !== value
       )
     },
+    /**
+     * modified version of source code from quasr.dev
+     * helper function for filtering q-select
+     * @param {String} val: value to filter for
+     * @param {Function} update: callback function to be modified
+     */
     filterFn: function (val, update) {
-      /**
-       * modified version of source code from quasr.dev
-       * helper function for filtering q-select
-       * @param {String} val: value to filter for
-       * @param {Function} update: callback function to be modified
-       * @return {void}
-       */
-
       update(() => {
         if (val === '') {
           this.projectList.filter = this.projectList.options
@@ -2404,13 +2326,11 @@ export default {
         }
       })
     },
+    /**
+     * helper function to handle file attachment and its alias
+     * @param {Object} data: record containing files
+     */
     updateAttachments: function (data) {
-      /**
-       * helper funciton to handle file attachment and its alias
-       * @param {Object} data: record containing files
-       * @return {void}
-       */
-
       let aliasName = ''
 
       for (let file in data) {
@@ -2426,22 +2346,17 @@ export default {
       this.fileAttachmentDialog.visible = false
       this.$forceUpdate()
     },
+    /**
+     * helper function to close attachment dialog
+     */
     leaveAttachments: function () {
-      /**
-       * helper function to close attachment dialog
-       * @param {void}
-       * @return {void}
-       */
-
       this.fileAttachmentDialog.visible = false
     },
+    /**
+     * update while hiding the reply log
+     * @param {String} entry: property to be edit
+     */
     updateAtHide: function (entry) {
-      /**
-       * update while hidding the reply log
-       * @param {String} entry: property to be edit
-       * @return {void}
-       */
-
       if (entry) {
         if (entry[0] === 'index') {
           this.curData.logs[entry[1]].index = parseInt(entry[2])
@@ -2452,22 +2367,17 @@ export default {
 
       this.$forceUpdate()
     },
+    /**
+     * helper function to click on the hidden file picker
+     */
     invokeFilePicker: function () {
-      /**
-       * helper function to click on the hidden file picker
-       * @param {void}
-       * @return {void}
-       */
-
       this.$refs.imageInput.click()
     },
+    /**
+     * changes file references on file change
+     * @param {Event} e: event handler of the event
+     */
     filePickerOnChange: function (e) {
-      /**
-       * changes file references on file change
-       * @param {Event} e: event handler of the event
-       * @return {void}
-       */
-
       const file = e.target.files[0]
 
       if (file) {
@@ -2480,14 +2390,12 @@ export default {
         this.mainImage.file = ''
       }
     },
+    /**
+     * submit handler of the component; put images and files into storage;
+     * update challenge's data to ToC as well as webpage; emit 'added' event
+     * @returns {Promise<Boolean>}
+     */
     onSubmit: async function () {
-      /**
-       * submit handler of the component; put images and files into storage;
-       * update challenge's data to ToC as well as webpage; emit 'added' event
-       * @param {void}
-       * @return {Promise<Boolean>}
-       */
-
       // edit, preview, and submit handler
       if (this.submitMode === 'view') {
         this.childMode = (this.childMode === 'preview') ? 'edit' : 'preview'
@@ -2561,7 +2469,7 @@ export default {
 
           this.$q.notify({
             type: 'positive',
-            message: '<div align="center">Sucessful!<div>',
+            message: '<div align="center">Successful!<div>',
             html: true,
             timeout: 500
           })
@@ -2572,15 +2480,13 @@ export default {
         }
       }
     },
+    /**
+     * load firebase database reference
+     * load firebase storage reference (if applicable)
+     * load firebase cloud functions reference (if applicable)
+     * @returns {Promise<Boolean>}
+     */
     loadFireRefs: async function () {
-      /**
-       * load firebase database reference
-       * load firebase storage reference (if applicable)
-       * load firebase cloud functions reference (if applicable)
-       * @param {void}
-       * @return {Promise<Boolean>}
-       */
-
       if (this.$q.localStorage.has('boundless_db')) {
         let sessionDb = this.$q.localStorage.getItem('boundless_db')
 
@@ -2620,14 +2526,12 @@ export default {
         }
       }
     },
+    /**
+     * TODO: load from cache
+     * load config for the component
+     * @returns {Promise<Boolean>}
+     */
     loadConfig: async function () {
-      /**
-       * TODO: load from cache
-       * load config for the component
-       * @param {void}
-       * @return {Promise<Boolean>}
-       */
-
       try {
         let doc = await this.db.collection('config').doc('project').get()
 
@@ -2641,7 +2545,7 @@ export default {
             })
           }
 
-          this.configData = this.deepObjCopy(data)
+          this.configData = cloneDeep(data)
 
           this.configData.customChips = this.configData.customChips || []
 
@@ -2689,17 +2593,15 @@ export default {
         return false
       }
     },
+    /**
+     * load required information from the database
+     * @returns {Promise<Boolean>}
+     */
     loadInformation: async function () {
-      /**
-       * load required information from the database
-       * @param {void}
-       * @return {Promise<Boolean>}
-       */
-
       this.loading = true
 
       let promises = []
-      promises.push(this.db.collection('challenges').doc(this.challengeId).get())
+      promises.push(this.db.collection('challenges').doc(this.uuid).get())
       promises.push(this.db.collection('challenges').doc('ToC').get())
       promises.push(this.db.collection('projects').doc('ToC').get())
       promises.push(this.db.collection('users').doc('ToC').get())
@@ -2711,8 +2613,8 @@ export default {
           this.data[objField] = res[0].data()[objField]
         }
 
-        for (let objField in res[1].data()[this.challengeId]) {
-          this.data[objField] = res[1].data()[this.challengeId][objField]
+        for (let objField in res[1].data()[this.uuid]) {
+          this.data[objField] = res[1].data()[this.uuid][objField]
         }
 
         for (let objField in res[3].data()) {
@@ -2723,11 +2625,11 @@ export default {
         this.sortBody()
         this.sortChip()
 
-        this.curData = this.deepObjCopy(this.data)
+        this.curData = cloneDeep(this.data)
         this.childMode = this.mode
         this.data = {} // to save memory
 
-        // calling 3rd promise is okay here since not binded to data var
+        // calling 3rd promise is okay here since not bound to data var
         this.projectList.toc = res[2].data()
 
         for (let objField in this.projectList.toc) {
@@ -2829,35 +2731,26 @@ export default {
         return false
       }
     },
+    /**
+     * helper function to invoke advanced settings dialog
+     */
     popupAdvancedSettingsDialog: function () {
-      /**
-       * helper function to invoke advanced settings dialog
-       * @param {void}
-       * @return {void}
-       */
-
       this.advancedDialog = true
       this.oldAdvancedSettings.hidden = this.curData.hidden
     },
+    /**
+     * helper function to cancel changes in advanced settings
+     */
     advancedSettingsCancel: function () {
-      /**
-       * helper function to cancel changes in advanced settings
-       * @param {void}
-       * @return {void}
-       */
-
       this.aliasKeys = Object.keys(this.aliasMap)
       this.aliasVals = Object.values(this.aliasMap)
       this.curData.hidden = this.oldAdvancedSettings.hidden
       this.oldAdvancedSettings = {}
     },
+    /**
+     * helper function of advanced settings setter
+     */
     advancedSettingSet: function () {
-      /**
-       * helper function of advanced settings setter
-       * @param {void}
-       * @return {void}
-       */
-
       let alias = ''
       let oldAlias = this.curData.alias
       if (this.aliasVals.includes(this.curData.uuid)) {
@@ -2888,29 +2781,25 @@ export default {
 
       this.$q.notify({
         type: 'positive',
-        message: 'Submitted sucessfully!'
+        message: 'Submitted successfully!'
       })
 
       this.emitAdded()
     },
+    /**
+     * helper function to convert alias from the title
+     */
     addToAliasKeys: function () {
-      /**
-       * helper function to convert alias from the title
-       * @param {void}
-       * @return {void}
-       */
-
       let initName = this.curData.challenge.split(' ').join('_').toLowerCase()
       this.aliasKeys.push(initName)
       this.aliasVals.push(this.curData.uuid)
     },
+    /**
+     * helper function to help validate alias string
+     * @param {String} val: name to be validated
+     * @returns {Boolean}
+     */
     aliasValidation: function (val) {
-      /**
-       * helper function to help validate alias string
-       * @param {String} val: name to be validiated
-       * @return {Boolean}
-       */
-
       if (val === '') {
         this.aliasEditObj.error = true
         this.aliasEditObj.message = 'Cannot be empty!'
@@ -2940,26 +2829,19 @@ export default {
       this.aliasEditObj.message = ''
       return true
     },
+    /**
+     * helper function to delete thread from the log
+     * @param  {Integer} index: index of the thread to be deleted
+     */
     deleteLogThread: function (index) {
-      /**
-       * helper function to delete thread from the log
-       * @param  {Integer} index: index of the thread to be deleted
-       * @return {void}
-       */
-
       this.curData.logs.splice(index, 1)
-
       this.updated = true
-
       this.$forceUpdate()
     },
+    /**
+     * helper function create log thread
+     */
     createLogThread: function () {
-      /**
-       * helper function create log thread
-       * @param {void}
-       * @return {void}
-       */
-
       this.$q.dialog({
         dark: true,
         title: 'Description...',
@@ -2999,17 +2881,13 @@ export default {
             icon: 'report_problem'
           })
         }
-      }).onCancel(() => {
-      }).onDismiss(() => {
       })
     },
+    /**
+     * helper function to add log inside a thread
+     * @param {Integer} index: index of the log thread
+     */
     addLog: function (index) {
-      /**
-       * helper function to add log inside a thread
-       * @param {Integer} index: index of the log thread
-       * @return {void}
-       */
-
       this.$q.dialog({
         dark: true,
         title: 'Description...',
@@ -3047,36 +2925,28 @@ export default {
             icon: 'report_problem'
           })
         }
-      }).onCancel(() => {
-      }).onDismiss(() => {
       })
     },
+    /**
+     * helper function to delete log inside a thread
+     * @param {Integer} index: index of the log to be deleted inside thread
+     * @param  {Object} parent: name of the log thread
+     */
     deleteLog: function (index, parent) {
-      /**
-       * helper function to delete log inside a thread
-       * @param {Integer} index: index of the log to be deleted inside thread
-       * @param  {Object} parent: name of the log thread
-       * @return {void}
-       */
-
       this.curData.logs[parent].data.splice(index, 1)
-
       this.updated = true
-
       this.$forceUpdate()
     },
+    /**
+     * helper function to reply to a log inside a thread
+     * @param {Integer} familyIndex: index of the log inside the log thread
+     * @param {Object} responseObj: response object
+     */
     replyLog: function (familyIndex, responseObj) {
-      /**
-       * helper function to reply to a log inside a thread
-       * @param {Integer} familyIndex: index of the log inside the log thread
-       * @param {Object} responseObj: reponse object
-       * @return {void}
-       */
-
       this.$q.dialog({
         dark: true,
         title: 'Response...',
-        message: '<strong>Please enter your response.</strong><br><br><p class="text-red">Note: Your reponse cannot be empty!</p>',
+        message: '<strong>Please enter your response.</strong><br><br><p class="text-red">Note: Your response cannot be empty!</p>',
         html: true,
         prompt: {
           model: '',
@@ -3087,7 +2957,7 @@ export default {
       }).onOk(data => {
         if (data) {
           let tmpLog = {
-            title: `In respones to: "${responseObj.title}"!`,
+            title: `In response to: "${responseObj.title}"!`,
             date: Date(),
             description: `>>>>>>>>>>\n${responseObj.description}\n>>>>>>>>>>\n${data}`,
             hidden: false
@@ -3107,18 +2977,13 @@ export default {
             icon: 'report_problem'
           })
         }
-      }).onCancel(() => {
-      }).onDismiss(() => {
       })
     },
+    /**
+     * allow the user to add custom content on the body section
+     * which will be displayed on their individual webpage
+     */
     addCustomField: function () {
-      /**
-       * allow the user to add custom content on the body section
-       * which will be displayed on their individual webpage
-       * @param {void}
-       * @return {void}
-       */
-
       let tmpBody = {}
 
       if (this.bodyType.value === 'TEXT_BOX') {
@@ -3163,14 +3028,11 @@ export default {
       this.curData.webpage.body.push(tmpBody)
       this.updated = true
     },
+    /**
+     * allow the user to add custom chip for the chips section
+     * which will be displayed on their individual webpage
+     */
     addChip: function () {
-      /**
-       * allow the user to add custom chip for the chips section
-       * which will be displayed on their individual webpage
-       * @param {void}
-       * @return {void}
-       */
-
       let tmpChip = {}
 
       if (this.chipType.value === 'SOURCE') {
@@ -3179,7 +3041,8 @@ export default {
           content: {
             label: this.chipType.label,
             type: this.chipType.value,
-            icon: 'code'
+            icon: 'code',
+            url: ''
           }
         }
       } else if (this.chipType.value === 'VIDEO') {
@@ -3188,7 +3051,8 @@ export default {
           content: {
             label: this.chipType.label,
             type: this.chipType.value,
-            icon: 'movie'
+            icon: 'movie',
+            url: ''
           }
         }
       } else {
@@ -3197,7 +3061,8 @@ export default {
           content: {
             label: '',
             type: this.chipType.value,
-            icon: null
+            icon: null,
+            url: ''
           }
         }
       }
@@ -3205,13 +3070,11 @@ export default {
       this.curData.webpage.chips.push(tmpChip)
       this.updated = true
     },
+    /**
+     * trigger the description pop-up dialog
+     * @param {String} entry: description of the challenge
+     */
     popDialog: function (entry) {
-      /**
-       * trigger the description pop-up dialog
-       * @param {String} entry: description of the challenge
-       * @return {void}
-       */
-
       if (entry === 'awards') {
         this.dialogJSON['title'] = 'Impact Awards'
       } else {
@@ -3233,13 +3096,11 @@ export default {
 
       this.fixedDialog = true
     },
+    /**
+     * get the path of the main photo of the project
+     * @returns {String}
+     */
     getMainPhoto: function () {
-      /**
-       * get the path of the main photo of the project
-       * @params {void}
-       * @return {String}
-       */
-
       let val = `statics/images/computer-keyboard.jpg`
 
       if (this.$q.sessionStorage.has('boundless_config')) {
@@ -3257,13 +3118,10 @@ export default {
 
       return val
     },
+    /**
+     * helper function to count up this.curData.priority
+     */
     priorityCountUp: function () {
-      /**
-       * helper function to count up this.curData.priority
-       * @param {void}
-       * @return {void}
-       */
-
       if (this.curData.priority === 3) {
         this.curData.priority = 0
       } else {
@@ -3272,13 +3130,10 @@ export default {
 
       this.updated = true
     },
+    /**
+     * helper function to count down this.curData.priority
+     */
     priorityCountDown: function () {
-      /**
-       * helper function to count down this.curData.priority
-       * @param {void}
-       * @return {void}
-       */
-
       if (this.curData.priority === 0) {
         this.curData.priority = 3
       } else {
@@ -3287,13 +3142,10 @@ export default {
 
       this.updated = true
     },
+    /**
+     * helper function to handle adding new challenge sponsor
+     */
     addChallengeSponsor: function () {
-      /**
-       * helper function to handle adding new challenge sponsor
-       * @param {void}
-       * @return {void}
-       */
-
       let itemOptions = []
 
       for (let email in this.userEmailToObjMap) {
@@ -3340,31 +3192,22 @@ export default {
       // })
       this.addMemberDialog.use = this.curData.sponsors
     },
+    /**
+     * emit 'close' event back to parent
+     */
     emitClose: function () {
-      /**
-       * emit 'close' event back to parent
-       * @param {void}
-       * @return {void}
-       */
-
       this.$emit('close')
     },
+    /**
+     * emit 'added' event back to parent
+     */
     emitAdded: function () {
-      /**
-       * emit 'added' event back to parent
-       * @param {void}
-       * @return {void}
-       */
-
       this.$emit('added')
     },
+    /**
+     * helper function to sort this.data.webpage.body
+     */
     sortBody: function () {
-      /**
-       * helper function to sort this.data.webpage.body
-       * @param {void}
-       * @return {void}
-       */
-
       this.data.webpage.body.sort((a, b) => {
         return a.index - b.index
       })
@@ -3377,24 +3220,18 @@ export default {
         }
       })
     },
+    /**
+     * helper function to sort this.data.webpage.chips
+     */
     sortChip: function () {
-      /**
-       * helper function to sort this.data.webpage.chips
-       * @param {void}
-       * @return {void}
-       */
-
       this.data.webpage.chips.sort((a, b) => {
         return a.index - b.index
       })
     },
+    /**
+     * helper function to sort this.curData.webpage.body
+     */
     curSortBody: function () {
-      /**
-       * helper function to sort this.curData.webpage.body
-       * @param {void}
-       * @return {void}
-       */
-
       this.curData.webpage.body.sort((a, b) => {
         return a.index - b.index
       })
@@ -3407,61 +3244,30 @@ export default {
         }
       })
     },
+    /**
+     * helper function to sort this.curData.webpage.chips
+     */
     curSortChip: function () {
-      /**
-       * helper function to sort this.curData.webpage.chips
-       * @param {void}
-       * @return {void}
-       */
-
       this.curData.webpage.chips.sort((a, b) => {
         return a.index - b.index
       })
     },
+    /**
+     * helper function to open new tab with the pass in url
+     * @param {String} url: url to be opened
+     */
     openNewTab: function (url) {
-      /**
-       * helper function to open new tab with the pass in url
-       * @param {String} url: url to be opened
-       * @return {void}
-       */
-
       window.open(url, '_blank', 'noopener')
     },
-    deepObjCopy: function (aObject) {
-      /**
-       * https://stackoverflow.com/questions/4459928/how-to-deep-clone-in-javascript/34624648#34624648
-       * creates a deep copy of the input
-       * @param {Object} aObject: the object to be cloned
-       * @return {Object}
-      */
-
-      if (!aObject) {
-        return aObject
-      }
-
-      let v
-      let bObject = Array.isArray(aObject) ? [] : {}
-      for (const k in aObject) {
-        v = aObject[k]
-        bObject[k] = (typeof v === 'object') ? this.deepObjCopy(v) : v
-      }
-
-      return bObject
-    },
+    /**
+     * helper function to notify error has occurred
+     */
     notifyError: function () {
-      /**
-       * helper function to notify error has occured
-       * @param {void}
-       * @return {String}
-       */
-
       this.$q.notify({
         color: 'negative',
         message: 'Field is required!',
         icon: 'warning'
       })
-
-      return ''
     }
   }
 }

@@ -248,7 +248,7 @@ Methods:
             <q-td
               key="members"
               :props="props"
-              style="max-width: 150px; overflow: hidden;"
+              style="max-width: 90px; overflow: hidden;"
             >
               <div align="left">
                 {{ displayMembers(props.row.members) }}
@@ -280,7 +280,7 @@ Methods:
 
           <q-separator />
 
-          <q-card-section style="width: 50vh; height: 40vh; overflow: auto">
+          <q-card-section style="height: 40vh; overflow: auto">
             <p>
               {{ rowMessage }}
             </p>
@@ -300,6 +300,7 @@ Methods:
 
 <script>
 import { defaultImages } from '../../boundless.config'
+import isFirebaseError from '../../src/errors/isFirebaseError'
 
 import productionDb, { productionStorage } from '../firebase/init_production'
 import testingDb, { testingStorage } from '../firebase/init_testing'
@@ -318,14 +319,13 @@ export default {
       await this.loadFireRefs()
       await this.loadConfig()
       await this.loadProjectList()
-
       this.loadProgressBarConf()
 
       this.keywordsInUse = this.keywordsInUse.filter(
         v => v in this.keywordsValToKeyMap
       )
     } catch (error) {
-      throw new Error(error)
+      throw error
     }
   },
   beforeUpdate () {
@@ -389,7 +389,7 @@ export default {
         {
           name: 'progress',
           align: 'center',
-          label: 'Progess',
+          label: 'Progress',
           field: row => row.progress,
           format: val => `${val}`,
           sortable: true
@@ -455,7 +455,6 @@ export default {
       } else {
         try {
           let doc = await productionDb.collection('config').doc('project').get()
-
           if (doc.exists) {
             if (doc.data().db === 'testing') {
               this.db = testingDb
@@ -476,7 +475,7 @@ export default {
           this.storage = productionStorage
           this.$q.localStorage.set('boundless_db', 'production')
 
-          return false
+          throw error
         }
       }
     },
@@ -528,7 +527,7 @@ export default {
       /**
        * helper function to join keywords
        * @param {Array<String>} entry: string array with keywords to be
-       *                               appeneded
+       *                               appended
        * @return {String}
        */
 
@@ -554,7 +553,6 @@ export default {
 
       try {
         let doc = await this.db.collection('projects').doc('ToC').get()
-
         if (doc.exists) {
           for (let project in doc.data()) {
             if (project !== 'alias') {
@@ -606,7 +604,7 @@ export default {
       } catch (error) {
         this.loading = false
 
-        return false
+        throw error
       }
     },
     loadConfig: async function () {
@@ -619,7 +617,6 @@ export default {
 
       try {
         let doc = await this.db.collection('config').doc('project').get()
-
         if (doc.exists) {
           let data = doc.data()
 
@@ -643,7 +640,6 @@ export default {
             //   cachedKeywords.push(data['keywords'][key])
             // }
           }
-
           // this.keywordsInUse = cachedKeywords
           this.keywordsInUse = data.projectsConfig.keywords
 
@@ -659,7 +655,12 @@ export default {
                   data.extraKeywordsData[prop]
                 ).getDownloadURL()
               } catch (error) {
-                this.keywordsImage[key] = '../statics/images/other-icon.png'
+                if (isFirebaseError(error, 'storage/object-not-found')) {
+                  console.error(error)
+                  this.keywordsImage[key] = '../statics/images/other-icon.png'
+                } else {
+                  throw error
+                }
               }
             }
           }
@@ -667,7 +668,6 @@ export default {
           if (typeof data['pagination'] === 'number') {
             this.pagination.rowsPerPage = data['pagination']
           }
-
           let expireDate = data.newFlag * 24 * 60 * 60 * 1000
           this.todayDate = new Date(Date.now() - expireDate)
           this.todayDate = this.todayDate.toISOString().substring(0, 10)
@@ -677,7 +677,7 @@ export default {
           throw new Error('File not found!')
         }
       } catch (error) {
-        return false
+        throw error
       }
     },
     gettingCount: function () {

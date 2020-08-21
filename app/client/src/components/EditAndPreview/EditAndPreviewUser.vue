@@ -9,7 +9,7 @@
 ## under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES
 ## OR CONDITIONS OF ANY KIND, either express or implied.
 
-Name:     components/EditUser.vue
+Name:     components/EditAndPreview/EditAndPreviewUser.vue
 Purpose:  The user interface to allow the admin to edit and preview the
           resulting edits of the user before submitting
 Methods:
@@ -161,10 +161,10 @@ Methods:
                         </strong>
                         {{ curTocData.name }}
 
-                        <limited-len-input-popup
+                        <popup-input-limit-len
+                          title="Edit User Name"
                           :initialValue="curTocData.name"
                           :lenLimit="60"
-                          :label="name"
                           @save="saveEditedName"
                         />
 
@@ -230,7 +230,7 @@ Methods:
                       <div>
                         <div class="row q-px-md">
                           <strong style="fontSize: 20px;">
-                            Addtional Information
+                            Additional Information
                           </strong>
                           <q-separator class="q-mx-sm q-mt-md" color="secondary" />
                           <q-btn
@@ -310,7 +310,7 @@ Methods:
                     @deleted="projectDeleteByChild"
                   /> -->
                   <ProjectTable
-                    :userId="curTocData.uuid"
+                    :uuid="curTocData.uuid"
                     :childDb="db"
                     :projectList="curData.projects || []"
                   />
@@ -376,29 +376,29 @@ Methods:
 import firebase from 'firebase/app'
 import 'firebase/firestore'
 
-import productionDb, { productionStorage } from '../firebase/init_production'
-import testingDb, { testingStorage } from '../firebase/init_testing'
+import productionDb, { productionStorage } from '../../firebase/init_production'
+import testingDb, { testingStorage } from '../../firebase/init_testing'
 
-import LimitedLenInputPopup from '../components/LimitedLenInputPopup'
-import ProjectTable from '../components/Tables/ProjectTable'
+import PopupInputLimitLen from '../../components/Popups/PopupInputLimitLen.vue'
+import ProjectTable from '../../components/Tables/ProjectTable.vue'
 
 export default {
   props: {
-    userId: String,
-    emailList: Array
+    uuid: String,
+    emailSet: Set
   },
   components: {
     // uploadGUI
     ProjectTable,
-    LimitedLenInputPopup
+    PopupInputLimitLen
   },
   async created () {
     try {
-      // fetech data from database
+      // fetch data from database
       await this.loadFireRefs()
       await this.loadInformation()
     } catch (error) {
-      throw new Error(error)
+      throw error
     }
   },
   data () {
@@ -428,13 +428,13 @@ export default {
   methods: {
     popUpReset: function () {
       /**
-       * restting error message
+       * resetting error message
        * @param {void}
        * @return {void}
        */
 
       this.errorObj.error = false
-      this.errorObj.messsage = ''
+      this.errorObj.message = ''
     },
     popUpEmailValidation: function (val) {
       /**
@@ -445,7 +445,7 @@ export default {
 
       if (val === undefined) {
         this.errorObj.error = false
-        this.errorObj.messsage = ''
+        this.errorObj.message = ''
         return true
       }
 
@@ -457,15 +457,15 @@ export default {
         this.errorObj.error = true
         this.errorObj.message = 'Not a valid email format!'
         return false
-      } else if (this.emailList.includes(String(val).toLowerCase())) {
+      } else if (this.emailSet.has(String(val).toLowerCase())) {
         this.errorObj.error = true
         this.errorObj.message = 'This email is already taken!'
         return false
       }
 
-      // sucessful call
+      // successful call
       this.errorObj.error = false
-      this.errorObj.messsage = ''
+      this.errorObj.message = ''
       return true
     },
     validateEmailFormat: function (entry) {
@@ -530,8 +530,6 @@ export default {
             icon: 'warning'
           })
         }
-      }).onCancel(() => {
-      }).onDismiss(() => {
       })
     },
     getMainPhoto: function () {
@@ -577,7 +575,7 @@ export default {
     capitalizeKeys: function (entry) {
       /**
        * helper function to capitalize the first character of the field
-       * @param {String} entry: field string to be capitalzied
+       * @param {String} entry: field string to be capitalized
        * @return {String}
        */
 
@@ -616,14 +614,14 @@ export default {
         }
 
         await this.db.collection('users').doc('ToC').set({
-          [this.userId]: this.curTocData
+          [this.uuid]: this.curTocData
         }, { merge: true })
 
         this.curData.socialNetwork = this.curData.socialNetwork || {}
         this.curData.projects = this.curData.projects || []
         this.curData.achievements = this.curData.achievements || {}
 
-        await this.db.collection('users').doc(this.userId).set(this.curData)
+        await this.db.collection('users').doc(this.uuid).set(this.curData)
 
         this.emitClose()
         this.$emit('added')
@@ -697,7 +695,7 @@ export default {
       this.loading = true
       // this.projectImagePath = this.getMainPhoto()
       let promises = []
-      promises.push(this.db.collection('users').doc(this.userId).get())
+      promises.push(this.db.collection('users').doc(this.uuid).get())
       promises.push(this.db.collection('users').doc('ToC').get())
 
       try {
@@ -715,8 +713,8 @@ export default {
           // this.data[objField] = res[0].data()[objField]
         }
 
-        for (let objField in res[1].data()[this.userId]) {
-          this.tocData[objField] = res[1].data()[this.userId][objField]
+        for (let objField in res[1].data()[this.uuid]) {
+          this.tocData[objField] = res[1].data()[this.uuid][objField]
         }
 
         this.curData = this.deepObjCopy(this.data)
