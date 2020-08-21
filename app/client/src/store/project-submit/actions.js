@@ -28,20 +28,34 @@ import productionDb from '../../firebase/init_production'
 import DbException from '../../errors/DbException'
 import { LocalStorage } from 'quasar'
 import { backendEnum, CURRENT_BACKEND } from '../../../backends.config'
+
 /**
+ * Calls the appropriate action depending on the backend type.
  * @param {Object} context Exposes the same set of methods/properties as the
  *   store instance.
  *   For all the properties of the context object, see:
  *   https://vuex.vuejs.org/api/#actions.
+ * @param {...Function} action An action which needs a context that will be called
+ *   depending on the backend type. The order of the provided actions matters.
  */
-export async function initStoreProjectSubmit (context) {
+async function callDependingOnBackend (context, ...action) {
   switch (CURRENT_BACKEND) {
     case backendEnum.FIREBASE:
-      await loadFireRefs(context)
+      if (action[0]) {
+        await action[0](context)
+      }
       break
     default:
       throw DbException('No matching backend type.')
   }
+}
+
+/**
+ * Initializes state in this Vuex module.
+ *
+ */
+export async function initStoreProjectSubmit (context) {
+  await callDependingOnBackend(context, loadFireRefs)
   await loadConfig(context)
   await loadUserList(context)
 }
@@ -50,9 +64,9 @@ export async function initStoreProjectSubmit (context) {
  * Sets up the Firebase reference getter. This should be called foremost before
  * setting or getting any Vuex state related to the db.
  *
- * Previous versions of this functions return true if there was an error
- * and false other wise. This has been removed on 7/22/2020 since the purpose
- * of those return values were unknown.
+ * Previous versions of this function found in other files returned true if
+ * there was no error and false if there was an error. This has been removed on
+ * 7/22/2020 since the purpose of those return values were unknown.
  *
  * @param {Object} context Exposes the same set of methods/properties as the
  *   store instance.
@@ -89,23 +103,17 @@ async function loadFireRefs ({ commit }) {
  *   store instance.
  */
 async function loadConfig (context) {
-  switch (CURRENT_BACKEND) {
-    case backendEnum.FIREBASE:
-      await firebaseLoadConfig(context)
-      break
-    default:
-      throw DbException('No matching backend type.')
-  }
+  await callDependingOnBackend(context, firebaseLoadConfig)
 }
 
 /**
- * Load the config from firebase.
+ * Load the config from Firebase.
  * TODO: this should be replaced now that config/project
  *       is cached in session
  *
- * Previous versions of this functions return true if there was an error
- * and false other wise. This has been removed on 7/22/2020 since the purpose
- * of those return values were unknown.
+ * Previous versions of this function found in other files returned true if
+ * there was no error and false if there was an error. This has been removed on
+ * 7/22/2020 since the purpose of those return values were unknown.
  *
  * @param {Object} context Exposes the same set of methods/properties as the
  *   store instance.
@@ -143,37 +151,47 @@ async function firebaseLoadConfig ({ commit, getters }) {
 /**
  * Load the user list from the db and store the data into component state.
  *
- * Previous versions of this functions return true if there was an error
- * and false other wise. This has been removed on 7/22/2020 since the purpose
- * of those return values were unknown.
+ * @param {Object} context Exposes the same set of methods/properties as the
+ *   store instance.
+ */
+async function loadUserList (context) {
+  switch (CURRENT_BACKEND) {
+    case backendEnum.FIREBASE:
+      firebaseLoadUserList(context)
+      break
+    default:
+      throw DbException('No matching backend type.')
+  }
+}
+
+/**
+ * Load the user list from the firebase and store the data into component state.
+ *
+ * Previous versions of this functions found in other files returned true if
+ * there was no error and false if there was an error. This has been removed on
+ * 7/22/2020 since the purpose of those return values were unknown.
  *
  * @param {Object} context Exposes the same set of methods/properties as the
  *   store instance.
  * @param {Object} context.commit Allows this action to commit mutations
  * @param {Object} context.getters Gives access to state.
  */
-async function loadUserList ({ commit, getters }) {
-  const emailToUuidMap = {}
-  const emailToNameMap = {}
-  switch (CURRENT_BACKEND) {
-    case backendEnum.FIREBASE:
-      const doc = await getters.db.collection('users').doc('ToC').get()
+async function firebaseLoadUserList ({ commit, getters }) {
+  const doc = await getters.db.collection('users').doc('ToC').get()
 
-      if (doc.exists) {
-        const tocUserData = doc.data()
-        for (let uuid in tocUserData) {
-          emailToUuidMap[tocUserData[uuid].email] = uuid
-          emailToNameMap[tocUserData[uuid].email] = tocUserData[uuid].name
-        }
-      } else {
-        throw new DbException('users/ToC not found!')
-      }
-      break
-    default:
-      throw DbException('No matching backend type.')
+  if (doc.exists) {
+    const tocUserData = doc.data()
+    const emailToUuidMap = {}
+    const emailToNameMap = {}
+    for (let uuid in tocUserData) {
+      emailToUuidMap[tocUserData[uuid].email] = uuid
+      emailToNameMap[tocUserData[uuid].email] = tocUserData[uuid].name
+    }
+    commit('setEmailToUuidMap', emailToUuidMap)
+    commit('setEmailToNameMap', emailToNameMap)
+  } else {
+    throw new DbException('users/ToC not found!')
   }
-  commit('setEmailToUuidMap', emailToUuidMap)
-  commit('setEmailToNameMap', emailToNameMap)
 }
 
 /**
@@ -185,7 +203,17 @@ async function loadUserList ({ commit, getters }) {
  * @param {Object} context.commit Allows this action to commit mutations
  * @param {Object} context.getters Gives access to state.
  */
-export async function submitNewUsers ({ commit, getters }) {
+export async function submitNewUsers (context) {
+  switch (CURRENT_BACKEND) {
+    case backendEnum.FIREBASE:
+      firebaseSubmitNewUsers(context)
+      break
+    default:
+      throw DbException('No matching backend type.')
+  }
+}
+
+async function firebaseSubmitNewUsers ({ commit, getters }) {
   /*
   Cannot use Array.forEach with an async callback here, as it will not wait for the
   first iteration to finish before moving onto the second one.
@@ -194,33 +222,26 @@ export async function submitNewUsers ({ commit, getters }) {
     const email = member.email
     if (!(email in getters.emailToUuidMap)) {
       const name = member.name
-      let uuid
-      switch (CURRENT_BACKEND) {
-        case backendEnum.FIREBASE:
-          const timeOfSubmit = new Date(Date.now()).toISOString()
-          const userDoc = getters.db.collection('users').doc()
-          uuid = userDoc.id
-          let newUser = {
-            uuid,
-            name,
-            email,
-            title: '',
-            imgURL: '',
-            timestamp: timeOfSubmit,
-            created: timeOfSubmit
-          }
-          await getters.db.collection('users').doc(uuid).set({
-            socialNetwork: {},
-            projects: [],
-            achievements: {}
-          })
-          await getters.db.collection('users').doc('ToC').set({
-            [uuid]: newUser
-          }, { merge: true })
-          break
-        default:
-          throw DbException('No matching backend type.')
+      const timeOfSubmit = new Date(Date.now()).toISOString()
+      const userDoc = getters.db.collection('users').doc()
+      const uuid = userDoc.id
+      let newUser = {
+        uuid,
+        name,
+        email,
+        title: '',
+        imgURL: '',
+        timestamp: timeOfSubmit,
+        created: timeOfSubmit
       }
+      await getters.db.collection('users').doc(uuid).set({
+        socialNetwork: {},
+        projects: [],
+        achievements: {}
+      })
+      await getters.db.collection('users').doc('ToC').set({
+        [uuid]: newUser
+      }, { merge: true })
       commit('addEntryToEmailToUuidMap', {
         email,
         uuid
