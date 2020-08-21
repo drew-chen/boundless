@@ -30,7 +30,9 @@ import { LocalStorage } from 'quasar'
 import { backendEnum, CURRENT_BACKEND } from '../../../backends.config'
 
 /**
- * Calls the appropriate action depending on the backend type.
+ * Calls the appropriate action depending on the backend type. Can be extended to
+ * handle more backends by adding more cases and passing in more actions.
+ *
  * @param {Object} context Exposes the same set of methods/properties as the
  *   store instance.
  *   For all the properties of the context object, see:
@@ -103,11 +105,11 @@ async function loadFireRefs ({ commit }) {
  *   store instance.
  */
 async function loadConfig (context) {
-  await callDependingOnBackend(context, firebaseLoadConfig)
+  await callDependingOnBackend(context, loadConfigFirebase)
 }
 
 /**
- * Load the config from Firebase.
+ * Helper function for 'loadConfig' which uses Firebase as the backend.
  * TODO: this should be replaced now that config/project
  *       is cached in session
  *
@@ -120,7 +122,7 @@ async function loadConfig (context) {
  * @param {Object} context.commit Allows this action to commit mutations
  * @param {Object} context.getters Gives access to state.
  */
-async function firebaseLoadConfig ({ commit, getters }) {
+async function loadConfigFirebase ({ commit, getters }) {
   const doc = await getters.db.collection('config').doc('project').get()
   if (doc.exists) {
     const data = doc.data()
@@ -155,17 +157,11 @@ async function firebaseLoadConfig ({ commit, getters }) {
  *   store instance.
  */
 async function loadUserList (context) {
-  switch (CURRENT_BACKEND) {
-    case backendEnum.FIREBASE:
-      firebaseLoadUserList(context)
-      break
-    default:
-      throw DbException('No matching backend type.')
-  }
+  await callDependingOnBackend(context, loadUserListFirebase)
 }
 
 /**
- * Load the user list from the firebase and store the data into component state.
+ * Helper function for 'loadUserList' which uses Firebase as the backend.
  *
  * Previous versions of this functions found in other files returned true if
  * there was no error and false if there was an error. This has been removed on
@@ -176,9 +172,8 @@ async function loadUserList (context) {
  * @param {Object} context.commit Allows this action to commit mutations
  * @param {Object} context.getters Gives access to state.
  */
-async function firebaseLoadUserList ({ commit, getters }) {
+async function loadUserListFirebase ({ commit, getters }) {
   const doc = await getters.db.collection('users').doc('ToC').get()
-
   if (doc.exists) {
     const tocUserData = doc.data()
     const emailToUuidMap = {}
@@ -200,20 +195,20 @@ async function firebaseLoadUserList ({ commit, getters }) {
  *
  * @param {Object} context Exposes the same set of methods/properties as the
  *  store instance.
+ */
+export async function submitNewUsers (context) {
+  callDependingOnBackend(context, submitNewUsersFirebase)
+}
+
+/**
+ * Helper function for 'submitNewUsers' which uses Firebase as the backend.
+ *
+ * @param {Object} context Exposes the same set of methods/properties as the
+ *  store instance.
  * @param {Object} context.commit Allows this action to commit mutations
  * @param {Object} context.getters Gives access to state.
  */
-export async function submitNewUsers (context) {
-  switch (CURRENT_BACKEND) {
-    case backendEnum.FIREBASE:
-      firebaseSubmitNewUsers(context)
-      break
-    default:
-      throw DbException('No matching backend type.')
-  }
-}
-
-async function firebaseSubmitNewUsers ({ commit, getters }) {
+async function submitNewUsersFirebase ({ commit, getters }) {
   /*
   Cannot use Array.forEach with an async callback here, as it will not wait for the
   first iteration to finish before moving onto the second one.
@@ -255,11 +250,23 @@ async function firebaseSubmitNewUsers ({ commit, getters }) {
 }
 
 /**
- * Submits the project to the database once all the required fields are checked.
+ * Submits the project to the database once all the required fields are checked
+ * externally.
+ *
  * Creates the new users who are not in the db, and notifies
  * the user on both success and failure.
  * Unlike most other fields, the project id, submission time and users list
- * are finalized in here instead of in ProjectMainForm.vue
+ * are finalized in here instead of in 'ProjectMainForm.vue'.
+ *
+ * @param {Object} context Exposes the same set of methods/properties as the
+ *  store instance.
+ */
+export async function submitProject (context) {
+  await callDependingOnBackend(context, submitProjectFirebase)
+}
+
+/**
+ * Helper function for 'submitProject' which uses Firebase as the backend.
  *
  * @param {Object} context Exposes the same set of methods/properties as the
  *  store instance.
@@ -267,9 +274,7 @@ async function firebaseSubmitNewUsers ({ commit, getters }) {
  * @param {Object} context.dispatch Used to call other actions.
  * @param {Object} context.getters Gives access to state.
  */
-export async function submitProject ({ commit, dispatch, getters }) {
-  console.log('0 reached')
-
+async function submitProjectFirebase ({ commit, dispatch, getters }) {
   await dispatch('submitNewUsers')
 
   const tmpMembers = []
@@ -280,58 +285,45 @@ export async function submitProject ({ commit, dispatch, getters }) {
     })
   })
   commit('setSubmittedProjectMembers', tmpMembers)
-  console.log('----1 reached', tmpMembers)
-  switch (CURRENT_BACKEND) {
-    case backendEnum.FIREBASE:
-      // create a reference to a new project in the db
-      const projectDoc = getters.db.collection('projects').doc()
-      const newProjectUuid = projectDoc.id
-      const submitTime = new Date(Date.now()).toISOString()
-      await projectDoc.set({
-        customFormResponse: [],
-        webpage: getters.webpage,
-        files: {}
-      })
-      console.log('2 reached')
 
-      commit('setProjectSubmitTime', submitTime)
-      commit('setProjectUuid', newProjectUuid)
-      try {
-        await getters.db.collection('projects').doc('ToC').set({
-          [newProjectUuid]: getters.project
-        }, { merge: true })
-      } catch (error) {
-        debugger
-        console.error(error)
-        console.log('---', newProjectUuid, getters.project)
-        throw error
-      }
-      break
-    default:
-      throw DbException('No matching backend type.')
-  }
-  console.log('3 reached')
+  // create a reference to a new project in the db
+  const projectDoc = getters.db.collection('projects').doc()
+  const submitTime = new Date(Date.now()).toISOString()
+
+  commit('setProjectUuid', projectDoc.id)
+  commit('setProjectSubmitTime', submitTime)
+  await projectDoc.set({
+    webpage: getters.webpage,
+    files: {}
+  })
+  await getters.db.collection('projects').doc('ToC').set({
+    [getters.projectUuid]: getters.project
+  }, { merge: true })
 }
 
 /**
- * Save custom form responses under a field named 'createInfo'.
+ * Save custom form responses under a field named 'customFormResponse'.
+ *
+ * @param {Object} context Exposes the same set of methods/properties as the
+ *  store instance.
+ */
+export async function submitQuestions (context) {
+  await callDependingOnBackend(context, submitQuestionsFirebase)
+}
+
+/**
+ * Helper function for 'submitQuestions' which uses Firebase as the backend.
  *
  * @param {Object} context Exposes the same set of methods/properties as the
  *  store instance.
  * @param {Object} context.getters Gives access to state.
  */
-export async function submitQuestions ({ getters }) {
+async function submitQuestionsFirebase ({ getters }) {
   const uuid = getters.projectUuid
-  switch (CURRENT_BACKEND) {
-    case backendEnum.FIREBASE:
-      const projectDoc = getters.db.collection('projects').doc(uuid)
-      await projectDoc.update({
-        customFormResponse: getters.questions
-      })
-      break
-    default:
-      throw DbException('No matching backend type.')
-  }
+  const projectDoc = getters.db.collection('projects').doc(uuid)
+  await projectDoc.update({
+    customFormResponse: getters.questions
+  })
 }
 
 /**
@@ -387,7 +379,7 @@ export async function submitCustomFormEnabled ({ commit, getters }, customFormEn
 }
 
 /**
- * Helper function which resets the vuex store to the initial state.
+ * Resets the vuex store to the initial state.
  *
  * @param {Object} context Exposes the same set of methods/properties as the
  *  store instance.
