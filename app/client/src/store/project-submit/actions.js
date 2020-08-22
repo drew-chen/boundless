@@ -48,6 +48,11 @@ async function callDependingOnBackend (context, ...action) {
         await action[0](context)
       }
       break
+    case backendEnum.CUSTOM:
+      if (action[1]) {
+        await action[1](context)
+      }
+      break
     default:
       throw DbException('No matching backend type.')
   }
