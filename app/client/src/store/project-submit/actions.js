@@ -39,6 +39,7 @@ import { backendEnum, CURRENT_BACKEND } from '../../../backends.config'
  *   https://vuex.vuejs.org/api/#actions.
  * @param {...Function} action An action which needs a context that will be called
  *   depending on the backend type. The order of the provided actions matters.
+ *   Each action can only accept one parameter: context.
  */
 async function callDependingOnBackend (context, ...action) {
   switch (CURRENT_BACKEND) {
@@ -327,33 +328,50 @@ async function submitQuestionsFirebase ({ getters }) {
 }
 
 /**
- * Save questionTemplates to vuex and Firestore.
+ * Save questionTemplates to Vuex and the database.
+ *
+ * Since the helper function 'submitQuestionTemplatesFirebase' has two arguments
+ * instead of one and 'callDependingOnBackend' on works with functions with one
+ * argument, 'submitQuestionTemplatesFirebase' is converted to a one argument
+ * function.
  *
  * @param {Object} context Exposes the same set of methods/properties as the
+ *  store instance.
+ * @param {Array<Object>} questionTemplates The new state of questionTemplates.
+ */
+export async function submitQuestionTemplates (context, questionTemplates) {
+  function submitFirebaseQuestionsBound (context) {
+    return submitQuestionTemplatesFirebase(context, questionTemplates)
+  }
+  await callDependingOnBackend(context, submitFirebaseQuestionsBound)
+}
+
+/**
+ * Helper function for 'submitQuestionTemplates' which uses Firebase as the
+ * backend. Unlike most other helper functions in 'actions.js', this helper
+ * has two arguments instead of one.
+ *
+ * @param {Object} context Exposes the same set of methods/properties on the
  *  store instance.
  * @param {Object} context.commit Allows this action to commit mutations
  * @param {Object} context.getters Gives access to state.
  * @param {Array<Object>} questionTemplates The new state of questionTemplates.
  */
-export async function submitQuestionTemplates ({ commit, getters }, questionTemplates) {
-  switch (CURRENT_BACKEND) {
-    case backendEnum.FIREBASE:
-      await getters.db.collection('config')
-        .doc('project')
-        .set({
-          projectsConfig: {
-            questionTemplates
-          }
-        }, { merge: true })
-      break
-    default:
-      throw DbException('No matching backend type.')
-  }
+async function submitQuestionTemplatesFirebase ({ commit, getters }, questionTemplates) {
+  await getters.db.collection('config')
+    .doc('project')
+    .set({
+      projectsConfig: {
+        questionTemplates
+      }
+    }, { merge: true })
   commit('setQuestionTemplates', questionTemplates)
 }
 
 /**
- * Save customFormEnabled to vuex and Firestore.
+ * Save customFormEnabled to Vuex and the database. Converts
+ * 'submitCustomFormEnabledFirebase' into a one argument function before calling
+ * since 'callDependingOnBackend' only works with one argument functions.
  *
  * @param {Object} context Exposes the same set of methods/properties as the
  *  store instance.
@@ -361,20 +379,32 @@ export async function submitQuestionTemplates ({ commit, getters }, questionTemp
  * @param {Object} context.getters Gives access to state.
  * @param {Array<Object>} questionTemplates The new state of questionTemplates.
  */
-export async function submitCustomFormEnabled ({ commit, getters }, customFormEnabled) {
-  switch (CURRENT_BACKEND) {
-    case backendEnum.FIREBASE:
-      await getters.db.collection('config')
-        .doc('project')
-        .set({
-          projectsConfig: {
-            customFormEnabled
-          }
-        }, { merge: true })
-      break
-    default:
-      throw DbException('No matching backend type.')
+export async function submitCustomFormEnabled (context, customFormEnabled) {
+  function submitFirebaseCustomFormEnabledBound (context) {
+    return submitCustomFormEnabledFirebase(context, customFormEnabled)
   }
+  await callDependingOnBackend(context, submitFirebaseCustomFormEnabledBound)
+}
+
+/**
+ * Helper function for 'submitCustomFormEnabled' which uses Firebase as the
+ * backend. Unlike most other helper functions in 'actions.js', this helper
+ * has two arguments instead of one.
+ *
+ * @param {Object} context Exposes the same set of methods/properties on the
+ *  store instance.
+ * @param {Object} context.commit Allows this action to commit mutations
+ * @param {Object} context.getters Gives access to state.
+ * @param {Array<Object>} questionTemplates The new state of questionTemplates.
+ */
+async function submitCustomFormEnabledFirebase ({ commit, getters }, customFormEnabled) {
+  await getters.db.collection('config')
+    .doc('project')
+    .set({
+      projectsConfig: {
+        customFormEnabled
+      }
+    }, { merge: true })
   commit('setCustomFormEnabled', customFormEnabled)
 }
 
