@@ -33,6 +33,10 @@ import { backendEnum, CURRENT_BACKEND } from '../../../backends.config'
  * Calls the appropriate action depending on the backend type. Can be extended to
  * handle more backends by adding more cases and passing in more actions.
  *
+ * Note: if the function wrapping 'callDependingOnBackend' is expected to
+ * be awaited, then make sure the call to 'callDependingOnBackend' is also
+ * awaited.
+ *
  * @param {Object} context Exposes the same set of methods/properties as the
  *   store instance.
  *   For all the properties of the context object, see:
@@ -203,7 +207,7 @@ async function loadUserListFirebase ({ commit, getters }) {
  *  store instance.
  */
 export async function submitNewUsers (context) {
-  callDependingOnBackend(context, submitNewUsersFirebase)
+  await callDependingOnBackend(context, submitNewUsersFirebase)
 }
 
 /**
