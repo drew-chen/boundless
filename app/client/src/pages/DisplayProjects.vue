@@ -191,6 +191,7 @@ Methods:
             </q-td>
 
             <q-td
+              auto-width
               key="project"
               :props="props">
               {{ props.row.project }}
@@ -212,7 +213,7 @@ Methods:
                 </div>
 
                 <div
-                  :hidden="!(props.row.description.length > 40)"
+                  :hidden="!(props.row.description.length > 60)"
                   class="col-2"
                 >
                   <div
@@ -226,20 +227,13 @@ Methods:
             </q-td>
 
             <q-td key="progress"
-              :props="props">
-              <div
-                style="
-                  min-width: 150px;
-                  max-width: 250px;
-                  border: solid 1px;
-                  border-color: #d0d7e2;
-                "
-              >
-                <ProgressBar
-                  :progressBar="progressBar"
-                  :progress="props.row.progress"
-                />
-              </div>
+              auto-width
+              :props="props"
+            >
+              <ProgressBar
+                :progressBar="progressBar"
+                :progress="props.row.progress"
+              />
             </q-td>
 
             <q-td
@@ -390,7 +384,8 @@ export default {
           label: 'Progress',
           field: row => row.progress,
           format: val => `${val}`,
-          sortable: true
+          sortable: true,
+          classes: 'progress-bar'
         },
         {
           name: 'members',
@@ -705,4 +700,8 @@ export default {
   overflow-wrap break-word
   font-weight bold
   text-align left
+
+.progress-bar
+  width 250px
+
 </style>
