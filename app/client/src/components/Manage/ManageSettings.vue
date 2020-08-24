@@ -68,7 +68,7 @@ Methods:
           <q-separator />
           <q-route-tab
             no-caps exact
-            v-if="layoutConfig && layoutConfig.challenges"
+            v-if="challengesEnabled"
             label="Challenges"
             name="challenges"
             :to="`${basePath}/challenges`"
@@ -208,7 +208,8 @@ export default {
             keywords: this.configs.keywords,
             previewRatio: this.previewRatio,
             consoleLoading: this.consoleLoading.bind(this),
-            setChallengeConfig: this.setChallengeConfig.bind(this)
+            setChallengeConfig: this.setChallengeConfig.bind(this),
+            challengesEnabled: this.challengesEnabled
           }
         default:
           /*
@@ -225,6 +226,9 @@ export default {
             consoleLoading: this.consoleLoading.bind(this)
           }
       }
+    },
+    challengesEnabled () {
+      return this.layoutConfig && this.layoutConfig.challenges
     }
   },
   data () {
