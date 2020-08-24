@@ -54,7 +54,7 @@ const mixinSettingNavGuard = settingName => ({
     */
     if (settingName === this.settingProps.name) {
       // Opens dialog if there are unsaved changes.
-      if (this.$refs.settings.updated) {
+      if (this.$refs.settings && this.$refs.settings.updated) {
         this.$refs.settings.$refs.dialogConfirmLeave.open(next)
       } else {
         next()
