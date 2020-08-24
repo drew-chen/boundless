@@ -379,17 +379,12 @@ Methods:
               <div class="text-h6 col-2">{{ fieldParser(field) }}:</div>
 
               <div class="col q-pl-lg" >
-                <q-item tag="label" v-ripple style="border-radius: 3px;">
-                  <!-- <q-item-section>
-                  </q-item-section> -->
-                  <q-item-section avatar>
-                    <q-toggle
-                      color="green"
-                      v-model="data.enabledChallenges"
-                      @input="forceUpdateWUpdated"
-                    />
-                  </q-item-section>
-                </q-item>
+                <q-toggle
+                  class="q-ml-md"
+                  color="green"
+                  v-model="data.enabledChallenges"
+                  @input="forceUpdateWUpdated"
+                />
               </div>
 
             </div>
