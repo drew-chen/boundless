@@ -110,6 +110,7 @@ Methods:
 
       <!-- -------------------- Project Display Table -------------------- -->
       <q-table
+        binary-state-sort
         class="my-sticky-header-table"
         row-key="project"
         :data="projectList"
