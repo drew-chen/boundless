@@ -208,7 +208,6 @@ Methods:
                 <div
                   class="col"
                   ref="descriptionDiv"
-                  @click="popDialog(props.row.description)"
                   align="left"
                   style="overflow: hidden;"
                 >
