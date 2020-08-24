@@ -190,13 +190,10 @@ Methods:
               </div>
             </q-td>
 
-            <q-td key="project" :props="props" auto-width>
-              <div
-                align="left"
-                style="max-width: 200px; white-space: normal;"
-              >
-                <b>{{ props.row.project }}</b>
-              </div>
+            <q-td
+              key="project"
+              :props="props">
+              {{ props.row.project }}
             </q-td>
 
             <q-td
@@ -228,7 +225,8 @@ Methods:
               </div>
             </q-td>
 
-            <q-td key="progress" :props="props">
+            <q-td key="progress"
+              :props="props">
               <div
                 style="
                   min-width: 150px;
@@ -377,7 +375,8 @@ export default {
           align: 'center',
           field: row => row.project,
           format: val => `${val}`,
-          sortable: true
+          sortable: true,
+          classes: 'project-name'
         },
         {
           name: 'description',
@@ -700,4 +699,10 @@ export default {
 
 <style lang="stylus" scoped>
 
+.project-name
+  max-width 200px
+  white-space normal
+  overflow-wrap break-word
+  font-weight bold
+  text-align left
 </style>
