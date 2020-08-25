@@ -217,10 +217,10 @@ Methods:
                   class="col-2"
                 >
                   <div
-                    class="text-blue cursor-pointer"
+                    class="text-blue cursor-pointer q-mx-sm"
                     @click="popDialog(props.row.description)"
                   >
-                    &nbsp;&nbsp;[more]
+                    [more]
                   </div>
                 </div>
               </div>
@@ -245,7 +245,11 @@ Methods:
               </div>
             </q-td>
             <!-- Details column -->
-            <q-td key="url" :props="props">
+            <q-td
+              auto-width
+              key="url"
+              :props="props"
+            >
               <q-chip
                 dense
                 clickable
@@ -370,6 +374,7 @@ export default {
           field: row => row.project,
           format: val => `${val}`,
           sortable: true,
+          headerClasses: 'project-name-col',
           classes: 'project-name-col'
         },
         {
@@ -393,7 +398,9 @@ export default {
           align: 'center',
           label: 'Lead(s)',
           field: row => this.displayMembers(row.members),
-          sortable: true
+          sortable: true,
+          headerClasses: 'lead-members-col',
+          classes: 'lead-members-col'
         },
         {
           name: 'url',
@@ -696,14 +703,16 @@ export default {
 <style lang="stylus" scoped>
 
 .project-name-col
-  width 8%
-  white-space normal
-  overflow-wrap break-word !important
-  word-wrap: break-all
+  width 22%
   font-weight bold
   text-align left
 
 .progress-bar-col
   width 12%
+
+.lead-members-col
+  width 26%
+  overflow-wrap break-word
+  overflow normal
 
 </style>

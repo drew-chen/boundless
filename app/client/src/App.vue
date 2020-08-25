@@ -149,6 +149,12 @@ tr:nth-child(even) {
   background-color: #3498db14;
 }
 
+td {
+  overflow-wrap break-word;
+  word-wrap: break-word;
+  word-break: break-all;
+}
+
 // Center image/elements within div element
 .center-img {
   position: relative;
