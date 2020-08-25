@@ -9,7 +9,7 @@
 ## under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES
 ## OR CONDITIONS OF ANY KIND, either express or implied.
 
-Name:     components/EditUser.vue
+Name:     components/EditAndPreview/EditAndPreviewUser.vue
 Purpose:  The user interface to allow the admin to edit and preview the
           resulting edits of the user before submitting
 Methods:
@@ -160,20 +160,14 @@ Methods:
                           Name:
                         </strong>
                         {{ curTocData.name }}
-                        <q-popup-edit
-                          buttons
-                          v-model="curTocData.name"
-                          :validate="popUpNameValidation"
-                          @hide="popUpReset"
-                          @save="reRender"
-                        >
-                          <q-input
-                            dense filled autofocus label="Name"
-                            :error="errorObj.error"
-                            :error-message="errorObj.message"
-                            v-model="curTocData.name"
-                          />
-                        </q-popup-edit>
+
+                        <popup-input-limit-len
+                          title="Edit User Name"
+                          :initialValue="curTocData.name"
+                          :lenLimit="60"
+                          @save="saveEditedName"
+                        />
+
                         <dir style="
                           font-style: italic;
                           color: gray;
@@ -236,7 +230,7 @@ Methods:
                       <div>
                         <div class="row q-px-md">
                           <strong style="fontSize: 20px;">
-                            Addtional Information
+                            Additional Information
                           </strong>
                           <q-separator class="q-mx-sm q-mt-md" color="secondary" />
                           <q-btn
@@ -382,10 +376,11 @@ Methods:
 import firebase from 'firebase/app'
 import 'firebase/firestore'
 
-import productionDb, { productionStorage } from '../firebase/init_production'
-import testingDb, { testingStorage } from '../firebase/init_testing'
+import productionDb, { productionStorage } from '../../firebase/init_production'
+import testingDb, { testingStorage } from '../../firebase/init_testing'
 
-import ProjectTable from '../components/Tables/ProjectTable'
+import PopupInputLimitLen from '../../components/Popups/PopupInputLimitLen.vue'
+import ProjectTable from '../../components/Tables/ProjectTable.vue'
 
 export default {
   props: {
@@ -394,15 +389,16 @@ export default {
   },
   components: {
     // uploadGUI
-    ProjectTable
+    ProjectTable,
+    PopupInputLimitLen
   },
   async created () {
     try {
-      // fetech data from database
+      // fetch data from database
       await this.loadFireRefs()
       await this.loadInformation()
     } catch (error) {
-      throw new Error(error)
+      throw error
     }
   },
   data () {
@@ -432,37 +428,13 @@ export default {
   methods: {
     popUpReset: function () {
       /**
-       * restting error message
+       * resetting error message
        * @param {void}
        * @return {void}
        */
 
       this.errorObj.error = false
-      this.errorObj.messsage = ''
-    },
-    popUpNameValidation: function (val) {
-      /**
-       * validation check for pop-up edit
-       * @param {String} val: value to be validated
-       * @return {void}
-       */
-
-      if (val === undefined) {
-        this.errorObj.error = false
-        this.errorObj.messsage = ''
-        return true
-      }
-
-      if (!val || val.length === 0) {
-        this.errorObj.error = true
-        this.errorObj.message = 'Cannot be empty!'
-        return false
-      }
-
-      // sucessful call
-      this.errorObj.error = false
-      this.errorObj.messsage = ''
-      return true
+      this.errorObj.message = ''
     },
     popUpEmailValidation: function (val) {
       /**
@@ -473,7 +445,7 @@ export default {
 
       if (val === undefined) {
         this.errorObj.error = false
-        this.errorObj.messsage = ''
+        this.errorObj.message = ''
         return true
       }
 
@@ -491,9 +463,9 @@ export default {
         return false
       }
 
-      // sucessful call
+      // successful call
       this.errorObj.error = false
-      this.errorObj.messsage = ''
+      this.errorObj.message = ''
       return true
     },
     validateEmailFormat: function (entry) {
@@ -517,6 +489,10 @@ export default {
 
       this.updated = true
       this.$forceUpdate()
+    },
+    saveEditedName (editedName) {
+      this.curTocData.name = editedName
+      this.reRender()
     },
     deleteAdditionalInformation: function (entry) {
       /**
@@ -554,8 +530,6 @@ export default {
             icon: 'warning'
           })
         }
-      }).onCancel(() => {
-      }).onDismiss(() => {
       })
     },
     getMainPhoto: function () {
@@ -601,7 +575,7 @@ export default {
     capitalizeKeys: function (entry) {
       /**
        * helper function to capitalize the first character of the field
-       * @param {String} entry: field string to be capitalzied
+       * @param {String} entry: field string to be capitalized
        * @return {String}
        */
 

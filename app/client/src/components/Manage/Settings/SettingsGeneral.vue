@@ -1,5 +1,5 @@
 <!-- ##
-## Copyright (c) 2019 Wind River Systems, Inc.
+## Copyright (c) 2020 Wind River Systems, Inc.
 ##
 ## Licensed under the Apache License, Version 2.0 (the "License");
 ## you may not use this file except in compliance with the License.
@@ -9,9 +9,9 @@
 ## under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES
 ## OR CONDITIONS OF ANY KIND, either express or implied.
 
-Name:     components/SystemSettings.vue
+Name:     components/Manage/Settings/GeneralSettings.vue
 Purpose:  To allow the admin to customize general settings from
-          the admin console
+          the admin console.
 Methods:
   * Allows the admin to customize logo
   * Allows the admin to customize chips
@@ -23,40 +23,33 @@ Methods:
 
 <template>
   <div>
-    <div class="">
-      <div class="row text-h4">
-        General
+    <div class="float-right">
+      <button-undo-and-save
+        :disabled="!updated"
+        :save="submit"
+        :undo="openResetDialog"
+      />
+    </div>
+    <div class="text-h4 q-my-sm">
+      General
+    </div>
 
-        <q-space />
+    <q-separator color="secondary" />
 
-        <div class="q-mb-xs">
-          <q-btn
-            :disabled="!updated" no-caps
-            class="float-right"
-            label="Submit"
-            :color="!updated ? 'accent' : 'secondary'"
-            @click="onSubmit"
-          />
-        </div>
-      </div>
-
-      <q-separator color="secondary" />
-
-      <div
-        v-if="$q.sessionStorage.has('boundless_config')"
-        class="q-ml-md"
-      >
-        {{
-          $q.sessionStorage.has('boundless_config')
-          ? ($q.sessionStorage.getItem(
-            'boundless_config'
-          ).config_version
-          ? `(v ${$q.sessionStorage.getItem(
-            'boundless_config'
-          ).config_version})` : '')
-          : ''
-        }}
-      </div>
+    <div
+      v-if="$q.sessionStorage.has('boundless_config')"
+      class="q-ml-md"
+    >
+      {{
+        $q.sessionStorage.has('boundless_config')
+        ? ($q.sessionStorage.getItem(
+          'boundless_config'
+        ).config_version
+        ? `(v ${$q.sessionStorage.getItem(
+          'boundless_config'
+        ).config_version})` : '')
+        : ''
+      }}
     </div>
 
     <div class="q-pa-sm full-width">
@@ -386,17 +379,12 @@ Methods:
               <div class="text-h6 col-2">{{ fieldParser(field) }}:</div>
 
               <div class="col q-pl-lg" >
-                <q-item tag="label" v-ripple style="border-radius: 3px;">
-                  <!-- <q-item-section>
-                  </q-item-section> -->
-                  <q-item-section avatar>
-                    <q-toggle
-                      color="green"
-                      v-model="data.enabledChallenges"
-                      @input="forceUpdateWUpdated"
-                    />
-                  </q-item-section>
-                </q-item>
+                <q-toggle
+                  class="q-ml-md"
+                  color="green"
+                  v-model="data.enabledChallenges"
+                  @input="forceUpdateWUpdated"
+                />
               </div>
 
             </div>
@@ -408,14 +396,6 @@ Methods:
         </div>
 
         <div class="q-pa-md q-gutter-sm">
-          <q-btn
-            :disabled="!updated" no-caps
-            class="float-right"
-            label="Submit"
-            :color="!updated ? 'accent' : 'secondary'"
-            @click="onSubmit"
-          />
-
           <q-btn
             v-if="$q.sessionStorage.has('admin_token')"
             no-caps outline
@@ -533,73 +513,72 @@ Methods:
             <q-btn v-close-popup outline color="primary" label="Cancel" />
             <q-btn
               v-close-popup outline
-              color="primary" label="Submit"
+              color="primary" label="Save"
               @click="wikiSubmit"
             />
           </q-card-actions>
         </q-card>
       </q-dialog>
     </div>
+
+    <div class="float-right">
+      <button-undo-and-save
+        :disabled="!updated"
+        :save="submit"
+        :undo="openResetDialog"
+      />
+    </div>
+
+    <!-- -------------------- Dialog -------------------- -->
+    <dialog-confirm-leave
+      ref="dialogConfirmLeave"
+      :save="submit"
+      :undo="reset"
+    />
   </div>
 </template>
 
 <script>
-import productionDb, { productionStorage } from '../firebase/init_production'
-import testingDb, { testingStorage } from '../firebase/init_testing'
-import { layoutConfig } from '../../boundless.config'
-
+import deepClone from 'lodash.clonedeep'
+import Vue from 'vue'
 import sha256 from 'sha256'
 
-import Markdown from '../components/Markdown'
+import productionDb, { productionStorage } from '../../../firebase/init_production'
+import testingDb, { testingStorage } from '../../../firebase/init_testing'
+import { layoutConfig } from '../../../../../client/boundless.config'
+
+import Markdown from '../../../components/Markdown.vue'
+import DialogConfirmLeave from '../../../components/Dialogs/DialogConfirmLeave.vue'
+import ButtonUndoAndSave from '../../Buttons/ButtonUndoAndSave.vue'
+
+import mixinConfirmUnload from '../../../mixins/mixinConfirmUnload'
 
 export default {
   components: {
-    Markdown
+    Markdown,
+    DialogConfirmLeave,
+    ButtonUndoAndSave
   },
+  // Requires 'this.updated' in data.
+  mixins: [mixinConfirmUnload],
+  /** Fetches data and initializes 'dbData' to the same initial values as 'data'. */
   async created () {
-    try {
-      // fectches required data
-      await this.loadFireRefs()
-      await this.loadInformation()
+    await this.loadFireRefs()
+    await this.loadInformation()
 
-      if (this.$q.sessionStorage.getItem('boundless_config')) {
-        let cachedConfig = this.$q.sessionStorage.getItem('boundless_config')
-        this.layoutConfig = layoutConfig
+    if (this.$q.sessionStorage.getItem('boundless_config')) {
+      let cachedConfig = this.$q.sessionStorage.getItem('boundless_config')
+      this.layoutConfig = layoutConfig
 
-        if (typeof cachedConfig.enabledChallenges === 'boolean') {
-          this.layoutConfig.challenges = cachedConfig.enabledChallenges
-        }
-      } else {
-        this.layoutConfig = layoutConfig
+      if (typeof cachedConfig.enabledChallenges === 'boolean') {
+        this.layoutConfig.challenges = cachedConfig.enabledChallenges
       }
-
-      await this.storageUrlFetcher()
-    } catch (error) {
-      throw new Error(error)
+    } else {
+      this.layoutConfig = layoutConfig
     }
-  },
-  beforeDestroy () {
-    // not submitted and updated, ask sure to either abort of submit changes
+    await this.storageUrlFetcher()
 
-    if (!this.submitted && this.updated) {
-      this.$q.dialog({
-        title: 'Are you sure you want to leave without submitting changes? (All changes will be lost).',
-        cancel: {
-          flat: true,
-          noCaps: true,
-          label: 'Submit'
-        },
-        ok: {
-          flat: true,
-          noCaps: true,
-          label: 'Leave'
-        },
-        persistent: true
-      }).onOk(() => {
-      }).onCancel(() => {
-        this.onSubmit()
-      })
-    }
+    this.dbData = deepClone(this.data)
   },
   data () {
     return {
@@ -608,15 +587,17 @@ export default {
       layoutConfig: null, // <Object>: configurations related to layout
       fileDeleteQueue: [], // <Array<File>>: list of files to be deleted
       data: {}, // <Object>: data of the component
+      // <Object>: Unmodified data from the database used to reset 'this.data'.
+      dbData: {},
       aboutDialog: { // <Object>: information regarding the about dialog
         dialog: false, // <Boolean>: flag for about dialog
-        // maximizedToggle <Boolean>: flag for about dialog to be fullscreen
+        // <Boolean>: flag for about dialog to be fullscreen
         maximizedToggle: true
       },
       wikiDialog: { // <Object>: information regarding the wiki dialog
         dialog: false // <Boolean>: flag for wiki dialog
       },
-      file: { // <Object>: informaion regarding current and previous file
+      file: { // <Object>: information regarding current and previous file
         file: '', // <File>: current file
         prev: '', // <String or File>: url or file of the previous blob
         url: '' // <String>: url of the file or blob
@@ -625,18 +606,15 @@ export default {
         boxShadow: '0px 0px 0px 3px orange inset',
         borderRadius: '3px'
       },
-      updated: false, // <Boolean>: flag to track updated
-      submitted: false // <Boolean>: flag to track submitted
+      updated: false // <Boolean>: flag to track updated
     }
   },
   methods: {
+    /**
+     * Helper function to fetch the absolute url for system settings.
+     * @return {Promise<Boolean>}
+     */
     storageUrlFetcher: async function () {
-      /**
-       * helper function to fetch the absolute url for system settings
-       * @param {void}
-       * @return {Promise<Boolean>}
-       */
-
       try {
         let promises = []
         let keysWithNewImage = []
@@ -684,13 +662,10 @@ export default {
         return false
       }
     },
+    /**
+     * Keep track of layoutConfig changing to update the App.vue.
+     */
     staticDataChange: function () {
-      /**
-       * keep track of layoutConfig changing to update the App.vue
-       * @param {void}
-       * @return {void}
-       */
-
       let storedConfig = this.$q.sessionStorage.getItem('boundless_config')
 
       if (typeof storedConfig.enabledChallenges === 'boolean') {
@@ -705,13 +680,11 @@ export default {
         this.layoutConfig.homeURL = storedConfig.wikiInfo.url || ''
       }
     },
+    /**
+     * Submit handler for the wiki.
+     * @return {Promise<Boolean>}
+     */
     wikiSubmit: async function () {
-      /**
-       * submit handler for the wiki
-       * @param {void}
-       * @return {Promise<Boolean>}
-       */
-
       this.$emit('submitting', true)
       let storedConfig = this.$q.sessionStorage.getItem('boundless_config')
 
@@ -730,22 +703,17 @@ export default {
         return false
       }
     },
+    /**
+     * Helper function for force update.
+     */
     forceUpdateWOSubmit: function () {
-      /**
-       * helper function for force update
-       * @param {void}
-       * @return {void}
-       */
-
       this.$forceUpdate()
     },
+    /**
+     * Logo of the left panel on the about page
+     * @param {Event} e: event invoker
+     */
     aboutLogoImageSelect: function (e) {
-      /**
-       * logo of the left panel on the about page
-       * @param {Event} e: event invoker
-       * @return {void}
-       */
-
       let reader = new FileReader()
       this.file.file = e.target.files[0]
 
@@ -765,23 +733,17 @@ export default {
 
       this.updated = true
     },
+    /**
+     * Helper function for force update while updated.
+     */
     forceUpdateWUpdated: function () {
-      /**
-       * helper function for force update while updated
-       * @param {void}
-       * @return {void}
-       */
-
       this.updated = true
       this.$forceUpdate()
     },
+    /**
+     * Add custom chip to while letting the user craft to their likings.
+     */
     addCustomChips: function () {
-      /**
-       * add custom chip to while letting the user craft to their likings
-       * @param {void}
-       * @return {void}
-       */
-
       // adding custChips
       let tmpChip = {}
 
@@ -821,28 +783,21 @@ export default {
           })
         } else {
         }
-      }).onCancel(() => {
-      }).onDismiss(() => {
       })
     },
+    /**
+     * Helper function to delete the custom chip from this.data.customChips.
+     * @param {Integer} index: value of the index to be removed.
+     */
     deleteCustomChips: function (index) {
-      /**
-       * helper function to delete the custom chip from this.data.customChips
-       * @param {Integer} index: value of the index to be removed
-       * @return {void}
-       */
-
       // confirm with dialog
       this.updated = true
       this.data.customChips.splice(index, 1)
     },
+    /**
+     * Allow the admin to change the admin password.
+     */
     invokeAdminPassChange: function () {
-      /**
-       * allow the admin to change the admin password
-       * @param {void}
-       * @return {void}
-       */
-
       let tmpObj = {}
 
       this.$q.dialog({
@@ -919,7 +874,7 @@ export default {
                     this.$emit('submitting', false)
                     this.$q.notify({
                       type: 'positive',
-                      message: '<div align="center">Sucessful!<div>',
+                      message: '<div align="center">Successful!<div>',
                       html: true,
                       timeout: 750
                     })
@@ -941,33 +896,27 @@ export default {
                 this.$emit('submitting', false)
                 this.$q.dialog({
                   title: 'Error!',
-                  message: 'The password change was not sucessful!'
+                  message: 'The password change was not successful!'
                 })
               }
             }
           })
         })
-      }).onCancel(() => {
-      }).onDismiss(() => {
       })
     },
+    /**
+     * Helper function to click on the hidden file picker.
+     * @param {String} entry: key of the refs
+     */
     invokeFilePicker: function (entry) {
-      /**
-       * helper function to click on the hidden file picker
-       * @param {String} entry: key of the refs
-       * @return {void}
-       */
-
       this.$refs[entry][0].click()
     },
+    /**
+     * Fetching the file/blob url on file change.
+     * @param {String} entry: name of the refs
+     * @param  {String} key: keyword
+     */
     filePickerOnChange: function (entry, key) {
-      /**
-       * fetching the file/blob url on file change
-       * @param {String} entry: name of the refs
-       * @param  {String} key: keyword
-       * @return {void}
-       */
-
       let eventHandler = async (e, entry) => {
         if (!e.target.files[0]) {
           this.$refs[entry][0].src = this.data.extraKeywordsData[key] ||
@@ -986,15 +935,13 @@ export default {
 
       eventHandler(event, entry)
     },
+    /**
+     * https://stackoverflow.com/questions/3814231/loading-an-image-to-a-img-from-input-file
+     * Helper function to generate file/blob url of the file.
+     * @param {File} file: file to be converted to url
+     * @param {DOM} target: html component for the url
+     */
     onFileSelected: function (file, target) {
-      /**
-       * https://stackoverflow.com/questions/3814231/loading-an-image-to-a-img-from-input-file
-       * helper function to generate file/blob url of the file
-       * @param {File} file: file to be converted to url
-       * @param {DOM} target: html component for the url
-       * @return {void}
-       */
-
       let reader = new FileReader()
 
       reader.onload = (event) => {
@@ -1003,14 +950,12 @@ export default {
 
       reader.readAsDataURL(file)
     },
+    /**
+     * Helper function to delete keywords;
+     * also deletes the file associated with the keyword.
+     * @param {String} key: keyword to be deleted
+     */
     keywordsDelete: function (key) {
-      /**
-       * helper function to delete keywords;
-       * also deletes the file associated with the keyword
-       * @param {String} key: keyword to be deleted
-       * @return {void}
-       */
-
       if (key in this.data.extraKeywordsData) {
         this.fileDeleteQueue.push(key)
       }
@@ -1019,13 +964,10 @@ export default {
       this.updated = true
       this.$forceUpdate()
     },
+    /**
+     * Function handler to adding keywords into the system.
+     */
     addKeywords: function () {
-      /**
-       * function handler to adding keywords into the system
-       * @param {void}
-       * @return {void}
-       */
-
       this.$q.dialog({
         title: 'Add new keyword',
         prompt: {
@@ -1042,21 +984,15 @@ export default {
             this.updated = true
             this.$forceUpdate()
           }
-        } else {
         }
-      }).onCancel(() => {
-      }).onDismiss(() => {
       })
     },
+    /**
+     * Load firebase database, storage (if applicable),
+     * amd cloud functions reference (if applicable).
+     * @return {Promise<Boolean>}
+     */
     loadFireRefs: async function () {
-      /**
-       * load firebase database reference
-       * load firebase storage reference (if applicable)
-       * load firebase cloud functions reference (if applicable)
-       * @param {void}
-       * @return {Promise<Boolean>}
-       */
-
       if (this.$q.localStorage.has('boundless_db')) {
         let sessionDb = this.$q.localStorage.getItem('boundless_db')
 
@@ -1096,13 +1032,11 @@ export default {
         }
       }
     },
-    onSubmit: async function () {
-      /**
-       * submit files, gets urls, and upate session config
-       * @param {void}
-       * @return {Promise<String>}
-       */
-
+    /**
+     * Submit files, gets urls, and update session config.
+     * @return {Promise<String>}
+     */
+    submit: async function () {
       // start loading
       this.$emit('submitting', true)
 
@@ -1214,7 +1148,7 @@ export default {
         await this.storageUrlFetcher()
 
         // finish loading
-        this.submitted = true
+        this.dbData = deepClone(this.data)
         this.$emit('submitting', false)
         this.updated = false
 
@@ -1223,13 +1157,11 @@ export default {
         return false
       }
     },
+    /**
+     * Load information from config/project of the database
+     * @return {Promise<Boolean>}
+     */
     loadInformation: async function () {
-      /**
-       * load information from config/project of the database
-       * @param {void}
-       * @return {Promise<Boolean>}
-       */
-
       try {
         let doc = await this.db.collection('config').doc('project').get()
 
@@ -1305,13 +1237,12 @@ export default {
         return false
       }
     },
+    /**
+     * Helper function to data fields inside the data.
+     * @param {String} val: camel cased field to be splitted and capitalized
+     * @return {String}
+     */
     fieldParser: function (val) {
-      /**
-       * helper function to data fields inside the data
-       * @param {String} val: camel cased field to be splitted and capitalized
-       * @return {String}
-       */
-
       if (val === 'db') {
         return 'Database'
       } else {
@@ -1320,6 +1251,24 @@ export default {
           strTokens[i] = strTokens[i][0].toUpperCase() + strTokens[i].slice(1).toLowerCase()
         }
         return strTokens.join(' ')
+      }
+    },
+    /** Opens confirmation to undo unsaved changes. */
+    openResetDialog () {
+      this.$q.dialog({
+        title: 'Confirm',
+        message: 'Would you like undo all unsaved changes?',
+        cancel: true
+      }).onOk(() => {
+        this.reset()
+      })
+    },
+    /** Undo's local changes if there are changes to be saved. */
+    reset () {
+      if (this.updated) {
+        Vue.set(this.$data, 'data', deepClone(this.dbData))
+        Vue.set(this.$data, 'fileDeleteQueue', [])
+        this.updated = false
       }
     }
   }

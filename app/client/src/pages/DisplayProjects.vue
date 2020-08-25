@@ -110,6 +110,7 @@ Methods:
 
       <!-- -------------------- Project Display Table -------------------- -->
       <q-table
+        binary-state-sort
         class="my-sticky-header-table"
         row-key="project"
         :data="projectList"
@@ -173,7 +174,7 @@ Methods:
 
         <template v-slot:body="props" >
           <q-tr :props="props">
-
+            <!-- Project 'new' column (date) -->
             <q-td
               key="new"
               :props="props"
@@ -189,16 +190,13 @@ Methods:
                 {{ joinKeywords(props.row.keywords) }}
               </div>
             </q-td>
-
-            <q-td key="project" :props="props" auto-width>
-              <div
-                align="left"
-                style="max-width: 200px; white-space: normal;"
-              >
-                <b>{{ props.row.project }}</b>
-              </div>
+            <!-- Project name column -->
+            <q-td
+              key="project"
+              :props="props">
+              {{ props.row.project }}
             </q-td>
-
+            <!-- Description column -->
             <q-td
               key="description"
               :props="props"
@@ -208,7 +206,6 @@ Methods:
                 <div
                   class="col"
                   ref="descriptionDiv"
-                  @click="popDialog(props.row.description)"
                   align="left"
                   style="overflow: hidden;"
                 >
@@ -216,45 +213,43 @@ Methods:
                 </div>
 
                 <div
-                  :hidden="!(props.row.description.length > 40)"
+                  :hidden="!(props.row.description.length > 60)"
                   class="col-2"
                 >
                   <div
-                    class="text-blue cursor-pointer"
+                    class="text-blue cursor-pointer q-mx-sm"
                     @click="popDialog(props.row.description)"
                   >
-                    &nbsp;&nbsp;[more]
+                    [more]
                   </div>
                 </div>
               </div>
             </q-td>
-
-            <q-td key="progress" :props="props">
-              <div
-                style="
-                  min-width: 150px;
-                  max-width: 250px;
-                  border: solid 1px;
-                  border-color: #d0d7e2;
-                "
-              >
-                <ProgressBar
-                  :progressBar="progressBar"
-                  :progress="props.row.progress"
-                />
-              </div>
+            <!-- Progress bar column -->
+            <q-td key="progress"
+              :props="props"
+            >
+              <ProgressBar
+                :progressBar="progressBar"
+                :progress="props.row.progress"
+              />
             </q-td>
-
+            <!-- Lead members column -->
             <q-td
               key="members"
               :props="props"
-              style="max-width: 150px; overflow: hidden;"
+              style="max-width: 90px; overflow: hidden;"
             >
               <div align="left">
                 {{ displayMembers(props.row.members) }}
               </div>
             </q-td>
-            <q-td key="url" :props="props">
+            <!-- Details column -->
+            <q-td
+              auto-width
+              key="url"
+              :props="props"
+            >
               <q-chip
                 dense
                 clickable
@@ -280,7 +275,7 @@ Methods:
 
           <q-separator />
 
-          <q-card-section style="width: 50vh; height: 40vh; overflow: auto">
+          <q-card-section style="height: 40vh; overflow: auto">
             <p>
               {{ rowMessage }}
             </p>
@@ -300,6 +295,7 @@ Methods:
 
 <script>
 import { defaultImages } from '../../boundless.config'
+import isFirebaseError from '../../src/errors/isFirebaseError'
 
 import productionDb, { productionStorage } from '../firebase/init_production'
 import testingDb, { testingStorage } from '../firebase/init_testing'
@@ -318,14 +314,13 @@ export default {
       await this.loadFireRefs()
       await this.loadConfig()
       await this.loadProjectList()
-
       this.loadProgressBarConf()
 
       this.keywordsInUse = this.keywordsInUse.filter(
         v => v in this.keywordsValToKeyMap
       )
     } catch (error) {
-      throw new Error(error)
+      throw error
     }
   },
   beforeUpdate () {
@@ -378,7 +373,9 @@ export default {
           align: 'center',
           field: row => row.project,
           format: val => `${val}`,
-          sortable: true
+          sortable: true,
+          headerClasses: 'project-name-col',
+          classes: 'project-name-col'
         },
         {
           name: 'description',
@@ -389,17 +386,21 @@ export default {
         {
           name: 'progress',
           align: 'center',
-          label: 'Progess',
+          label: 'Progress',
           field: row => row.progress,
           format: val => `${val}`,
-          sortable: true
+          sortable: true,
+          headerClasses: 'progress-bar-col',
+          classes: 'progress-bar-col'
         },
         {
           name: 'members',
           align: 'center',
           label: 'Lead(s)',
           field: row => this.displayMembers(row.members),
-          sortable: true
+          sortable: true,
+          headerClasses: 'lead-members-col',
+          classes: 'lead-members-col'
         },
         {
           name: 'url',
@@ -455,7 +456,6 @@ export default {
       } else {
         try {
           let doc = await productionDb.collection('config').doc('project').get()
-
           if (doc.exists) {
             if (doc.data().db === 'testing') {
               this.db = testingDb
@@ -476,7 +476,7 @@ export default {
           this.storage = productionStorage
           this.$q.localStorage.set('boundless_db', 'production')
 
-          return false
+          throw error
         }
       }
     },
@@ -528,7 +528,7 @@ export default {
       /**
        * helper function to join keywords
        * @param {Array<String>} entry: string array with keywords to be
-       *                               appeneded
+       *                               appended
        * @return {String}
        */
 
@@ -554,7 +554,6 @@ export default {
 
       try {
         let doc = await this.db.collection('projects').doc('ToC').get()
-
         if (doc.exists) {
           for (let project in doc.data()) {
             if (project !== 'alias') {
@@ -606,7 +605,7 @@ export default {
       } catch (error) {
         this.loading = false
 
-        return false
+        throw error
       }
     },
     loadConfig: async function () {
@@ -619,7 +618,6 @@ export default {
 
       try {
         let doc = await this.db.collection('config').doc('project').get()
-
         if (doc.exists) {
           let data = doc.data()
 
@@ -643,7 +641,6 @@ export default {
             //   cachedKeywords.push(data['keywords'][key])
             // }
           }
-
           // this.keywordsInUse = cachedKeywords
           this.keywordsInUse = data.projectsConfig.keywords
 
@@ -659,7 +656,12 @@ export default {
                   data.extraKeywordsData[prop]
                 ).getDownloadURL()
               } catch (error) {
-                this.keywordsImage[key] = '../statics/images/other-icon.png'
+                if (isFirebaseError(error, 'storage/object-not-found')) {
+                  console.error(error)
+                  this.keywordsImage[key] = '../statics/images/other-icon.png'
+                } else {
+                  throw error
+                }
               }
             }
           }
@@ -667,7 +669,6 @@ export default {
           if (typeof data['pagination'] === 'number') {
             this.pagination.rowsPerPage = data['pagination']
           }
-
           let expireDate = data.newFlag * 24 * 60 * 60 * 1000
           this.todayDate = new Date(Date.now() - expireDate)
           this.todayDate = this.todayDate.toISOString().substring(0, 10)
@@ -677,7 +678,7 @@ export default {
           throw new Error('File not found!')
         }
       } catch (error) {
-        return false
+        throw error
       }
     },
     gettingCount: function () {
@@ -700,5 +701,18 @@ export default {
 </script>
 
 <style lang="stylus" scoped>
+
+.project-name-col
+  width 22%
+  font-weight bold
+  text-align left
+
+.progress-bar-col
+  width 12%
+
+.lead-members-col
+  width 26%
+  overflow-wrap break-word
+  overflow normal
 
 </style>

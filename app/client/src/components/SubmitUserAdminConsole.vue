@@ -26,7 +26,7 @@ Methods:
       <SubmitPage @added="emitAdded" />
 
       <q-page-sticky
-        position="bottom-right"
+        position="top-right"
         :offset="[30, 18]"
       >
         <q-btn

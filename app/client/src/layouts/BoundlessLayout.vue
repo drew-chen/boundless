@@ -64,34 +64,39 @@ Methods:
         class="text-secondary shadow-1"
         align="left" style="background: #F5F5F5;"
       >
-        <q-route-tab to="/" label="About" />
-
-        <q-route-tab to="/project/display" label="Projects" />
-
-        <q-route-tab to="/project/add" label="Add Project" />
-
+        <q-route-tab
+          to="/"
+          label="About"
+        />
+        <q-route-tab
+          to="/project/display"
+          label="Projects"
+        />
+        <q-route-tab
+          to="/project/add"
+          label="Add Project"
+        />
         <q-route-tab
           v-if="layoutConfig && layoutConfig.challenges"
-          to="/challenge/display" label="Challenges"
+          to="/challenge/display"
+          label="Challenges"
         />
-
         <q-route-tab
           v-if="layoutConfig && layoutConfig.challenges"
-          to="/challenge/add" label="Add Challenge"
+          to="/challenge/add"
+          label="Add Challenge"
         />
-
         <q-route-tab
           v-if="layoutConfig && layoutConfig.hairCut"
-          to="/haircut" icon="fas fa-cut"
+          to="/haircut"
+          icon="fas fa-cut"
         />
-
         <q-route-tab
           v-if="$q.sessionStorage.has('admin_token')"
-          to="/admin/console" icon="widgets"
+          to="/admin"
+          label="Admin"
         />
-
         <q-space />
-
         <q-tab
           :label="
             $q.sessionStorage.has('admin_token') ? 'Log Out' : 'Admin Log In'
@@ -101,7 +106,7 @@ Methods:
       </q-tabs>
     </q-header>
 
-    <q-page-container style="min-height: 67.5vh;">
+    <q-page-container>
       <router-view />
     </q-page-container>
 
@@ -219,7 +224,7 @@ export default {
         this.$q.localStorage.set('boundless_db', 'production')
       }
     } catch (error) {
-      throw new Error(error)
+      throw error
     }
   },
   beforeUpdate () {
@@ -478,7 +483,7 @@ export default {
                   this.$router.go()
                 } else {
                   setTimeout(() => {
-                    alert('Unsucessful log in!')
+                    alert('Unsuccessful log in!')
                   }, 300)
                 }
               } else {
@@ -502,7 +507,7 @@ export default {
                   this.$router.go()
                 } else {
                   setTimeout(() => {
-                    alert('Unsucessful log in!')
+                    alert('Unsuccessful log in!')
                   }, 300)
                 }
               }
@@ -514,8 +519,6 @@ export default {
             alert('User does not exists!')
           }, 300)
         }
-      }).onCancel(() => {
-      }).onDismiss(() => {
       })
     },
     cookieCheck: function () {
@@ -554,5 +557,4 @@ export default {
 </script>
 
 <style lang="stylus" scoped>
-
 </style>

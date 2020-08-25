@@ -16,218 +16,104 @@ Methods:
   * Shows quick count of projects
   * Shows quick count of innovators
   * Shows quick count of challenges (if enabled)
-  * Shows quick coount of sponsors (if enabled)
+  * Shows quick count of sponsors (if enabled)
 
 ## -->
 
 <template>
-  <div class="q-pa-md">
-    <div v-if="loading" class="absolute-center">
-      <q-spinner color="primary" size="8em" />
-    </div>
-
-    <div
-      v-else
-      class="row shadow-2"
-      style="
-        margin: auto;
-        max-width: 99%;
-        min-width: 800px;
-        border-radius: 3px;
-      "
-    >
-
-      <!-- -------------------- Left QCard -------------------- -->
+  <q-page>
+    <div class="q-pa-md">
+      <div v-if="loading" class="absolute-center">
+        <q-spinner color="primary" size="8em" />
+      </div>
       <div
-        class="col-3 q-mt-sm q-mb-sm q-ml-sm q-pa-sm shadow-2"
+        v-else
+        class="row shadow-2"
         style="
-          overflow: auto;
+          margin: auto;
+          max-width: 99%;
+          min-width: 800px;
           border-radius: 3px;
-          min-width: 300px;
         "
-        align="center"
       >
-        <!-- -------------------- HAIRCOUNT SESSIONS -------------------- -->
-        <q-card
-          v-if="layoutConfig && layoutConfig.hairCut"
-          class="cursor-pointer"
-          style="height: 270px;"
-          @click="routeHairCutPage"
+        <!-- -------------------- Left QCard -------------------- -->
+        <div
+          class="col-3 q-mt-sm q-mb-sm q-ml-sm q-pa-sm shadow-2"
+          style="
+            overflow: auto;
+            border-radius: 3px;
+            min-width: 300px;
+          "
+          align="center"
         >
-          <div>
-            <hr>
-            <strong class="title-font-1">Rabih's Haircut Challenge</strong>
-            <hr>
-          </div>
-
-          <HairCut
-            :hairCount="250 - projectList.length - challengeList.length - 10"
-          />
-
-          <div
-            class="hairCutTarget q-mr-xs text-blue-6"
+          <!-- -------------------- HAIRCOUNT SESSIONS -------------------- -->
+          <q-card
+            v-if="layoutConfig && layoutConfig.hairCut"
+            class="cursor-pointer"
+            style="height: 270px;"
+            @click="routeHairCutPage"
           >
-            Learn more...
-          </div>
-        </q-card>
-
-        <!-- -------------------- BY THE NUMBER SESSION -------------------- -->
-        <div>
-          <div
-            v-if="
-              aboutData && aboutData.leftImg &&
-              (aboutData.leftImg.visible ||
-              aboutData.leftImg.visible === undefined)
-            "
-          >
-            <div class="q-px-md">
-              <q-img
-                contain
-                spinner-color="primary"
-                :ratio="4/3"
-                :src="
-                  !aboutData.leftImg.active ?
-                  '../statics/images/boundless-logo2.png' :
-                  !aboutData.leftImg.url.includes('http') ?
-                  '' : aboutData.leftImg.url
-                "
-              />
+            <div>
+              <hr>
+              <strong class="title-font-1">Rabih's Haircut Challenge</strong>
+              <hr>
             </div>
-            <hr>
-          </div>
 
-          <div v-else-if="!aboutData">
-            <div class="q-px-md">
-              <q-img
-                :ratio="4/3"
-                contain
-                src="../statics/images/boundless-logo2.png"
-                spinner-color="primary"
-              />
+            <HairCut
+              :hairCount="250 - projectList.length - challengeList.length - 10"
+            />
+
+            <div
+              class="hairCutTarget q-mr-xs text-blue-6"
+            >
+              Learn more...
             </div>
-            <hr>
-          </div>
+          </q-card>
 
-          <div v-else>
-            <hr>
-            <strong class="title-font-1">By The Numbers</strong>
-            <hr>
-          </div>
-
+          <!-- -------------------- BY THE NUMBER SESSION -------------------- -->
           <div>
-            <div class="row q-mt-sm">
-              <div class="col">
-                <span
-                  class="text-blue-4"
-                  style="font-size: 20px"
-                >
-                  <strong>
-                    {{ projectList.length }}
-                  </strong>
-                </span>
-              </div>
-
-              <div class="col q-mt-xs">
-                <strong>Projects</strong>
-              </div>
-
-              <div class="col q-mb-sm">
-                <q-img
-                  src="../statics/images/projects-icon.png"
-                  style="height: 40px; max-width: 45px"
-                />
-              </div>
-            </div>
-
-            <q-separator inset />
-
             <div
-              v-if="layoutConfig && layoutConfig.challenges"
-              class="row q-mt-sm"
+              v-if="
+                aboutData && aboutData.leftImg &&
+                (aboutData.leftImg.visible ||
+                aboutData.leftImg.visible === undefined)
+              "
             >
-              <div class="col">
-                <span
-                  class="text-blue-4"
-                  style="font-size: 20px"
-                >
-                  <strong>
-                    {{ challengeList.length }}
-                  </strong>
-                </span>
-              </div>
-
-              <div class="col q-mt-xs">
-                <strong>Challenges</strong>
-              </div>
-
-              <div class="col q-mb-sm">
+              <div class="q-px-md">
                 <q-img
-                  src="../statics/images/challenge-icon1.png"
-                  style="height: 40px; max-width: 45px"
+                  contain
+                  spinner-color="primary"
+                  :ratio="4/3"
+                  :src="
+                    !aboutData.leftImg.active ?
+                    '../statics/images/boundless-logo2.png' :
+                    !aboutData.leftImg.url.includes('http') ?
+                    '' : aboutData.leftImg.url
+                  "
                 />
               </div>
+              <hr>
             </div>
-            <q-separator inset />
 
-            <div class="row q-mt-sm">
-              <div class="col">
-                <span
-                  class="text-blue-4"
-                  style="font-size: 20px"
-                >
-                  <strong>
-                    {{ innovatorList.length }}
-                  </strong>
-                </span>
-              </div>
-
-              <div class="col q-mt-xs">
-                <strong>Innovators</strong>
-              </div>
-
-              <div class="col q-mb-sm">
+            <div v-else-if="!aboutData">
+              <div class="q-px-md">
                 <q-img
-                  src="../statics/images/innovator-icon.png"
-                  style="height: 40px; max-width: 45px"
+                  :ratio="4/3"
+                  contain
+                  src="../statics/images/boundless-logo2.png"
+                  spinner-color="primary"
                 />
               </div>
+              <hr>
             </div>
 
-            <q-separator inset />
-
-            <div
-              v-if="layoutConfig && layoutConfig.challenges"
-              class="row q-mt-sm"
-            >
-              <div class="col">
-                <span
-                  class="text-blue-4"
-                  style="font-size: 20px"
-                >
-                  <strong>
-                    {{ sponsorList.length }}
-                  </strong>
-                </span>
-              </div>
-
-              <div class="col q-mt-xs">
-                <strong>Sponsors</strong>
-              </div>
-
-              <div class="col q-mb-sm">
-                <q-icon
-                  name="person"
-                  size="45px"
-                />
-              </div>
+            <div v-else>
+              <hr>
+              <strong class="title-font-1">By The Numbers</strong>
+              <hr>
             </div>
 
-            <q-separator inset />
-
-            <div
-              v-for="(key, ind) in keywordsInUse"
-              :key="ind"
-            >
+            <div>
               <div class="row q-mt-sm">
                 <div class="col">
                   <span
@@ -235,130 +121,244 @@ Methods:
                     style="font-size: 20px"
                   >
                     <strong>
-                      {{ keywordsCounter[key] }}
+                      {{ projectList.length }}
                     </strong>
                   </span>
                 </div>
 
                 <div class="col q-mt-xs">
-                  <strong>{{ keywordsValToKeyMap[key] }}</strong>
+                  <strong>Projects</strong>
                 </div>
 
                 <div class="col q-mb-sm">
                   <q-img
-                    :src="keywordsImage[key]"
+                    src="../statics/images/projects-icon.png"
                     style="height: 40px; max-width: 45px"
                   />
                 </div>
               </div>
-            </div>
 
+              <q-separator inset />
+
+              <div
+                v-if="layoutConfig && layoutConfig.challenges"
+                class="row q-mt-sm"
+              >
+                <div class="col">
+                  <span
+                    class="text-blue-4"
+                    style="font-size: 20px"
+                  >
+                    <strong>
+                      {{ challengeList.length }}
+                    </strong>
+                  </span>
+                </div>
+
+                <div class="col q-mt-xs">
+                  <strong>Challenges</strong>
+                </div>
+
+                <div class="col q-mb-sm">
+                  <q-img
+                    src="../statics/images/challenge-icon1.png"
+                    style="height: 40px; max-width: 45px"
+                  />
+                </div>
+              </div>
+              <q-separator inset />
+
+              <div class="row q-mt-sm">
+                <div class="col">
+                  <span
+                    class="text-blue-4"
+                    style="font-size: 20px"
+                  >
+                    <strong>
+                      {{ innovatorList.length }}
+                    </strong>
+                  </span>
+                </div>
+
+                <div class="col q-mt-xs">
+                  <strong>Innovators</strong>
+                </div>
+
+                <div class="col q-mb-sm">
+                  <q-img
+                    src="../statics/images/innovator-icon.png"
+                    style="height: 40px; max-width: 45px"
+                  />
+                </div>
+              </div>
+
+              <q-separator inset />
+
+              <div
+                v-if="layoutConfig && layoutConfig.challenges"
+                class="row q-mt-sm"
+              >
+                <div class="col">
+                  <span
+                    class="text-blue-4"
+                    style="font-size: 20px"
+                  >
+                    <strong>
+                      {{ sponsorList.length }}
+                    </strong>
+                  </span>
+                </div>
+
+                <div class="col q-mt-xs">
+                  <strong>Sponsors</strong>
+                </div>
+
+                <div class="col q-mb-sm">
+                  <q-icon
+                    name="person"
+                    size="45px"
+                  />
+                </div>
+              </div>
+
+              <q-separator inset />
+
+              <div
+                v-for="(key, ind) in keywordsInUse"
+                :key="ind"
+              >
+                <div class="row q-mt-sm">
+                  <div class="col">
+                    <span
+                      class="text-blue-4"
+                      style="font-size: 20px"
+                    >
+                      <strong>
+                        {{ keywordsCounter[key] }}
+                      </strong>
+                    </span>
+                  </div>
+
+                  <div class="col q-mt-xs">
+                    <strong>{{ keywordsValToKeyMap[key] }}</strong>
+                  </div>
+
+                  <div class="col q-mb-sm">
+                    <q-img
+                      :src="keywordsImage[key]"
+                      style="height: 40px; max-width: 45px"
+                    />
+                  </div>
+                </div>
+              </div>
+
+            </div>
           </div>
+
         </div>
 
-      </div>
+        <!-- -------------------- Right QCard -------------------- -->
+        <div class="col q-pa-sm">
+          <div
+            class="q-pa-sm row"
+            style="height: 100%; border-radius: 3px; overflow: auto;"
+            :style="{
+              backgroundColor:
+                aboutData && aboutData.bgColor ? aboutData.bgColor : 'black',
+              color:
+                aboutData && aboutData.txtColor ? aboutData.txtColor : 'white'
+            }"
+          >
 
-      <!-- -------------------- Right QCard -------------------- -->
-      <div class="col q-pa-sm">
-        <div
-          class="q-pa-sm row"
-          style="height: 100%; border-radius: 3px; overflow: auto;"
-          :style="{
-            backgroundColor:
-              aboutData && aboutData.bgColor ? aboutData.bgColor : 'black',
-            color:
-              aboutData && aboutData.txtColor ? aboutData.txtColor : 'white'
-          }"
-        >
-
-          <!-- -------------------- Image -------------------- -->
-          <div class="col-3 q-pa-sm">
-            <br class="small">
-            <q-img
-              v-if="layoutConfig && layoutConfig.defaultImg"
-              class="local-img" border="true"
-              :src="`statics/${layoutConfig.defaultImg}`"
-              :ratio="1/1.0"
-            />
-            <q-img
-              v-else
-              class="local-img" border="true"
-              src="statics\images\home-main-image.jpg"
-              :ratio="1/1.0"
-            />
-          </div>
-
-          <!-- -------------------- Text -------------------- -->
-          <div class="col-9">
-
-            <!-- ---------------- IF MARKDOWN FOUND ----------------- -->
-            <div v-if="aboutData && aboutData.data">
-              <MarkdownTranslator
-                :storage="storage"
-                :data="aboutData.data"
+            <!-- -------------------- Image -------------------- -->
+            <div class="col-3 q-pa-sm">
+              <br class="small">
+              <q-img
+                v-if="layoutConfig && layoutConfig.defaultImg"
+                class="local-img" border="true"
+                :src="`statics/${layoutConfig.defaultImg}`"
+                :ratio="1/1.0"
+              />
+              <q-img
+                v-else
+                class="local-img" border="true"
+                src="statics\images\home-main-image.jpg"
+                :ratio="1/1.0"
               />
             </div>
 
-            <!-- ---------------- IF MARKDOWN NOT FOUND ----------------- -->
-            <div v-else class="q-pa-lg">
-              <div
-                v-if="layoutConfig && layoutConfig.companyName"
-                class="text-h4 text-white"
-              >
-                Innovation Tracking @ {{ layoutConfig.companyName }}
+            <!-- -------------------- Text -------------------- -->
+            <div class="col-9">
+
+              <!-- ---------------- IF MARKDOWN FOUND ----------------- -->
+              <div v-if="aboutData && aboutData.data">
+                <MarkdownTranslator
+                  :storage="storage"
+                  :data="aboutData.data"
+                />
               </div>
-              <div v-else class="text-h4 text-white">
-                Innovation Tracking
-              </div>
 
-              <hr class="newColor">
-
-              <div
-                class="text-white"
-                style="
-                  font-size: 16px;
-                  font-family: Tahoma, Verdana, Segoe, sans-serif;
-                "
-              >
-
-                <p>
-                  Employee driven innovations {{ (layoutConfig && layoutConfig.companyName) ? `@ ${layoutConfig.companyName}` : '' }} are tracked here. An innovation may include (but not limited to):
-                  <ul>
-                    <li> cool fun demo (e.g., Internet connected coffee maker);</li>
-                    <li> new tool or process that make other Wind River groups or customers more productive;</li>
-                    <li> new product feature;</li>
-                    <li> platform extensions (e.g., VxWorks, Linux, Titanium);</li>
-                    <li> customer or trade show demo;</li>
-                    <li> new open source solution; or</li>
-                    <li> explore a technology you have an interest in </li>
-                  </ul>
-                </p><br>
+              <!-- ---------------- IF MARKDOWN NOT FOUND ----------------- -->
+              <div v-else class="q-pa-lg">
+                <div
+                  v-if="layoutConfig && layoutConfig.companyName"
+                  class="text-h4 text-white"
+                >
+                  Innovation Tracking @ {{ layoutConfig.companyName }}
+                </div>
+                <div v-else class="text-h4 text-white">
+                  Innovation Tracking
+                </div>
 
                 <hr class="newColor">
 
-                <q-icon name="visibility" style="font-size: 1.5em; bottom: 2px;" />&nbsp;<router-link class="text-info" :to="'/project/display'">View Projects</router-link> &nbsp;
-
-                <q-icon name="add_box" style="font-size: 1.5em; bottom: 2px;" />&nbsp;<router-link class="text-info" :to="'/project/add'">Submit Project</router-link> &nbsp;
-
-                <span
-                  v-if="
-                    layoutConfig &&
-                    (layoutConfig.homeName && layoutConfig.homeURL)
+                <div
+                  class="text-white"
+                  style="
+                    font-size: 16px;
+                    font-family: Tahoma, Verdana, Segoe, sans-serif;
                   "
                 >
-                  <q-icon name="home" style="font-size: 1.5em; bottom: 2px;" /> <a :href="layoutConfig.homeURL" class="text-info">Boundless Program {{ layoutConfig.homeName }} Home Page</a> &nbsp;
-                </span>
 
+                  <p>
+                    Employee driven innovations {{ (layoutConfig && layoutConfig.companyName) ? `@ ${layoutConfig.companyName}` : '' }} are tracked here. An innovation may include (but not limited to):
+                    <ul>
+                      <li> cool fun demo (e.g., Internet connected coffee maker);</li>
+                      <li> new tool or process that make other Wind River groups or customers more productive;</li>
+                      <li> new product feature;</li>
+                      <li> platform extensions (e.g., VxWorks, Linux, Titanium);</li>
+                      <li> customer or trade show demo;</li>
+                      <li> new open source solution; or</li>
+                      <li> explore a technology you have an interest in </li>
+                    </ul>
+                  </p><br>
+
+                  <hr class="newColor">
+
+                  <q-icon name="visibility" style="font-size: 1.5em; bottom: 2px;" />&nbsp;<router-link class="text-info" :to="'/project/display'">View Projects</router-link> &nbsp;
+
+                  <q-icon name="add_box" style="font-size: 1.5em; bottom: 2px;" />&nbsp;<router-link class="text-info" :to="'/project/add'">Submit Project</router-link> &nbsp;
+
+                  <span
+                    v-if="
+                      layoutConfig &&
+                      (layoutConfig.homeName && layoutConfig.homeURL)
+                    "
+                  >
+                    <q-icon name="home" style="font-size: 1.5em; bottom: 2px;" /> <a :href="layoutConfig.homeURL" class="text-info">Boundless Program {{ layoutConfig.homeName }} Home Page</a> &nbsp;
+                  </span>
+
+                </div>
               </div>
+
             </div>
 
           </div>
-
         </div>
-      </div>
 
+      </div>
     </div>
-  </div>
+  </q-page>
 </template>
 
 <script>
@@ -396,7 +396,7 @@ export default {
         this.layoutConfig = layoutConfig
       }
     } catch (error) {
-      throw new Error(error)
+      throw error
     }
   },
   data () {
