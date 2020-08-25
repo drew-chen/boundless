@@ -174,7 +174,7 @@ Methods:
 
         <template v-slot:body="props" >
           <q-tr :props="props">
-
+            <!-- Project 'new' column (date) -->
             <q-td
               key="new"
               :props="props"
@@ -190,14 +190,13 @@ Methods:
                 {{ joinKeywords(props.row.keywords) }}
               </div>
             </q-td>
-
+            <!-- Project name column -->
             <q-td
-              auto-width
               key="project"
               :props="props">
               {{ props.row.project }}
             </q-td>
-
+            <!-- Description column -->
             <q-td
               key="description"
               :props="props"
@@ -226,9 +225,8 @@ Methods:
                 </div>
               </div>
             </q-td>
-
+            <!-- Progress bar column -->
             <q-td key="progress"
-              auto-width
               :props="props"
             >
               <ProgressBar
@@ -236,7 +234,7 @@ Methods:
                 :progress="props.row.progress"
               />
             </q-td>
-
+            <!-- Lead members column -->
             <q-td
               key="members"
               :props="props"
@@ -246,6 +244,7 @@ Methods:
                 {{ displayMembers(props.row.members) }}
               </div>
             </q-td>
+            <!-- Details column -->
             <q-td key="url" :props="props">
               <q-chip
                 dense
@@ -371,7 +370,7 @@ export default {
           field: row => row.project,
           format: val => `${val}`,
           sortable: true,
-          classes: 'project-name'
+          classes: 'project-name-col'
         },
         {
           name: 'description',
@@ -386,7 +385,8 @@ export default {
           field: row => row.progress,
           format: val => `${val}`,
           sortable: true,
-          classes: 'progress-bar'
+          headerClasses: 'progress-bar-col',
+          classes: 'progress-bar-col'
         },
         {
           name: 'members',
@@ -695,14 +695,15 @@ export default {
 
 <style lang="stylus" scoped>
 
-.project-name
-  max-width 200px
+.project-name-col
+  width 8%
   white-space normal
-  overflow-wrap break-word
+  overflow-wrap break-word !important
+  word-wrap: break-all
   font-weight bold
   text-align left
 
-.progress-bar
-  width 250px
+.progress-bar-col
+  width 12%
 
 </style>
