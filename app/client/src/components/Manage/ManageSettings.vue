@@ -159,9 +159,7 @@ export default {
     /**
      * Each router-view needs different props. Some of these props interact
      * with the data in 'ManageSettings.vue' which is why they are passed in
-     * here instead of through the router. 'this' is explicitly bound
-     * to be safe and make sure each callback acts as if it was called in
-     * 'ManageSettings.vue' instead of in a child component.
+     * here instead of through the router.
      *
      * @param <String>: The value of 'tabSelected'.
      * @returns <Object> An object where each property is a prop.
@@ -177,11 +175,11 @@ export default {
           return {
             name: 'database',
             dbId: this.dbId,
-            consoleLoading: this.consoleLoading.bind(this),
-            setDatabaseId: this.setDatabaseId.bind(this),
+            consoleLoading: this.consoleLoading,
+            setDatabaseId: this.setDatabaseId,
             hideDatabaseSwitch: !this.layoutConfig.switchDatabase,
             dbName: this.dbName,
-            switchDatabase: this.switchDatabase.bind(this)
+            switchDatabase: this.switchDatabase
           }
         case 'projects':
           if (!this.dataLoaded) {
@@ -194,8 +192,8 @@ export default {
             name: 'projects',
             keywords: this.configs.keywords,
             previewRatio: this.previewRatio,
-            consoleLoading: this.consoleLoading.bind(this),
-            setProjectConfig: this.setProjectConfig.bind(this)
+            consoleLoading: this.consoleLoading,
+            setProjectConfig: this.setProjectConfig
           }
         case 'challenges':
           if (!this.dataLoaded) {
@@ -207,8 +205,8 @@ export default {
             name: 'challenges',
             keywords: this.configs.keywords,
             previewRatio: this.previewRatio,
-            consoleLoading: this.consoleLoading.bind(this),
-            setChallengeConfig: this.setChallengeConfig.bind(this),
+            consoleLoading: this.consoleLoading,
+            setChallengeConfig: this.setChallengeConfig,
             challengesEnabled: this.challengesEnabled
           }
         default:
@@ -219,11 +217,11 @@ export default {
           */
           return {
             name: 'general',
-            setUserConfig: this.setUserConfig.bind(this),
-            setChallengeConfig: this.setChallengeConfig.bind(this),
-            setProjectConfig: this.setProjectConfig.bind(this),
-            setKeywords: this.setKeywords.bind(this),
-            consoleLoading: this.consoleLoading.bind(this)
+            setUserConfig: this.setUserConfig,
+            setChallengeConfig: this.setChallengeConfig,
+            setProjectConfig: this.setProjectConfig,
+            setKeywords: this.setKeywords,
+            consoleLoading: this.consoleLoading
           }
       }
     },
