@@ -110,6 +110,7 @@ Methods:
 
       <!-- -------------------- Project Display Table -------------------- -->
       <q-table
+        binary-state-sort
         class="my-sticky-header-table"
         row-key="project"
         :data="projectList"
@@ -173,7 +174,7 @@ Methods:
 
         <template v-slot:body="props" >
           <q-tr :props="props">
-
+            <!-- Project 'new' column (date) -->
             <q-td
               key="new"
               :props="props"
@@ -189,16 +190,13 @@ Methods:
                 {{ joinKeywords(props.row.keywords) }}
               </div>
             </q-td>
-
-            <q-td key="project" :props="props" auto-width>
-              <div
-                align="left"
-                style="max-width: 200px; white-space: normal;"
-              >
-                <b>{{ props.row.project }}</b>
-              </div>
+            <!-- Project name column -->
+            <q-td
+              key="project"
+              :props="props">
+              {{ props.row.project }}
             </q-td>
-
+            <!-- Description column -->
             <q-td
               key="description"
               :props="props"
@@ -208,7 +206,6 @@ Methods:
                 <div
                   class="col"
                   ref="descriptionDiv"
-                  @click="popDialog(props.row.description)"
                   align="left"
                   style="overflow: hidden;"
                 >
@@ -216,35 +213,28 @@ Methods:
                 </div>
 
                 <div
-                  :hidden="!(props.row.description.length > 40)"
+                  :hidden="!(props.row.description.length > 60)"
                   class="col-2"
                 >
                   <div
-                    class="text-blue cursor-pointer"
+                    class="text-blue cursor-pointer q-mx-sm"
                     @click="popDialog(props.row.description)"
                   >
-                    &nbsp;&nbsp;[more]
+                    [more]
                   </div>
                 </div>
               </div>
             </q-td>
-
-            <q-td key="progress" :props="props">
-              <div
-                style="
-                  min-width: 150px;
-                  max-width: 250px;
-                  border: solid 1px;
-                  border-color: #d0d7e2;
-                "
-              >
-                <ProgressBar
-                  :progressBar="progressBar"
-                  :progress="props.row.progress"
-                />
-              </div>
+            <!-- Progress bar column -->
+            <q-td key="progress"
+              :props="props"
+            >
+              <ProgressBar
+                :progressBar="progressBar"
+                :progress="props.row.progress"
+              />
             </q-td>
-
+            <!-- Lead members column -->
             <q-td
               key="members"
               :props="props"
@@ -254,7 +244,12 @@ Methods:
                 {{ displayMembers(props.row.members) }}
               </div>
             </q-td>
-            <q-td key="url" :props="props">
+            <!-- Details column -->
+            <q-td
+              auto-width
+              key="url"
+              :props="props"
+            >
               <q-chip
                 dense
                 clickable
@@ -378,7 +373,9 @@ export default {
           align: 'center',
           field: row => row.project,
           format: val => `${val}`,
-          sortable: true
+          sortable: true,
+          headerClasses: 'project-name-col',
+          classes: 'project-name-col'
         },
         {
           name: 'description',
@@ -392,14 +389,18 @@ export default {
           label: 'Progress',
           field: row => row.progress,
           format: val => `${val}`,
-          sortable: true
+          sortable: true,
+          headerClasses: 'progress-bar-col',
+          classes: 'progress-bar-col'
         },
         {
           name: 'members',
           align: 'center',
           label: 'Lead(s)',
           field: row => this.displayMembers(row.members),
-          sortable: true
+          sortable: true,
+          headerClasses: 'lead-members-col',
+          classes: 'lead-members-col'
         },
         {
           name: 'url',
@@ -700,5 +701,18 @@ export default {
 </script>
 
 <style lang="stylus" scoped>
+
+.project-name-col
+  width 22%
+  font-weight bold
+  text-align left
+
+.progress-bar-col
+  width 12%
+
+.lead-members-col
+  width 26%
+  overflow-wrap break-word
+  overflow normal
 
 </style>

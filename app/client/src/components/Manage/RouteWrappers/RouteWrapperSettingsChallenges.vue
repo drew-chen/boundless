@@ -22,7 +22,7 @@ Methods:
 
 <template>
   <settings-projects-and-challenges
-    v-if="settingProps.name === 'challenges'"
+    v-if="settingProps.name === 'challenges' && settingProps.challengesEnabled"
     type="challenges"
     :keywords="settingProps.keywords"
     :ratio="settingProps.previewRatio"
@@ -50,6 +50,24 @@ export default {
   },
   components: {
     SettingsProjectsAndChallenges
+  },
+  /**
+   * If challenges are disabled, redirect to general settings.
+   *
+   * @param {Object} to The target Route Object being navigated to.
+   * @param {Object} from The current route being navigated away from.
+   * @param {Function} next This function must be called to resolve the hook.
+   *  In other words, this is the function controlling routing.
+   */
+  beforeRouteEnter (to, from, next) {
+    next(vm => {
+      // access to component instance via 'vm'
+      if (vm.settingProps.challengesEnabled) {
+        next()
+      } else {
+        next('/admin/settings/general')
+      }
+    })
   }
 }
 </script>
