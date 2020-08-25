@@ -11,7 +11,7 @@
 
 Name:     setup.js
 Purpose:  To help generate all the required files from the firebase
-          credientials which the user has input into system.yml
+          credentials which the user has input into system.yml
 
 ## */
 

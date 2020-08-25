@@ -1,5 +1,5 @@
 <!-- ##
-## Copyright (c) 2019 Wind River Systems, Inc.
+## Copyright (c) 2020 Wind River Systems, Inc.
 ##
 ## Licensed under the Apache License, Version 2.0 (the "License");
 ## you may not use this file except in compliance with the License.
@@ -9,39 +9,40 @@
 ## under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES
 ## OR CONDITIONS OF ANY KIND, either express or implied.
 
-Name:     components/SettingPanels/Config.vue
-Purpose:  To allow the user configure project/challenge UI via a config panel
-          inside admin console
+Name:     components/Manage/Settings/SettingsProjectsAndChallenges.vue
+Purpose:
+
+  To allow the user configure project/challenge UI via a config panel
+  inside admin console.
+
 Methods:
-  * Allow the user to manage keywords for project/challenge
-  * Allow the user to manage banners for project/challenge
-  * The changes persists to display table as well
+
+  Allow the user to manage keywords for project/challenge.
+  Allow the user to manage banners for project/challenge.
+  The changes persists to display table as well.
 
 ## -->
 
 <template>
   <div :hidden="loading">
+
+    <div class="float-right">
+      <button-undo-and-save
+        :disabled="!updated"
+        :save="submit"
+        :undo="openResetDialog"
+      />
+    </div>
+
     <!-- -------------------- Progress Bar -------------------- -->
     <div v-if="data.progressBar">
       <div
         v-if="type === 'projects'"
-        class="text-h4 q-mb-md"
+        class="q-my-sm"
       >
-        <div class="row">
-          Project Progress Bar
 
-          <q-space />
+        <div class="text-h4 q-my-sm">Project Progress Bar</div>
 
-          <div class="q-mb-xs">
-            <q-btn
-              :disabled="!updated"
-              no-caps
-              label="Submit"
-              :color="!updated ? 'accent' : 'secondary'"
-              @click="onSubmit"
-            />
-          </div>
-        </div>
         <q-separator color="secondary" />
       </div>
 
@@ -75,44 +76,26 @@ Methods:
           Half-step:
         </div>
 
-        <div class="col q-pt-sm">
-          <q-item tag="label" v-ripple style="border-radius: 3px;">
+        <div class="col-2 q-pt-sm q-ml-md">
             <!-- <q-item-section>
             </q-item-section> -->
-            <q-item-section avatar>
               <q-toggle
                 color="green"
                 v-model="data.progressBar.half"
                 @input="forceUpdate()"
               />
-            </q-item-section>
-          </q-item>
-        </div>
+          </div>
       </div>
 
     </div>
 
     <!-- -------------------- Keywords -------------------- -->
     <div>
-
       <div
         v-if="type === 'challenges'"
-        class="text-h4 q-mb-md"
+        class="q-my-sm"
       >
-        <div class="row">
-          Challenge Keywords
-          <q-space />
-
-          <div class="q-mb-xs">
-            <q-btn
-              :disabled="!updated"
-              no-caps
-              label="Submit"
-              :color="!updated ? 'accent' : 'secondary'"
-              @click="onSubmit"
-            />
-          </div>
-        </div>
+        <div class="text-h4 q-my-sm">Challenge Keywords</div>
         <q-separator color="secondary" />
       </div>
 
@@ -127,7 +110,7 @@ Methods:
       <!-- If there is at least one keyword - then list them w/check box -->
       <div v-if="Object.keys(keywordOptions).length">
         <dir class="text-italic text-grey">
-          You can select up to 6 keywords to diplay under the banner.
+          You can select up to 6 keywords to display under the banner.
         </dir>
         <q-option-group
           v-if="data.keywords"
@@ -151,6 +134,13 @@ Methods:
         </dir>
       </p>
     </div>
+
+    <!-- -------------------- Project Submission Questions -------------------- -->
+    <project-create-custom-form
+      :type="type"
+      ref="projectCreateCustomForm"
+      @modified="updated = true"
+    />
 
     <!-- -------------------- Listing Table -------------------- -->
     <div>
@@ -214,7 +204,7 @@ Methods:
                       v-if="type === 'challenges'"
                       contain
                       class="center-img"
-                      :src="`../statics/${staticImages.challenges.tableBanner}`"
+                      :src="`${staticsPath}/${staticImages.challenges.tableBanner}`"
                       :ratio="ratio"
                       style="max-height: 22vh;"
                     >
@@ -227,7 +217,7 @@ Methods:
                       v-else
                       contain
                       class="center-img"
-                      :src="`../statics/${staticImages.projects.tableBanner}`"
+                      :src="`${staticsPath}/${staticImages.projects.tableBanner}`"
                       :ratio="ratio"
                       style="max-height: 22vh;"
                     >
@@ -278,7 +268,7 @@ Methods:
                       v-if="type === 'challenges'"
                       contain
                       class="center-img"
-                      :src="`../statics/${staticImages.challenges.tableBanner}`"
+                      :src="`${staticsPath}/${staticImages.challenges.tableBanner}`"
                       :ratio="ratio"
                       style="max-height: 15vh;"
                     >
@@ -291,7 +281,7 @@ Methods:
                       v-else
                       contain
                       class="center-img"
-                      :src="`../statics/${staticImages.projects.tableBanner}`"
+                      :src="`${staticsPath}/${staticImages.projects.tableBanner}`"
                       :ratio="ratio"
                       style="max-height: 15vh;"
                     >
@@ -368,7 +358,7 @@ Methods:
                       v-if="type === 'challenges'"
                       contain
                       class="center-img"
-                      :src="`../statics/${staticImages.challenges.webBanner}`"
+                      :src="`${staticsPath}/${staticImages.challenges.webBanner}`"
                       :ratio="ratio"
                       style="max-height: 22vh;"
                     >
@@ -381,7 +371,7 @@ Methods:
                       v-else
                       contain
                       class="center-img"
-                      :src="`../statics/${staticImages.projects.webBanner}`"
+                      :src="`${staticsPath}/${staticImages.projects.webBanner}`"
                       :ratio="ratio"
                       style="max-height: 22vh;"
                     >
@@ -424,7 +414,7 @@ Methods:
                       v-if="type === 'challenges'"
                       contain
                       class="center-img"
-                      :src="`../statics/${staticImages.challenges.webBanner}`"
+                      :src="`${staticsPath}/${staticImages.challenges.webBanner}`"
                       :ratio="ratio"
                       style="max-height: 15vh;"
                     >
@@ -437,7 +427,7 @@ Methods:
                       v-else
                       contain
                       class="center-img"
-                      :src="`../statics/${staticImages.projects.webBanner}`"
+                      :src="`${staticsPath}/${staticImages.projects.webBanner}`"
                       :ratio="ratio"
                       style="max-height: 15vh;"
                     >
@@ -487,7 +477,7 @@ Methods:
                     <q-img
                       contain
                       class="center-img"
-                      src="../../statics/images/computer-keyboard.jpg"
+                      :src="`${staticsPath}/images/computer-keyboard.jpg`"
                       :ratio="ratio"
                       style="max-height: 22vh;"
                     >
@@ -529,7 +519,7 @@ Methods:
                     <q-img
                       contain
                       class="center-img"
-                      src="../../statics/images/computer-keyboard.jpg"
+                      :src="`${staticsPath}/images/computer-keyboard.jpg`"
                       :ratio="ratio"
                       style="max-height: 15vh;"
                     >
@@ -548,105 +538,105 @@ Methods:
       </div>
     </div>
 
-    <!-- -------------------- Button -------------------- -->
-    <div class="q-px-lg q-pb-lg">
-      <div class="q-px-md q-pb-md q-gutter-sm" align="right">
-        <q-btn
-          :disabled="!updated"
-          no-caps
-          label="Submit"
-          :color="!updated ? 'accent' : 'secondary'"
-          @click="onSubmit"
-        />
-      </div>
+    <div class="float-right">
+      <button-undo-and-save
+        :disabled="!updated"
+        :save="submit"
+        :undo="openResetDialog"
+      />
     </div>
+
+    <!-- -------------------- Dialog to confirm leaving with unsaved changes. -------------------- -->
+    <dialog-confirm-leave
+      ref="dialogConfirmLeave"
+      :save="submit"
+      :onLeave="revokeUrls"
+      :undo="reset"
+    />
   </div>
 </template>
 
 <script>
-import { defaultImages } from '../../../boundless.config'
+import deepClone from 'lodash.clonedeep'
+import Vue from 'vue'
+import isFirebaseError from '../../../errors/isFirebaseError'
+import { defaultImages } from '../../../../../client/boundless.config'
 
-import productionDb, { productionStorage } from '../../firebase/init_production'
-import testingDb, { testingStorage } from '../../firebase/init_testing'
+import productionDb, { productionStorage } from '../../../firebase/init_production'
+import testingDb, { testingStorage } from '../../../firebase/init_testing'
+
+import ProjectCreateCustomForm from '../../Forms/Project/ProjectCreateCustomForm.vue'
+import ButtonUndoAndSave from '../../Buttons/ButtonUndoAndSave.vue'
+import DialogConfirmLeave from '../../Dialogs/DialogConfirmLeave.vue'
+
+import mixinConfirmUnload from '../../../mixins/mixinConfirmUnload'
 
 export default {
   props: {
-    keywords: Object,
-    type: String,
-    ratio: String
-  },
-  async created () {
-    try {
-      setTimeout(() => {
-        this.loading = false
-      }, 100)
-
-      // data fetching goes here
-      await this.loadFireRefs()
-      this.data = this.$q.sessionStorage.getItem('boundless_config')
-      this.data = this.data[`${this.type}Config`]
-
-      // help instantiate this.data.progressBar if not found in config
-      if (
-        this.type === 'projects' &&
-        typeof this.data.progressBar === 'undefined'
-      ) {
-        this.data.progressBar = {
-          tags: ['Idea', 'PoC', 'Value'],
-          half: true
-        }
+    // Dictionary containing keywords
+    keywords: {
+      type: Object,
+      required: true
+    },
+    // Represents whether the parent component is handling projects or challenges.
+    type: {
+      type: String,
+      required: true,
+      validator (value) {
+        // The value must match one of these strings.
+        return ['projects', 'challenges'].indexOf(value) !== -1
       }
-
-      for (let key in this.keywords) {
-        this.keywordOptions.push({
-          label: key,
-          value: this.keywords[key]
-        })
-      }
-
-      this.data.keywords = this.data.keywords.filter(
-        v => Object.values(this.keywords).includes(v)
-      )
-      // this.data.listingTable.bannerImg.url
-      // this.data.webpage.bannerImg.url
-      // this.data.webpage.mainImg.url
-      await this.storageUrlFetcher('listingTable', 'bannerImg')
-      await this.storageUrlFetcher('webpage', 'bannerImg')
-      await this.storageUrlFetcher('webpage', 'mainImg')
-    } catch (error) {
-      throw new Error(error)
+    },
+    // The forced ratio given to images (used as a q-img prop).
+    ratio: {
+      type: String,
+      required: true
     }
   },
-  beforeDestroy () {
-    // verfiy for user to leave if changes were detected
-    if (!this.submitted && this.updated) {
-      this.$q.dialog({
-        title: 'Are you sure you want to leave without submitting changes? (All changes will be lost).',
-        cancel: {
-          flat: true,
-          noCaps: true,
-          label: 'Submit'
-        },
-        ok: {
-          flat: true,
-          noCaps: true,
-          label: 'Leave'
-        },
-        persistent: true
-      }).onOk(() => {
-        if (this.data.listingTable.bannerImg.url) {
-          URL.revokeObjectURL(this.data.listingTable.bannerImg.url)
-        }
-        if (this.data.webpage.bannerImg.url) {
-          URL.revokeObjectURL(this.data.webpage.bannerImg.url)
-        }
-        if (this.data.webpage.mainImg.url) {
-          URL.revokeObjectURL(this.data.webpage.mainImg.url)
-        }
-      }).onCancel(() => {
-        this.onSubmit()
+  components: {
+    ProjectCreateCustomForm,
+    ButtonUndoAndSave,
+    DialogConfirmLeave
+  },
+  // Requires 'this.updated' in data.
+  mixins: [mixinConfirmUnload],
+  /** Fetches data and initializes 'dbData' to the same initial values as 'data'. */
+  async created () {
+    setTimeout(() => {
+      this.loading = false
+    }, 100)
+    // data fetching goes here
+    await this.loadFireRefs()
+    this.data = this.$q.sessionStorage.getItem('boundless_config')
+    this.data = this.data[`${this.type}Config`]
+
+    // help instantiate this.data.progressBar if not found in config
+    if (
+      this.type === 'projects' &&
+      typeof this.data.progressBar === 'undefined'
+    ) {
+      this.data.progressBar = {
+        tags: ['Idea', 'PoC', 'Value'],
+        half: true
+      }
+    }
+
+    for (let key in this.keywords) {
+      this.keywordOptions.push({
+        label: key,
+        value: this.keywords[key]
       })
     }
+
+    this.data.keywords = this.data.keywords.filter(
+      v => Object.values(this.keywords).includes(v)
+    )
+
+    await this.storageUrlFetcher('listingTable', 'bannerImg')
+    await this.storageUrlFetcher('webpage', 'bannerImg')
+    await this.storageUrlFetcher('webpage', 'mainImg')
+
+    this.dbData = deepClone(this.data)
   },
   data () {
     return {
@@ -659,8 +649,10 @@ export default {
       keywordOptions: [],
       // data <Object>: config information of either project or challenge
       data: {},
+      // <Object>: Unmodified data from the database used to reset 'this.data'.
+      dbData: {},
       recoveryPath: {}, // <Object>: record for paths to be recovered
-      counter: 0, // <Integer>: couter to track promises
+      counter: 0, // <Integer>: Counter to track promises
       endCounter: 0, // <Integer>: counter to end the promise calls
       selectedStyle: { // <Object>: style of the dom once selected
         // boxShadow <String>: css property box-shadow
@@ -668,19 +660,23 @@ export default {
         borderRadius: '3px' // <String>: css property border-radius
       },
       loading: true, // <Boolean>: flag for the page loading
-      submitted: false, // <Boolean>: flag for handling child emitted submit
-      updated: false // <Boolean>: flag for handling child emitted submit
+      /**
+       * <Boolean>: Flag for handling child emitted submit.
+       * Describes to all updates except 'ProjectCreateCustomForm.vue' since
+       * it's state is separate. Used in 'this.updated'.
+       */
+      updated: false,
+      // <String>: Relative path of the statics directory
+      staticsPath: '../../../statics'
     }
   },
   methods: {
-    storageUrlFetcher: async function (property, obj) {
-      /**
-       * helper function to fetch the absolute url given relative
-       * @param {String} property: name of the property inside config
-       * @param {String} obj: name of the field inside the property
-       * @return {Promise<Boolean>}
-       */
-
+    /**
+     * Helper function to fetch the absolute url given relative
+     * @param {String} property: name of the property inside config
+     * @param {String} obj: name of the field inside the property
+     */
+    async storageUrlFetcher (property, obj) {
       if (
         this.data[property] && this.data[property][obj] &&
         this.data[property][obj].url
@@ -694,29 +690,23 @@ export default {
             ).getDownloadURL()
 
             this.data[property][obj].url = url
-
-            return true
           } catch (error) {
-            this.data[property][obj].url = ''
-
-            return false
+            if (isFirebaseError(error, 'storage/object-not-found')) {
+              console.error(error)
+              this.data[property][obj].url = ''
+            } else {
+              throw error
+            }
           }
         }
-
-        return true
       }
-
-      return false
     },
-    addProgressTag: function () {
-      /**
-       * helper function to add new tab on the progress
-       * which creates a dialog when invoked and notifies
-       * the user on success/failure
-       * @param {void}
-       * @return {void}
-       */
-
+    /**
+     * Helper function to add new tab on the progress
+     * which creates a dialog when invoked and notifies
+     * the user on success/failure.
+     */
+    addProgressTag () {
       this.$q.dialog({
         title: 'Add new tag for progress bar',
         prompt: {
@@ -753,21 +743,16 @@ export default {
             color: 'negative'
           })
         }
-      }).onCancel(() => {
-      }).onDismiss(() => {
       })
     },
-    deleteProgressTag: function (index) {
-      /**
-       * helper function deletes the progress tag when invoked
-       * and notifies the user on failure
-       * @param {Integer} index: of the tag to be deleted
-       * @return {void}
-       */
-
+    /**
+     * Helper function deletes the progress tag when invoked
+     * and notifies the user on failure.
+     * @param {Integer} index: of the tag to be deleted
+     */
+    deleteProgressTag (index) {
       if (this.data.progressBar.tags.length > 1) {
         this.data.progressBar.tags.splice(index, 1)
-
         this.forceUpdate()
       } else {
         this.$q.notify({
@@ -777,101 +762,84 @@ export default {
         })
       }
     },
-    forceUpdate: function () {
-      /**
-       * updates the vue component by force once called and
-       * sets true to this.updated
-       * @param {void}
-       * @return {void}
-       */
-
+    /**
+     * Updates the vue component by force once called and
+     * sets true to this.updated.
+     */
+    forceUpdate () {
       this.updated = true
       this.$forceUpdate()
     },
-    checkMax: function (keywords) {
-      /**
-       * helper function to check if this.data.keywords is full (length of 5)
-       * @param {Array<String>} keywords: list of keywords
-       * @return {void}
-       */
-
+    /**
+     * Helper function to check if this.data.keywords is full (length of 5).
+     * @param {Array<String>} keywords: List of keywords.
+     */
+    checkMax (keywords) {
       if (keywords.length > 6) {
         this.$q.notify({
           color: 'negative',
           icon: 'warning',
           position: 'bottom',
-          message: 'Maximun of 6 keywords only.',
+          message: 'Maximum of 6 keywords only.',
           timeout: 500
         })
-
         keywords.pop()
         this.data.keywords = keywords
       } else {
         this.updated = true
       }
     },
-    getBlobAndSubmitFromURL: async function (url, property, obj) {
-      /**
-       * https://stackoverflow.com/questions/11876175/how-to-get-a-file-or-blob-from-an-object-url
-       * fetch the blob data from the given url
-       * @param {String} url: link of where the blob data is stored
-       * @param {String} property: key of the config type
-       * @param {String} obj: filename of the file to be stored
-       *                      inside firebase storage
-       * @return {Promise<Blob>}
-       */
+    /**
+     * https://stackoverflow.com/questions/11876175/how-to-get-a-file-or-blob-from-an-object-url
+     * fetch the blob data from the given url.
+     * @param {String} url: Link of where the blob data is stored.
+     * @param {String} property: Key of the config type.
+     * @param {String} obj: Filename of the file to be stored
+     *                      inside firebase storage.
+     */
+    async getBlobAndSubmitFromURL (url, property, obj) {
+      let res = await fetch(url)
+      res = await res.blob()
 
-      try {
-        let res = await fetch(url)
-        res = await res.blob()
+      let storageRef = this.storage.ref().child(
+        `configs/${this.type}/${property}/${obj}.png`
+      )
+      await storageRef.put(res)
+      let dlURL = `configs/${this.type}/${property}/${obj}.png`
 
-        let storageRef = this.storage.ref().child(
-          `configs/${this.type}/${property}/${obj}.png`
-        )
-        // let ss = await storageRef.put(res)
-        // let dlURL = await ss.ref.getDownloadURL()
-        await storageRef.put(res)
-        let dlURL = `configs/${this.type}/${property}/${obj}.png`
+      URL.revokeObjectURL(url)
+      this.data[property][obj].url = dlURL
+      delete this.data[property][obj].prev
+      this.counter = this.counter + 1
 
-        URL.revokeObjectURL(url)
-        this.data[property][obj].url = dlURL
-        delete this.data[property][obj].prev
-        this.counter = this.counter + 1
+      if (this.counter === this.endCounter) {
+        await this.db.collection('config').doc('project').set({
+          [`${this.type}Config`]: this.data
+        }, { merge: true })
 
-        if (this.counter === this.endCounter) {
-          await this.db.collection('config').doc('project').set({
-            [`${this.type}Config`]: this.data
-          }, { merge: true })
+        if (this.$q.sessionStorage.has('boundless_config')) {
+          let dbConfig = this.$q.sessionStorage.getItem('boundless_config')
+          dbConfig[`${this.type}Config`] = this.data
 
-          if (this.$q.sessionStorage.has('boundless_config')) {
-            let dbConfig = this.$q.sessionStorage.getItem('boundless_config')
-            dbConfig[`${this.type}Config`] = this.data
-
-            this.$q.sessionStorage.set('boundless_config', dbConfig)
-          }
-
-          await this.storageUrlFetcher('listingTable', 'bannerImg')
-          await this.storageUrlFetcher('webpage', 'bannerImg')
-          await this.storageUrlFetcher('webpage', 'mainImg')
-
-          this.counter = 0
-          this.updated = false
-          this.$emit('submitting', false)
-          this.$emit('submitted', this.data)
+          this.$q.sessionStorage.set('boundless_config', dbConfig)
         }
-      } catch (error) {
-        throw new Error(error)
+
+        await this.storageUrlFetcher('listingTable', 'bannerImg')
+        await this.storageUrlFetcher('webpage', 'bannerImg')
+        await this.storageUrlFetcher('webpage', 'mainImg')
+
+        this.dbData = (this.data)
+        this.counter = 0
+        this.updated = false
+        this.$emit('submitting', false)
+        this.$emit('submitted', this.data)
       }
     },
-    loadFireRefs: async function () {
-      /**
-       * load firebase database reference
-       * load firebase storage reference (if applicable)
-       * load firebase cloud functions reference (if applicable)
-       * @param {void}
-       * @return {Promise<Boolean>}
-       */
-
+    /**
+     * Load Firebase database, storage (if applicable),
+     * and cloud functions reference (if applicable).
+     */
+    async loadFireRefs () {
       if (this.$q.localStorage.has('boundless_db')) {
         let sessionDb = this.$q.localStorage.getItem('boundless_db')
 
@@ -882,110 +850,92 @@ export default {
           this.db = productionDb
           this.storage = productionStorage
         }
-
-        return true
       } else {
-        try {
-          let doc = await productionDb.collection('config').doc('project').get()
+        let doc = await productionDb.collection('config').doc('project').get()
 
-          if (doc.exists) {
-            if (doc.data().db === 'testing') {
-              this.db = testingDb
-              this.$q.localStorage.set('boundless_db', 'testing')
-            } else {
-              this.db = productionDb
-              this.$q.localStorage.set('boundless_db', 'production')
-            }
-
-            return true
+        if (doc.exists) {
+          if (doc.data().db === 'testing') {
+            this.db = testingDb
+            this.$q.localStorage.set('boundless_db', 'testing')
           } else {
-            let msg = '"/config/project" path does not exists!'
-
-            throw new Error(msg)
+            this.db = productionDb
+            this.$q.localStorage.set('boundless_db', 'production')
           }
-        } catch (error) {
-          return false
+        } else {
+          let msg = '"/config/project" path does not exists!'
+
+          throw new Error(msg)
         }
       }
     },
-    onSubmit: async function () {
-      /**
-       * submit handler for the component
-       * @param {void}
-       * @return {void}
-       */
-
+    /**
+     * Submit handler for the component.
+     */
+    async submit () {
       this.endCounter = 0
-      this.submitted = true
       this.$emit('submitting', true)
 
       let blobFlag = false
 
-      try {
-        for (let property in this.data) {
-          for (let obj in this.data[property]) {
-            let blobURL = this.data[property][obj].url
+      for (let property in this.data) {
+        for (let obj in this.data[property]) {
+          let blobURL = this.data[property][obj].url
 
-            if (blobURL && blobURL.split(':')[0] === 'blob') {
-              blobFlag = true
-              this.endCounter = this.endCounter + 1
-              this.getBlobAndSubmitFromURL(blobURL, property, obj)
-            }
+          if (blobURL && blobURL.split(':')[0] === 'blob') {
+            blobFlag = true
+            this.endCounter = this.endCounter + 1
+            this.getBlobAndSubmitFromURL(blobURL, property, obj)
+          }
+        }
+      }
+
+      if (!blobFlag) {
+        // this.data.listingTable.bannerImg.url
+        // this.data.webpage.bannerImg.url
+        // this.data.webpage.mainImg.url
+        for (let key in this.recoveryPath) {
+          let val = this.recoveryPath[key]
+
+          key = key.split('.')
+
+          this.data[key[0]][key[1]].url = val
+          if (this.data[key[0]][key[1]].prev) {
+            delete this.data[key[0]][key[1]].prev
           }
         }
 
-        if (!blobFlag) {
-          // this.data.listingTable.bannerImg.url
-          // this.data.webpage.bannerImg.url
-          // this.data.webpage.mainImg.url
-          for (let key in this.recoveryPath) {
-            let val = this.recoveryPath[key]
+        await this.db.collection('config').doc('project').set({
+          [`${this.type}Config`]: this.data
+        }, { merge: true })
 
-            key = key.split('.')
+        if (this.$q.sessionStorage.has('boundless_config')) {
+          let dbConfig = this.$q.sessionStorage.getItem('boundless_config')
+          dbConfig[`${this.type}Config`] = this.data
 
-            this.data[key[0]][key[1]].url = val
-            if (this.data[key[0]][key[1]].prev) {
-              delete this.data[key[0]][key[1]].prev
-            }
-          }
-
-          await this.db.collection('config').doc('project').set({
-            [`${this.type}Config`]: this.data
-          }, { merge: true })
-
-          if (this.$q.sessionStorage.has('boundless_config')) {
-            let dbConfig = this.$q.sessionStorage.getItem('boundless_config')
-            dbConfig[`${this.type}Config`] = this.data
-
-            this.$q.sessionStorage.set('boundless_config', dbConfig)
-          }
-
-          await this.storageUrlFetcher('listingTable', 'bannerImg')
-          await this.storageUrlFetcher('webpage', 'bannerImg')
-          await this.storageUrlFetcher('webpage', 'mainImg')
-
-          setTimeout(() => {
-            this.updated = false
-
-            this.$emit('submitting', false)
-            this.$emit('submitted', this.data)
-          }, 300)
+          this.$q.sessionStorage.set('boundless_config', dbConfig)
         }
-      } catch (error) {
-        throw new Error(error)
+
+        await this.storageUrlFetcher('listingTable', 'bannerImg')
+        await this.storageUrlFetcher('webpage', 'bannerImg')
+        await this.storageUrlFetcher('webpage', 'mainImg')
+        if (this.type === 'projects') {
+          this.$refs.projectCreateCustomForm.submit()
+        }
+        this.dbData = deepClone(this.data)
+        this.updated = false
+        this.$emit('submitting', false)
+        this.$emit('submitted', this.data)
       }
     },
-    filePickerOnChange: function (type, field) {
-      /**
-       * helper function to extract image out of the picked file
-       * @param {String} type: type of the field to be assigned
-       * @param {String} field: filed of the object to be assigned
-       * @return {void}
-       */
-
+    /**
+     * Helper function to extract image out of the picked file.
+     * @param {String} type: type of the field to be assigned.
+     * @param {String} field: filed of the object to be assigned.
+     */
+    filePickerOnChange (type, field) {
       const eventHandler = (e, type, field) => {
         const file = e.target.files[0]
-        let fToken = field.split('.')
+        const fToken = field.split('.')
 
         if (file) {
           this.data[fToken[0]][fToken[1]].prev = this.data[fToken[0]][fToken[1]].url
@@ -1002,29 +952,43 @@ export default {
           }
         }
       }
-
       eventHandler(event, type, field)
     },
-    deepObjCopy: function (aObject) {
-      /**
-       * https://stackoverflow.com/questions/4459928/how-to-deep-clone-in-javascript/34624648#34624648
-       * creates a deep copy of the input
-       * @param {Object} aObject: the object to be cloned
-       * @return {Object}
-       */
-
-      if (!aObject) {
-        return aObject
+    /** Opens confirmation to undo unsaved changes. */
+    openResetDialog () {
+      this.$q.dialog({
+        title: 'Confirm',
+        message: 'Would you like undo all unsaved changes?',
+        cancel: true
+      }).onOk(() => {
+        this.reset()
+      })
+    },
+    /** Undo's local changes if there are changes to be saved. */
+    reset () {
+      if (this.updated) {
+        if (this.type === 'projects') {
+          this.$refs.projectCreateCustomForm.reset()
+        }
+        Vue.set(this.$data, 'data', deepClone(this.dbData))
+        this.updated = false
       }
-
-      let v
-      let bObject = Array.isArray(aObject) ? [] : {}
-      for (const k in aObject) {
-        v = aObject[k]
-        bObject[k] = (typeof v === 'object') ? this.deepObjCopy(v) : v
+    },
+    /**
+     * When leaving the page, this function is called since we will no longer
+     * use previously created URL objects. This is passed as a prop to
+     * 'DialogConfirmLeave.vue'.
+     */
+    revokeUrls () {
+      if (this.data.listingTable.bannerImg.url) {
+        URL.revokeObjectURL(this.data.listingTable.bannerImg.url)
       }
-
-      return bObject
+      if (this.data.webpage.bannerImg.url) {
+        URL.revokeObjectURL(this.data.webpage.bannerImg.url)
+      }
+      if (this.data.webpage.mainImg.url) {
+        URL.revokeObjectURL(this.data.webpage.mainImg.url)
+      }
     }
   }
 }

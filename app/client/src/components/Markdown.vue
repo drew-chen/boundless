@@ -13,7 +13,7 @@ Name:     components/Markdown.vue
 Purpose:  Allows the editing of the right panel body of about page with
           markdown format
 Methods:
-  * Custmize right panel passage with markdown
+  * Customize right panel passage with markdown
 
 ## -->
 
@@ -220,7 +220,7 @@ export default {
 
         this.$q.notify({
           color: 'green',
-          message: '<div align="center">Sucessful!<div>',
+          message: '<div align="center">successful!<div>',
           html: true,
           timeout: 750
         })

@@ -13,7 +13,7 @@ ERROR: Default project does not exists...
 make: *** [makefile:43: fb_functions_deploy] Error 1
 ```
 
-**Solution 1**: Sometimes special characters accidently get added to the init.js file when using certain editors. This file is used to generate  app/client/database.cred.js which contains the different database credentials of the different databases used (e.g., production, testing).
+**Solution 1**: Sometimes special characters accidentally get added to the init.js file when using certain editors. This file is used to generate  app/client/database.cred.js which contains the different database credentials of the different databases used (e.g., production, testing).
 
 To see if this is a problem run:
 
@@ -92,7 +92,7 @@ generating: boundless-d7c8e.storage.06.24.2020_22_28_48
 starting the zipping process...
 deleting the content...
 
-Export completed sucessfully
+Export completed successfully
 The zipped file is available inside ~/tools/fbm folder!
 ```
 

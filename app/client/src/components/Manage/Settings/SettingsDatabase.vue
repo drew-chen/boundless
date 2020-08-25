@@ -1,5 +1,5 @@
 <!-- ##
-## Copyright (c) 2019 Wind River Systems, Inc.
+## Copyright (c) 2020 Wind River Systems, Inc.
 ##
 ## Licensed under the Apache License, Version 2.0 (the "License");
 ## you may not use this file except in compliance with the License.
@@ -9,7 +9,7 @@
 ## under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES
 ## OR CONDITIONS OF ANY KIND, either express or implied.
 
-Name:     components/GetDataFromFirestore.vue
+Name:     components/Manage/Settings/SettingsDatabase.vue
 Purpose:  To allow the user to export data from firestore and import data
           into firestore
 Methods:
@@ -20,7 +20,7 @@ Methods:
 
 <template>
   <div class="q-px-sm full-width">
-    <q-card flat class="">
+    <q-card flat>
       <!-- IMPORT DATABASE -->
       <div class="">
         <div>
@@ -28,13 +28,27 @@ Methods:
           <q-separator color="secondary" />
         </div>
 
-        <input
-          class="q-pb-md q-pt-sm"
-          type="file" ref="file" accept=".json"
-          @change="retrieveDataFromFile"
+        <q-card
+          flat bordered
+          class="q-my-md q-pa-sm input-field row"
         >
+          <input
+            class="col-10"
+            type="file"
+            ref="form"
+            accept=".json"
+            @change="retrieveDataFromFile"
+          >
+          <q-btn
+            flat
+            class="col-2"
+            size="sm"
+            icon="clear"
+            @click.stop="reset"
+          />
+        </q-card>
 
-        <q-form @submit="onSubmit">
+        <q-form @submit="submit">
           <div class="">
             <q-btn
               no-caps label="Import" type="submit"
@@ -63,25 +77,38 @@ Methods:
         </div>
       </div>
     </q-card>
+      <!-- -------------------- Dialog -------------------- -->
+    <dialog-confirm-leave
+      ref="dialogConfirmLeave"
+      :save="submit"
+      :undo="reset"
+    />
   </div>
 </template>
 
 <script>
-import productionDb from '../firebase/init_production'
-import testingDb from '../firebase/init_testing'
+import productionDb from '../../../firebase/init_production'
+import testingDb from '../../../firebase/init_testing'
 
-import { dbMeta } from '../../boundless.config'
+import { dbMeta } from '../../../../../client/boundless.config'
+
+import DialogConfirmLeave from '../../Dialogs/DialogConfirmLeave'
 
 export default {
+  components: {
+    DialogConfirmLeave
+  },
   async created () {
-    try {
-      await this.loadFireRefs()
-      await this.loadData()
+    await this.loadFireRefs()
+    await this.loadData()
 
-      this.dbId = this.db.XT.bT.ci.projectId
-      this.$emit('databaseId', this.dbId)
-    } catch (error) {
-      throw new Error(error)
+    this.dbId = this.db.XT.bT.ci.projectId
+    this.$emit('databaseId', this.dbId)
+  },
+  computed: {
+    // <Boolean>: Tells mixinSettingNavGuard.js when to open the dialog.
+    updated () {
+      return this.attachedFile
     }
   },
   data () {
@@ -90,37 +117,29 @@ export default {
       dbId: null, // <String>: project id of the firebase cred
       loading: false, // <Boolean>: flag for page loading
       attachedFile: false, // <Boolean>: flag to check import file is attached
-      // meta <Object>: meta data of the database to be exported or imported
+      // <Object>: meta data of the database to be exported or imported
       meta: {},
-      // data <Array<Object>>: list of information to be exported or imported
+      // <Array<Object>>: list of information to be exported or imported
       data: [],
       importDataField: '' // <String>: data to be imported
     }
   },
   methods: {
+    /**
+     * Load firebase database, storage (if applicable)
+     * and cloud functions reference (if applicable).
+     */
     loadFireRefs: async function () {
-      /**
-       * load firebase database reference
-       * load firebase storage reference (if applicable)
-       * load firebase cloud functions reference (if applicable)
-       * @param {void}
-       * @return {Promise<Boolean>}
-       */
-
       if (this.$q.localStorage.has('boundless_db')) {
         let sessionDb = this.$q.localStorage.getItem('boundless_db')
-
         if (sessionDb === 'testing') {
           this.db = testingDb
         } else {
           this.db = productionDb
         }
-
-        return true
       } else {
         try {
           let doc = await productionDb.collection('config').doc('project').get()
-
           if (doc.exists) {
             if (doc.data().db === 'testing') {
               this.db = testingDb
@@ -129,37 +148,37 @@ export default {
               this.db = productionDb
               this.$q.localStorage.set('boundless_db', 'production')
             }
-
-            return true
           } else {
             let msg = '"/config/project" path does not exists!'
-
             throw new Error(msg)
           }
         } catch (error) {
           this.db = productionDb
           this.$q.localStorage.set('boundless_db', 'production')
-
-          return false
+          throw error
         }
       }
     },
-    onSubmit: async function () {
-      /**
-       * importing to the database
-       * @param {void}
-       * @return {Promise<Boolean>}
-       */
+    /**
+     * Importing to the database. Dialog is wrapped in a promise so that this
+     * function can be awaited.
+     */
+    async submit () {
+      const promisedDialog = await new Promise(resolve => {
+        this.$q.dialog({
+          title: 'Confirmation to Import',
+          message: 'The old data will be overwritten!',
+          cancel: true,
+          persistent: true
+        }).onOk(() => resolve(true)
+        ).onCancel(() => resolve(false))
+      })
 
-      this.$q.dialog({
-        title: 'Confirmation to Import',
-        message: 'The old data will be overwritten!',
-        cancel: true,
-        persistent: true
-      }).onOk(async () => {
-        let promises = []
+      // ok is clicked
+      if (promisedDialog) {
+        await (async () => {
+          let promises = []
 
-        try {
           this.$emit('importingToDB', true)
 
           this.importDataField.forEach(colObj => {
@@ -179,23 +198,17 @@ export default {
             this.$emit('importingToDB', false)
 
             location.reload()
-
-            return true
           }, 100)
-        } catch (error) {
-          return false
-        }
-      })
+        })()
+      }
     },
+    /**
+     * https://ourcodeworld.com/articles/read/189/how-to-create-a-file-and-generate-a-download-with-javascript-in-the-browser-without-a-server
+     * exporting the data from the database into a .json file
+     * @param {String} filename: name of the file
+     * @param {String} text: data to be written on the file
+     */
     download: function (filename, text) {
-      /**
-       * https://ourcodeworld.com/articles/read/189/how-to-create-a-file-and-generate-a-download-with-javascript-in-the-browser-without-a-server
-       * exporting the data from the database into a .json file
-       * @param {String} filename: name of the file
-       * @param {String} text: data to be written on the file
-       * @return {void}
-       */
-
       let todayDate = new Date(Date.now()).toISOString().substring(0, 19)
       let element = document.createElement('a')
 
@@ -210,76 +223,75 @@ export default {
 
       document.body.removeChild(element)
     },
+    /**
+     * Load the data from the database.
+     */
     loadData: async function () {
-      /**
-       * load the data from the database
-       * @param {void}
-       * @return {Promise<Boolean>}
-       */
+      let doc = await this.db.collection(
+        '--db_meta--'
+      ).doc('data').get()
 
-      try {
-        let doc = await this.db.collection(
+      if (doc.exists) {
+        this.meta = doc.data()
+      } else {
+        this.meta = dbMeta
+
+        // write the meta collection to db
+        await this.db.collection(
           '--db_meta--'
-        ).doc('data').get()
+        ).doc('data').set(this.meta)
+      }
 
-        if (doc.exists) {
-          this.meta = doc.data()
-        } else {
-          this.meta = dbMeta
+      // copy each fields from file to db
+      this.meta.collections.forEach(async (colId) => {
+        let docs = await this.db.collection(colId).get()
 
-          // write the meta collection to db
-          await this.db.collection(
-            '--db_meta--'
-          ).doc('data').set(this.meta)
-        }
+        let collectionDocuments = []
 
-        // copy each fields from file to db
-        this.meta.collections.forEach(async (colId) => {
-          let docs = await this.db.collection(colId).get()
-
-          let collectionDocuments = []
-
-          docs.forEach(doc => {
-            collectionDocuments.push({
-              doc_id: doc.id,
-              data: doc.data()
-            })
-          })
-
-          this.data.push({
-            name: colId,
-            data: collectionDocuments
+        docs.forEach(doc => {
+          collectionDocuments.push({
+            doc_id: doc.id,
+            data: doc.data()
           })
         })
 
-        return true
-      } catch (error) {
-        return false
-      }
+        this.data.push({
+          name: colId,
+          data: collectionDocuments
+        })
+      })
     },
+    /**
+     * Read the data from the file attached to the uploader.
+     */
     retrieveDataFromFile: function () {
-      /**
-       * read the data from the file attached to the uploader
-       * @param {void}
-       * @return {void}
-       */
-
-      if (!this.$refs.file.files[0]) {
+      if (!this.$refs.form.files || !this.$refs.form.files[0]) {
         this.attachedFile = !this.attachedFile
       } else {
         let fr = new FileReader()
-        fr.readAsText(this.$refs.file.files[0])
+        fr.readAsText(this.$refs.form.files[0])
         fr.onload = () => {
           this.importDataField = JSON.parse(fr.result)
 
           this.attachedFile = !this.attachedFile
         }
       }
+    },
+    /**
+     * Removes uploaded file. Does NOT reset the database imported.
+     */
+    reset () {
+      this.importDataField = ''
+      this.attachedFile = false
+      this.$refs.form.value = ''
     }
   }
 }
 </script>
 
 <style lang="stylus">
+
+.input-field
+  width 300px
 
 </style>

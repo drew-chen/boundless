@@ -293,7 +293,7 @@ Methods:
 
           <q-separator />
 
-          <q-card-section style="width: 50vh; height: 40vh; overflow: auto">
+          <q-card-section style="height: 40vh; overflow: auto">
             <p>
               {{ rowMessage }}
             </p>
@@ -324,7 +324,7 @@ export default {
     Banner
   },
   async created () {
-    // fetech data from database
+    // fetch data from database
     try {
       await this.loadFireRefs()
       await this.loadConfig()
@@ -353,7 +353,7 @@ export default {
         v => v in this.keywordsValToKeyMap
       )
     } catch (error) {
-      throw new Error(error)
+      throw error
     }
   },
   data () {
@@ -492,7 +492,7 @@ export default {
           this.storage = productionStorage
           this.$q.localStorage.set('boundless_db', 'production')
 
-          return false
+          throw error
         }
       }
     },
@@ -599,7 +599,7 @@ export default {
       } catch (error) {
         this.loading = false
 
-        return false
+        throw error
       }
     },
     loadConfig: async function () {
@@ -670,7 +670,7 @@ export default {
           throw new Error('File not found!')
         }
       } catch (error) {
-        return false
+        throw error
       }
     },
     gettingCount: function () {
