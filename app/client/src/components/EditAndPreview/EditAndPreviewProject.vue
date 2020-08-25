@@ -3098,10 +3098,10 @@ export default {
     exportCustomFormResponse () {
       const customFormResponse = this.curData.customFormResponse || []
       let markdownStr = '## Additional Q&A\n\n'
-      for (let question of customFormResponse) {
+      customFormResponse.forEach((question) => {
         // Not using multiline string template since indenting messes with format.
         markdownStr += `**${question.label}**\n${question.response}\n\n`
-      }
+      })
       this.copyTextToClipboard(markdownStr)
       this.$q.notify({
         message: 'Additional questions and responses have been copied.',

@@ -9,15 +9,14 @@
 ## under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES
 ## OR CONDITIONS OF ANY KIND, either express or implied.
 
-Name:     errors/DbException.js
-Purpose:  Exception related to the database.
-Methods:  Inherits from Error and can be detected using 'instanceof'.
+Name:     backends.config.js
+Purpose:  Defines backend types and the type of the current backend.
 
 ## */
 
-export default class DbException extends Error {
-  constructor (...params) {
-    super(...params)
-    this.name = 'Database Exception'
-  }
-}
+export const backendEnum = Object.freeze({
+  FIREBASE: 'firebase',
+  CUSTOM: 'custom'
+})
+
+export const CURRENT_BACKEND = backendEnum.FIREBASE

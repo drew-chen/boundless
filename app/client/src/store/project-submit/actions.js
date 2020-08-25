@@ -27,20 +27,64 @@ Methods:
 import productionDb from '../../firebase/init_production'
 import DbException from '../../errors/DbException'
 import { LocalStorage } from 'quasar'
+import { backendEnum, CURRENT_BACKEND } from '../../../backends.config'
+
+/**
+ * Calls the appropriate action depending on the backend type. Can be extended to
+ * handle more backends by adding more cases and passing in more actions.
+ *
+ * Note: if the function wrapping 'callDependingOnBackend' is expected to
+ * be awaited, then make sure the call to 'callDependingOnBackend' is also
+ * awaited.
+ *
+ * @param {Object} context Exposes the same set of methods/properties as the
+ *   store instance.
+ *   For all the properties of the context object, see:
+ *   https://vuex.vuejs.org/api/#actions.
+ * @param {...Function} action An action which needs a context that will be called
+ *   depending on the backend type. The order of the provided actions matters.
+ *   Each action can only accept one parameter: context.
+ */
+async function callDependingOnBackend (context, ...action) {
+  switch (CURRENT_BACKEND) {
+    case backendEnum.FIREBASE:
+      if (action[0]) {
+        await action[0](context)
+      }
+      break
+    case backendEnum.CUSTOM:
+      if (action[1]) {
+        await action[1](context)
+      }
+      break
+    default:
+      throw DbException('No matching backend type.')
+  }
+}
+
+/**
+ * Initializes state in this Vuex module.
+ *
+ */
+export async function initStoreProjectSubmit (context) {
+  await callDependingOnBackend(context, loadFireRefs)
+  await loadConfig(context)
+  await loadUserList(context)
+}
 
 /**
  * Sets up the Firebase reference getter. This should be called foremost before
  * setting or getting any Vuex state related to the db.
  *
- * Previous versions of this functions return true if there was an error
- * and false other wise. This has been removed on 7/22/2020 since the purpose
- * of those return values were unknown.
+ * Previous versions of this function found in other files returned true if
+ * there was no error and false if there was an error. This has been removed on
+ * 7/22/2020 since the purpose of those return values were unknown.
  *
- * @param {Object} context Exposes the same set of methods/properties on the
- *  store instance.
+ * @param {Object} context Exposes the same set of methods/properties as the
+ *   store instance.
  * @param {Object} context.commit Allows this action to commit mutations
  */
-export async function loadFireRefs ({ commit }) {
+async function loadFireRefs ({ commit }) {
   if (LocalStorage.has('boundless_db')) {
     const sessionDb = LocalStorage.getItem('boundless_db')
     commit('setIsTestingDb', sessionDb === 'testing')
@@ -65,20 +109,31 @@ export async function loadFireRefs ({ commit }) {
 }
 
 /**
-  * Load the config from the db.
-  * TODO: this should be replaced now that config/project
-  *       is cached in session
-  *
-  * Previous versions of this functions return true if there was an error
-  * and false other wise. This has been removed on 7/22/2020 since the purpose
-  * of those return values were unknown.
-  *
-  * @param {*} { commit, getters } Allows this action to
-  *  commit mutations and retrieve state.
-  */
-export async function loadConfig ({ commit, getters }) {
-  const doc = await getters.db.collection('config').doc('project').get()
+ * Load the config from the db.
+ *
+ * @param {Object} context Exposes the same set of methods/properties as the
+ *   store instance.
+ */
+async function loadConfig (context) {
+  await callDependingOnBackend(context, loadConfigFirebase)
+}
 
+/**
+ * Helper function for 'loadConfig' which uses Firebase as the backend.
+ * TODO: this should be replaced now that config/project
+ *       is cached in session
+ *
+ * Previous versions of this function found in other files returned true if
+ * there was no error and false if there was an error. This has been removed on
+ * 7/22/2020 since the purpose of those return values were unknown.
+ *
+ * @param {Object} context Exposes the same set of methods/properties as the
+ *   store instance.
+ * @param {Object} context.commit Allows this action to commit mutations
+ * @param {Object} context.getters Gives access to state.
+ */
+async function loadConfigFirebase ({ commit, getters }) {
+  const doc = await getters.db.collection('config').doc('project').get()
   if (doc.exists) {
     const data = doc.data()
     const keywordOptions = []
@@ -106,20 +161,29 @@ export async function loadConfig ({ commit, getters }) {
 }
 
 /**
-  * Load the user list from the db and store the data into component state.
-  *
-  * Previous versions of this functions return true if there was an error
-  * and false other wise. This has been removed on 7/22/2020 since the purpose
-  * of those return values were unknown.
-  *
-  * @param {Object} context Exposes the same set of methods/properties on the
-  *   store instance.
-  * @param {Object} context.commit Allows this action to commit mutations
-  * @param {Object} context.getters Gives access to state.
-  */
-export async function loadUserList ({ commit, getters }) {
-  const doc = await getters.db.collection('users').doc('ToC').get()
+ * Load the user list from the db and store the data into component state.
+ *
+ * @param {Object} context Exposes the same set of methods/properties as the
+ *   store instance.
+ */
+async function loadUserList (context) {
+  await callDependingOnBackend(context, loadUserListFirebase)
+}
 
+/**
+ * Helper function for 'loadUserList' which uses Firebase as the backend.
+ *
+ * Previous versions of this functions found in other files returned true if
+ * there was no error and false if there was an error. This has been removed on
+ * 7/22/2020 since the purpose of those return values were unknown.
+ *
+ * @param {Object} context Exposes the same set of methods/properties as the
+ *   store instance.
+ * @param {Object} context.commit Allows this action to commit mutations
+ * @param {Object} context.getters Gives access to state.
+ */
+async function loadUserListFirebase ({ commit, getters }) {
+  const doc = await getters.db.collection('users').doc('ToC').get()
   if (doc.exists) {
     const tocUserData = doc.data()
     const emailToUuidMap = {}
@@ -139,64 +203,88 @@ export async function loadUserList ({ commit, getters }) {
  * Submits the new users related to the project as the user submits
  * the project to the database.
  *
- * @param {Object} context Exposes the same set of methods/properties on the
+ * @param {Object} context Exposes the same set of methods/properties as the
+ *  store instance.
+ */
+export async function submitNewUsers (context) {
+  await callDependingOnBackend(context, submitNewUsersFirebase)
+}
+
+/**
+ * Helper function for 'submitNewUsers' which uses Firebase as the backend.
+ *
+ * @param {Object} context Exposes the same set of methods/properties as the
  *  store instance.
  * @param {Object} context.commit Allows this action to commit mutations
  * @param {Object} context.getters Gives access to state.
  */
-export async function submitNewUsers ({ commit, getters }) {
-  getters.projectMembers.forEach(async (member) => {
-    if (!(member.email in getters.emailToUuidMap)) {
+async function submitNewUsersFirebase ({ commit, getters }) {
+  /*
+  Cannot use Array.forEach with an async callback here, as it will not wait for the
+  first iteration to finish before moving onto the second one.
+  */
+  for (const member of getters.projectMembers) {
+    const email = member.email
+    if (!(email in getters.emailToUuidMap)) {
+      const name = member.name
       const timeOfSubmit = new Date(Date.now()).toISOString()
       const userDoc = getters.db.collection('users').doc()
       const uuid = userDoc.id
-
       let newUser = {
         uuid,
-        name: member.name,
-        email: member.email,
+        name,
+        email,
         title: '',
         imgURL: '',
         timestamp: timeOfSubmit,
         created: timeOfSubmit
       }
-
-      commit('addEntryToEmailToUuidMap', {
-        email: newUser.email,
-        uuid
-      })
-      commit('addEntryToEmailToNameMap', {
-        email: newUser.email,
-        name: newUser.name
-      })
-
       await getters.db.collection('users').doc(uuid).set({
         socialNetwork: {},
         projects: [],
         achievements: {}
       })
-
       await getters.db.collection('users').doc('ToC').set({
         [uuid]: newUser
       }, { merge: true })
+      commit('addEntryToEmailToUuidMap', {
+        email,
+        uuid
+      })
+      commit('addEntryToEmailToNameMap', {
+        email,
+        name
+      })
     }
-  })
+  }
 }
 
 /**
- * Submits the project to the database once all the required fields are checked.
+ * Submits the project to the database once all the required fields are checked
+ * externally.
+ *
  * Creates the new users who are not in the db, and notifies
  * the user on both success and failure.
  * Unlike most other fields, the project id, submission time and users list
- * are finalized in here instead of in ProjectMainForm.vue
+ * are finalized in here instead of in 'ProjectMainForm.vue'.
  *
- * @param {Object} context Exposes the same set of methods/properties on the
+ * @param {Object} context Exposes the same set of methods/properties as the
+ *  store instance.
+ */
+export async function submitProject (context) {
+  await callDependingOnBackend(context, submitProjectFirebase)
+}
+
+/**
+ * Helper function for 'submitProject' which uses Firebase as the backend.
+ *
+ * @param {Object} context Exposes the same set of methods/properties as the
  *  store instance.
  * @param {Object} context.commit Allows this action to commit mutations.
  * @param {Object} context.dispatch Used to call other actions.
  * @param {Object} context.getters Gives access to state.
  */
-export async function submitProject ({ commit, dispatch, getters }) {
+async function submitProjectFirebase ({ commit, dispatch, getters }) {
   await dispatch('submitNewUsers')
 
   const tmpMembers = []
@@ -224,13 +312,23 @@ export async function submitProject ({ commit, dispatch, getters }) {
 }
 
 /**
- * Save custom form responses under a field named 'createInfo'.
+ * Save custom form responses under a field named 'customFormResponse'.
  *
- * @param {Object} context Exposes the same set of methods/properties on the
+ * @param {Object} context Exposes the same set of methods/properties as the
+ *  store instance.
+ */
+export async function submitQuestions (context) {
+  await callDependingOnBackend(context, submitQuestionsFirebase)
+}
+
+/**
+ * Helper function for 'submitQuestions' which uses Firebase as the backend.
+ *
+ * @param {Object} context Exposes the same set of methods/properties as the
  *  store instance.
  * @param {Object} context.getters Gives access to state.
  */
-export async function submitQuestions ({ getters }) {
+async function submitQuestionsFirebase ({ getters }) {
   const uuid = getters.projectUuid
   const projectDoc = getters.db.collection('projects').doc(uuid)
   await projectDoc.update({
@@ -239,7 +337,28 @@ export async function submitQuestions ({ getters }) {
 }
 
 /**
- * Save questionTemplates to vuex and Firestore.
+ * Save questionTemplates to Vuex and the database.
+ *
+ * Since the helper function 'submitQuestionTemplatesFirebase' has two arguments
+ * instead of one and 'callDependingOnBackend' on works with functions with one
+ * argument, 'submitQuestionTemplatesFirebase' is converted to a one argument
+ * function.
+ *
+ * @param {Object} context Exposes the same set of methods/properties as the
+ *  store instance.
+ * @param {Array<Object>} questionTemplates The new state of questionTemplates.
+ */
+export async function submitQuestionTemplates (context, questionTemplates) {
+  function submitFirebaseQuestionsBound (context) {
+    return submitQuestionTemplatesFirebase(context, questionTemplates)
+  }
+  await callDependingOnBackend(context, submitFirebaseQuestionsBound)
+}
+
+/**
+ * Helper function for 'submitQuestionTemplates' which uses Firebase as the
+ * backend. Unlike most other helper functions in 'actions.js', this helper
+ * has two arguments instead of one.
  *
  * @param {Object} context Exposes the same set of methods/properties on the
  *  store instance.
@@ -247,7 +366,7 @@ export async function submitQuestions ({ getters }) {
  * @param {Object} context.getters Gives access to state.
  * @param {Array<Object>} questionTemplates The new state of questionTemplates.
  */
-export async function submitQuestionTemplates ({ commit, getters }, questionTemplates) {
+async function submitQuestionTemplatesFirebase ({ commit, getters }, questionTemplates) {
   await getters.db.collection('config')
     .doc('project')
     .set({
@@ -259,7 +378,27 @@ export async function submitQuestionTemplates ({ commit, getters }, questionTemp
 }
 
 /**
- * Save customFormEnabled to vuex and Firestore.
+ * Save customFormEnabled to Vuex and the database. Converts
+ * 'submitCustomFormEnabledFirebase' into a one argument function before calling
+ * since 'callDependingOnBackend' only works with one argument functions.
+ *
+ * @param {Object} context Exposes the same set of methods/properties as the
+ *  store instance.
+ * @param {Object} context.commit Allows this action to commit mutations
+ * @param {Object} context.getters Gives access to state.
+ * @param {Array<Object>} questionTemplates The new state of questionTemplates.
+ */
+export async function submitCustomFormEnabled (context, customFormEnabled) {
+  function submitFirebaseCustomFormEnabledBound (context) {
+    return submitCustomFormEnabledFirebase(context, customFormEnabled)
+  }
+  await callDependingOnBackend(context, submitFirebaseCustomFormEnabledBound)
+}
+
+/**
+ * Helper function for 'submitCustomFormEnabled' which uses Firebase as the
+ * backend. Unlike most other helper functions in 'actions.js', this helper
+ * has two arguments instead of one.
  *
  * @param {Object} context Exposes the same set of methods/properties on the
  *  store instance.
@@ -267,7 +406,7 @@ export async function submitQuestionTemplates ({ commit, getters }, questionTemp
  * @param {Object} context.getters Gives access to state.
  * @param {Array<Object>} questionTemplates The new state of questionTemplates.
  */
-export async function submitCustomFormEnabled ({ commit, getters }, customFormEnabled) {
+async function submitCustomFormEnabledFirebase ({ commit, getters }, customFormEnabled) {
   await getters.db.collection('config')
     .doc('project')
     .set({
@@ -279,9 +418,9 @@ export async function submitCustomFormEnabled ({ commit, getters }, customFormEn
 }
 
 /**
- * Helper function which resets the vuex store to the initial state.
+ * Resets the vuex store to the initial state.
  *
- * @param {Object} context Exposes the same set of methods/properties on the
+ * @param {Object} context Exposes the same set of methods/properties as the
  *  store instance.
  * @param {Object} context.commit Allows this action to commit mutations
  */

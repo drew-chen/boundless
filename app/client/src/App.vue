@@ -36,15 +36,11 @@ export default {
    * by Vue's errorHandler, which needs the Vue instance.
    */
   async mounted () {
-    await this.loadFireRefs()
-    await this.loadConfig()
-    await this.loadUserList()
+    await this.initStoreProjectSubmit()
   },
   methods: {
     ...mapActions([
-      'loadFireRefs',
-      'loadConfig',
-      'loadUserList'
+      'initStoreProjectSubmit'
     ])
   }
 }
