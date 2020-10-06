@@ -40,7 +40,7 @@ Methods:
         <p class="q-mb-xl">
           Submit a problem or challenge (an itch)  you would like solve or explore (scratch).
         </p>
-        <q-separator class="newLine2" />
+        <q-separator />
         <!-- -------------------- Project Name -------------------- -->
         <q-input
           filled lazy-rules clearable
@@ -79,7 +79,7 @@ Methods:
           </template>
         </q-input>
 
-        <q-separator class="newLine2" />
+        <q-separator />
 
         <!--  -------------------- Keywords -------------------- -->
         <div class="row q-pa-sm" align="left">
@@ -93,7 +93,7 @@ Methods:
           />
         </div>
 
-        <q-separator class="newLine2" />
+        <q-separator />
 
         <!-- -------------------- Team Member -------------------- -->
         <div>
@@ -175,7 +175,7 @@ Methods:
 
         <!-- -------------------- Admin Mode -------------------- -->
         <div :hidden="!adminMode">
-          <q-separator class="newLine2" />
+          <q-separator />
           <!-- -------------------- Chips -------------------- -->
           <div>
             <div class="row" align="left">

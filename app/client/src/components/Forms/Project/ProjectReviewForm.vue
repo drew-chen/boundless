@@ -54,7 +54,7 @@ Methods:
         </template>
       </q-input>
 
-      <hr class="newLine2">
+      <q-separator />
 
       <div class="row q-pa-sm" align="left">
         <p class="col-4 header">Keywords:</p>
@@ -67,7 +67,7 @@ Methods:
         />
       </div>
 
-      <hr class="newLine2">
+      <q-separator />
 
       <div>
         <div class="row">
@@ -122,6 +122,8 @@ Methods:
             v-for="question in customFormResponse"
             :key="question.label"
           >
+            <q-separator />
+
             <q-input
               borderless readonly stack-label
               class="q-mt-sm"
@@ -130,6 +132,9 @@ Methods:
               :value="question.response"
             />
           </div>
+
+          <q-separator />
+
         </div>
         <div v-else>
           <p>(No custom form questions for this project.)</p>
