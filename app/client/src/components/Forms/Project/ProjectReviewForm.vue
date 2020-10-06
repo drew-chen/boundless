@@ -38,7 +38,7 @@ Methods:
         :value="projectName"
       >
         <template v-slot:prepend>
-          <q-icon name="fas fa-project-diagram" />
+          <q-icon class="q-mr-sm" name="fas fa-project-diagram" />
         </template>
       </q-input>
 

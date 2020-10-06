@@ -399,7 +399,6 @@ export default {
           align: 'center',
           label: 'Lead(s)',
           field: row => this.displayMembers(row.members),
-          sortable: true,
           headerClasses: 'lead-members-col',
           classes: 'lead-members-col'
         },
@@ -609,77 +608,68 @@ export default {
         throw error
       }
     },
+    /**
+     * load the config from the db
+     * TODO: this should be replaced since config/project is cached in session
+     */
     loadConfig: async function () {
-      /**
-       * load the config from the db
-       * TODO: this should be replaced since config/project is cached in session
-       * @param {void}
-       * @return {Promise<Boolean>}
-       */
+      let doc = await this.db.collection('config').doc('project').get()
+      if (doc.exists) {
+        let data = doc.data()
 
-      try {
-        let doc = await this.db.collection('config').doc('project').get()
-        if (doc.exists) {
-          let data = doc.data()
+        // extracting keywords for the banner and dropdown filter
+        // non-sorted to maintain order for now
+        // let cachedKeywords = data.projectsConfig.keywords.sort()
+        // let cachedKeywords = data.projectsConfig.keywords
 
-          // extracting keywords for the banner and dropdown filter
-          // non-sorted to maintain order for now
-          // let cachedKeywords = data.projectsConfig.keywords.sort()
-          // let cachedKeywords = data.projectsConfig.keywords
+        for (let key in data['keywords']) {
+          this.popkeywords.push({
+            label: key,
+            value: data['keywords'][key]
+          })
 
-          for (let key in data['keywords']) {
-            this.popkeywords.push({
-              label: key,
-              value: data['keywords'][key]
-            })
+          this.keywordsValToKeyMap[data['keywords'][key]] = key
 
-            this.keywordsValToKeyMap[data['keywords'][key]] = key
+          // if (
+          //   !cachedKeywords.includes(data['keywords'][key]) &&
+          //   cachedKeywords.length < 5
+          // ) {
+          //   cachedKeywords.push(data['keywords'][key])
+          // }
+        }
+        // this.keywordsInUse = cachedKeywords
+        this.keywordsInUse = data.projectsConfig.keywords
 
-            // if (
-            //   !cachedKeywords.includes(data['keywords'][key]) &&
-            //   cachedKeywords.length < 5
-            // ) {
-            //   cachedKeywords.push(data['keywords'][key])
-            // }
-          }
-          // this.keywordsInUse = cachedKeywords
-          this.keywordsInUse = data.projectsConfig.keywords
+        // make sure the database response has extraKeywordsData
+        if (data.extraKeywordsData) {
+          // loading the image url from extraKeywordsData
+          let key = ''
+          for (let prop in data.extraKeywordsData) {
+            key = prop.toLowerCase()
 
-          // make sure the database response has extraKeywordsData
-          if (data.extraKeywordsData) {
-            // loading the image url from extraKeywordsData
-            let key = ''
-            for (let prop in data.extraKeywordsData) {
-              key = prop.toLowerCase()
-
-              try {
-                this.keywordsImage[key] = await this.storage.ref().child(
-                  data.extraKeywordsData[prop]
-                ).getDownloadURL()
-              } catch (error) {
-                if (isFirebaseError(error, 'storage/object-not-found')) {
-                  console.error(error)
-                  this.keywordsImage[key] = '../statics/images/other-icon.png'
-                } else {
-                  throw error
-                }
+            try {
+              this.keywordsImage[key] = await this.storage.ref().child(
+                data.extraKeywordsData[prop]
+              ).getDownloadURL()
+            } catch (error) {
+              if (isFirebaseError(error, 'storage/object-not-found')) {
+                console.error(error)
+                this.keywordsImage[key] = '../statics/images/other-icon.png'
+              } else {
+                throw error
               }
             }
           }
-
-          if (typeof data['pagination'] === 'number') {
-            this.pagination.rowsPerPage = data['pagination']
-          }
-          let expireDate = data.newFlag * 24 * 60 * 60 * 1000
-          this.todayDate = new Date(Date.now() - expireDate)
-          this.todayDate = this.todayDate.toISOString().substring(0, 10)
-
-          return true
-        } else {
-          throw new Error('File not found!')
         }
-      } catch (error) {
-        throw error
+
+        if (typeof data['pagination'] === 'number') {
+          this.pagination.rowsPerPage = data['pagination']
+        }
+        let expireDate = data.newFlag * 24 * 60 * 60 * 1000
+        this.todayDate = new Date(Date.now() - expireDate)
+        this.todayDate = this.todayDate.toISOString().substring(0, 10)
+      } else {
+        throw new Error('File not found!')
       }
     },
     gettingCount: function () {
