@@ -33,17 +33,17 @@ Methods:
       <h6>Main info</h6>
 
       <q-input
-        filled readonly stack-label
+        borderless readonly stack-label
         label="Project Name"
         :value="projectName"
       >
         <template v-slot:prepend>
-          <q-icon name="fas fa-project-diagram" />
+          <q-icon class="q-mr-sm" name="fas fa-project-diagram" />
         </template>
       </q-input>
 
       <q-input
-        filled autogrow readonly stack-label
+        borderless autogrow readonly stack-label
         class="q-my-sm"
         label="Description/Overview"
         type="textarea"
@@ -54,7 +54,7 @@ Methods:
         </template>
       </q-input>
 
-      <hr class="newLine2">
+      <q-separator color="grey-5" />
 
       <div class="row q-pa-sm" align="left">
         <p class="col-4 header">Keywords:</p>
@@ -67,7 +67,7 @@ Methods:
         />
       </div>
 
-      <hr class="newLine2">
+      <q-separator color="grey-5" />
 
       <div>
         <div class="row">
@@ -79,11 +79,11 @@ Methods:
         <div
           v-for="(member, index) in projectMembers"
           :key="index"
-          class="row q-mb-xs"
+          class="row q-col-gutter-y-sm items-center"
         >
           <q-input
-            filled readonly stack-label
-            class="col q-pr-xs"
+            borderless readonly stack-label
+            class="col-5 q-pr-xs"
             label="Contributor's Email" type="email"
             :value="projectMembers[index].email"
           >
@@ -93,8 +93,8 @@ Methods:
           </q-input>
 
           <q-input
-            filled readonly stack-label
-            class="col q-pl-xs"
+            borderless readonly stack-label
+            class="col-3 q-pl-xs"
             label="Contributor's Full Name"
             :value="projectMembers[index].name"
           >
@@ -103,17 +103,10 @@ Methods:
             </template>
           </q-input>
 
-          <div class="col-1">
-            <q-card flat align="center">
+          <div class="col"
+              v-if="projectMembers[index].role == 'lead'"
+          >
               Lead
-              <q-toggle
-                disable
-                color="secondary"
-                true-value="lead"
-                false-value="member"
-                :value="projectMembers[index].role"
-              />
-            </q-card>
           </div>
         </div>
       </div>
@@ -129,14 +122,19 @@ Methods:
             v-for="question in customFormResponse"
             :key="question.label"
           >
+            <q-separator color="grey-5" />
+
             <q-input
-              filled readonly stack-label
+              borderless readonly stack-label
               class="q-mt-sm"
               :label="question.label"
               :type="question.type.value"
               :value="question.response"
             />
           </div>
+
+          <q-separator color="grey-5" />
+
         </div>
         <div v-else>
           <p>(No custom form questions for this project.)</p>
