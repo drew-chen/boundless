@@ -424,13 +424,23 @@ export default {
         }
       }
     },
+    async loadRowsByDate (ascending) {
+      const docRef = await this.db.collection(`${this.rowType}s`).doc('ToC')
+      let docs
+      if (ascending) {
+        docs = await docRef.orderBy('created').limit(3).get()
+      } else {
+        docs = await docRef.orderBy('created', 'desc').get()
+      }
+      return docs
+    },
     /**
      * Load all the projects, challenges, or users from the ToC for the admin
      * console.
      */
     loadAllRows: async function () {
       try {
-        const doc = await this.db.collection(`${this.rowType}s`).doc('ToC').get()
+        const doc = this.loadRowsByDate(true)
 
         if (doc.exists) {
           const tocAllRowData = doc.data()
