@@ -1494,7 +1494,10 @@ Methods:
                     :customFormEnabled="true"
                   />
                   <!-- Export custom form as markdown -->
-                  <div class="col">
+                  <div
+                    v-if="hasCustomFormResponse"
+                    class="col"
+                  >
                     <q-btn no-caps
                       class="q-ma-sm"
                       label="Copy additional responses"
@@ -1503,7 +1506,6 @@ Methods:
                     />
                     <!-- Delete custom form response if present. -->
                     <q-btn no-caps
-                      v-if="hasCustomFormResponse"
                       class="q-my-sm"
                       label="Delete additional responses"
                       color="secondary"
