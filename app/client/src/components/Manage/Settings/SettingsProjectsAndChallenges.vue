@@ -958,7 +958,7 @@ export default {
     openResetDialog () {
       this.$q.dialog({
         title: 'Confirm',
-        message: 'Would you like undo all unsaved changes?',
+        message: 'Undo all unsaved changes?',
         cancel: true
       }).onOk(() => {
         this.reset()
