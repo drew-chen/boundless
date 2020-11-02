@@ -1494,12 +1494,21 @@ Methods:
                     :customFormEnabled="true"
                   />
                   <!-- Export custom form as markdown -->
-                  <q-btn no-caps
-                    class="col q-my-sm"
-                    label="Copy additional questions"
-                    color="accent"
-                    @click="exportCustomFormResponse"
-                  />
+                  <div class="col">
+                    <q-btn no-caps
+                      class="q-ma-sm"
+                      label="Copy additional responses"
+                      color="accent"
+                      @click="exportCustomFormResponse"
+                    />
+                    <!-- Delete custom form response. -->
+                    <q-btn no-caps
+                      class="q-my-sm"
+                      label="Delete additional responses"
+                      color="secondary"
+                      @click="deleteCustomFormResponse"
+                    />
+                  </div>
                 </div>
               </q-tab-panel>
             </q-tab-panels>
@@ -3084,7 +3093,7 @@ export default {
       window.open(url, '_blank', 'noopener')
     },
     /**
-     * helper function to display notfiy
+     * helper function to display notify
      * @return {String}
      */
     notifyError: function () {
@@ -3095,6 +3104,7 @@ export default {
       })
       return ''
     },
+    /** Exports custom form questions and responses as markdown and saves the the user's clipboard. */
     exportCustomFormResponse () {
       const customFormResponse = this.curData.customFormResponse || []
       let markdownStr = '## Additional Q&A\n\n'
@@ -3105,6 +3115,20 @@ export default {
       this.copyTextToClipboard(markdownStr)
       this.$q.notify({
         message: 'Additional questions and responses have been copied.',
+        type: 'positive',
+        timeout: 2000
+      })
+    },
+    /** Delte the custom form response field. */
+    async deleteCustomFormResponse () {
+      // Create a document reference
+      const projectRef = this.db.collection('projects').doc(this.curData.uuid)
+
+      await projectRef.update({
+        customFormResponse: firebase.firestore.FieldValue.delete()
+      })
+      this.$q.notify({
+        message: 'Additional questions and responses have been deleted.',
         type: 'positive',
         timeout: 2000
       })
