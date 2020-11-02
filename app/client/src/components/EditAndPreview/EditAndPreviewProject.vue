@@ -1844,6 +1844,7 @@ Methods:
 import firebase from 'firebase/app'
 import 'firebase/firestore'
 import { cloneDeep, isEmpty } from 'lodash'
+import Vue from 'vue'
 
 import productionDb, { productionStorage } from '../../firebase/init_production'
 import testingDb, { testingStorage } from '../../firebase/init_testing'
@@ -3138,6 +3139,7 @@ export default {
           await projectRef.update({
             customFormResponse: firebase.firestore.FieldValue.delete()
           })
+          Vue.set(this.curData, 'customFormResponse', [])
 
           this.$q.notify({
             message: 'Additional questions and responses have been deleted.',
