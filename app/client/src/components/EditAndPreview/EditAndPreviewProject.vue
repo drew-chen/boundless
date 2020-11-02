@@ -1501,8 +1501,9 @@ Methods:
                       color="accent"
                       @click="exportCustomFormResponse"
                     />
-                    <!-- Delete custom form response. -->
+                    <!-- Delete custom form response if present. -->
                     <q-btn no-caps
+                      v-if="hasCustomFormResponse"
                       class="q-my-sm"
                       label="Delete additional responses"
                       color="secondary"
@@ -1895,6 +1896,10 @@ export default {
      */
     isExportCustomFormBtnDisabled () {
       return isEmpty(this.curData) || isEmpty(this.curData.customFormResponse)
+    },
+    /** Whether this project has custom form questions. */
+    hasCustomFormResponse () {
+      return this.curData.customFormResponse && this.curData.customFormResponse.length > 0
     }
   },
   data () {
@@ -3121,17 +3126,26 @@ export default {
     },
     /** Delte the custom form response field. */
     async deleteCustomFormResponse () {
-      // Create a document reference
-      const projectRef = this.db.collection('projects').doc(this.curData.uuid)
+      if (this.hasCustomFormResponse) {
+        this.$q.dialog({
+          title: 'Confirm',
+          message: 'Delete custom form questions and responses?',
+          cancel: true
+        }).onOk(async () => {
+          // Create a document reference
+          const projectRef = this.db.collection('projects').doc(this.curData.uuid)
 
-      await projectRef.update({
-        customFormResponse: firebase.firestore.FieldValue.delete()
-      })
-      this.$q.notify({
-        message: 'Additional questions and responses have been deleted.',
-        type: 'positive',
-        timeout: 2000
-      })
+          await projectRef.update({
+            customFormResponse: firebase.firestore.FieldValue.delete()
+          })
+
+          this.$q.notify({
+            message: 'Additional questions and responses have been deleted.',
+            type: 'positive',
+            timeout: 2000
+          })
+        })
+      }
     }
   }
 }
