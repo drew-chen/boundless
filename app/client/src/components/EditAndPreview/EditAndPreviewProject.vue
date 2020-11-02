@@ -1500,14 +1500,14 @@ Methods:
                   >
                     <q-btn no-caps
                       class="q-ma-sm"
-                      label="Copy additional responses"
+                      label="Copy additional questions"
                       color="accent"
                       @click="exportCustomFormResponse"
                     />
                     <!-- Delete custom form response if present. -->
                     <q-btn no-caps
                       class="q-my-sm"
-                      label="Delete additional responses"
+                      label="Delete additional questions"
                       color="secondary"
                       @click="deleteCustomFormResponse"
                     />
