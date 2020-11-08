@@ -1,3 +1,5 @@
+import callDependingOnBackend from '../../store/callDependingOnBackend'
+
 /**
  * Initializes state in this Vuex module.
  *
@@ -5,9 +7,7 @@
  *   store instance.
  */
 export async function initStoreProjectSubmit (context) {
-  await callDependingOnBackend(context, loadFireRefs)
-  await loadConfig(context)
-  await loadUserList(context)
+  callDependingOnBackend(context, loadUserListFirebase)
 }
 
 /**
