@@ -296,6 +296,9 @@ import isFirebaseError from '../../src/errors/isFirebaseError'
 
 import productionDb, { productionStorage } from '../firebase/init_production'
 import testingDb, { testingStorage } from '../firebase/init_testing'
+import { createNamespacedHelpers } from 'vuex'
+// Ensures mapActions and mapGetters can only use the 'store/project-submit' module.
+const { mapActions, mapGetters } = createNamespacedHelpers('projectSubmit')
 
 import Banner from '../components/Banners/Banner'
 import ProgressBar from '../components/ProgressBar'
@@ -304,6 +307,11 @@ export default {
   components: {
     Banner,
     ProgressBar
+  },
+  computed: {
+    ...mapGetters([
+      'tocPromise'
+    ])
   },
   async created () {
     try {
@@ -417,6 +425,9 @@ export default {
     }
   },
   methods: {
+    ...mapActions([
+      'loadTocPromise'
+    ]),
     loadProgressBarConf: function () {
       /**
        * loads progress bar configuration from session cache
@@ -553,9 +564,13 @@ export default {
        */
 
       try {
-        let tocRef = this.db.collection('projects').doc('ToC')
-        let doc = await tocRef.get()
-        if (doc.exists) {
+        let doc
+        if (this.tocPromise === undefined) {
+          // tocPromise is undefined when the /project route is navigated to directly.
+          this.loadTocPromise()
+        }
+        doc = await this.tocPromise
+        if (doc && doc.exists) {
           for (let project in doc.data()) {
             if (project !== 'alias') {
               if (!doc.data()[project].hidden) {

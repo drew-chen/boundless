@@ -70,7 +70,7 @@ export async function initStoreProjectSubmit (context) {
   await callDependingOnBackend(context, loadFireRefs)
   await loadConfig(context)
   await loadUserList(context)
-  loadToC(context)
+  loadTocPromise(context)
 }
 
 /**
@@ -450,7 +450,7 @@ export function resetProject ({ commit }) {
   })
 }
 
-async function loadToC ({ commit, getters }) {
-  const ToC = getters.db.collection('projects').doc('ToC').get()
-  commit('setTocPromise', ToC)
+async function loadTocPromise ({ commit, getters }) {
+  const tocPromise = getters.db.collection('projects').doc('ToC').get()
+  commit('setTocPromise', tocPromise)
 }
