@@ -43,14 +43,14 @@ export default async function callDependingOnBackend (context, ...action) {
       if (action[0]) {
         await action[0](context)
       } else {
-        throw DbException('Method for this backend is not implemented.')
+        throw DbException('Method for this backend is not given.')
       }
       break
     case backendEnum.CUSTOM:
       if (action[1]) {
         await action[1](context)
       } else {
-        throw DbException('Method for this backend is not implemented.')
+        throw DbException('Method for this backend is not given.')
       }
       break
     default:

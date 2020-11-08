@@ -61,5 +61,5 @@ async function loadProjectTocPromise ({ commit, getters }) {
  */
 async function loadUserTocPromise ({ commit, getters }) {
   const tocPromise = getters.db.collection('users').doc('ToC').get()
-  commit('setProjectTocPromise', tocPromise)
+  commit('setUserTocPromise', tocPromise)
 }

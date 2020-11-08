@@ -31,9 +31,9 @@ will change as soon as data is fetched from the database (see 'actions.js').
 export default function () {
   return {
     project: {
-      uuid: null, // <String> Uuid is assigned upon submission in action.
-      project: '', // <String> The name of the project.
-      description: '', // <String> Description of project.
+      uuid: null, // <String>: Uuid is assigned upon submission in action.
+      project: '', // <String>: The name of the project.
+      description: '', // <String>: Description of project.
       members: [], // <Array<Object>>: Exact members submitted to the database.
       keywords: [], // <Array<Object>>: Chosen subset of keywordOptions
       timestamp: null, // <Object>: Date object set in submitProject action, not component.
@@ -84,7 +84,6 @@ export default function () {
     <Boolean>: Whether custom forms are used during project creation.
     This also disables the editing of custom forms.
     */
-    customFormEnabled: false,
-    tocPromise: undefined
+    customFormEnabled: false
   }
 }
