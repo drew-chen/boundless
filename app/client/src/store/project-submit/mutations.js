@@ -92,8 +92,9 @@ export function setCustomFormEnabled (state, customFormEnabled) {
   Vue.set(state, 'customFormEnabled', customFormEnabled)
 }
 
-export function setTocPromise (state, ToC) {
-  Vue.set(state, 'tocPromise', ToC)
+export function setTocPromise (state, tocPromise) {
+  // No need to be reactive.
+  state.tocPromise = tocPromise
 }
 
 export function addEntryToEmailToUuidMap (state, { email, uuid }) {

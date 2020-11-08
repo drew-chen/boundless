@@ -314,19 +314,15 @@ export default {
     ])
   },
   async created () {
-    try {
-      // fetches data from database
-      await this.loadFireRefs()
-      await this.loadConfig()
-      await this.loadProjectList()
-      this.loadProgressBarConf()
+    // fetches data from database
+    await this.loadFireRefs()
+    await this.loadConfig()
+    await this.loadProjectList()
+    this.loadProgressBarConf()
 
-      this.keywordsInUse = this.keywordsInUse.filter(
-        v => v in this.keywordsValToKeyMap
-      )
-    } catch (error) {
-      throw error
-    }
+    this.keywordsInUse = this.keywordsInUse.filter(
+      v => v in this.keywordsValToKeyMap
+    )
   },
   beforeUpdate () {
     this.loadProgressBarConf()
@@ -565,10 +561,6 @@ export default {
 
       try {
         let doc
-        if (this.tocPromise === undefined) {
-          // tocPromise is undefined when the /project route is navigated to directly.
-          this.loadTocPromise()
-        }
         doc = await this.tocPromise
         if (doc && doc.exists) {
           for (let project in doc.data()) {
