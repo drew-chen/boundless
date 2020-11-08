@@ -32,6 +32,10 @@ export function setProjectTocPromise (state, tocPromise) {
   state.projectTocPromise = tocPromise
 }
 
+export function setProjectConfig (state, projectConfigPromise) {
+  state.projectConfigPromise = projectConfigPromise
+}
+
 export function setUserTocPromise (state, tocPromise) {
   state.userTocPromise = tocPromise
 }

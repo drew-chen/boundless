@@ -36,6 +36,7 @@ import callDependingOnBackend from '../../store/callDependingOnBackend'
 export async function initStoreProjectSubmit (context) {
   callDependingOnBackend(context, loadProjectTocPromise)
   callDependingOnBackend(context, loadUserTocPromise)
+  callDependingOnBackend(context, loadProjectConfigPromise)
 }
 
 /**
@@ -49,6 +50,19 @@ export async function initStoreProjectSubmit (context) {
 async function loadProjectTocPromise ({ commit, getters }) {
   const tocPromise = getters.db.collection('projects').doc('ToC').get()
   commit('setProjectTocPromise', tocPromise)
+}
+
+/**
+ * Loads the config document for projects.
+ *
+ * @param {Object} context Exposes the same set of methods/properties as the
+ *   store instance.
+ * @param {Object} context.commit Allows this action to commit mutations
+ * @param {Object} context.getters Gives access to state.
+ */
+async function loadProjectConfigPromise ({ commit, getters }) {
+  const tocPromise = getters.db.collection('config').doc('project').get()
+  commit('setProjectConfigPromise', tocPromise)
 }
 
 /**

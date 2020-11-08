@@ -27,6 +27,10 @@ export function projectTocPromise (state) {
   return state.projectTocPromise
 }
 
+export function projectConfigPromise (state) {
+  return state.projectConfigPromise
+}
+
 export function userTocPromise (state) {
   return state.userTocPromise
 }

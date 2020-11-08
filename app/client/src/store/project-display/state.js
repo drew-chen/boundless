@@ -17,7 +17,8 @@ Methods:  References to the database ie, Firebase, are stored here.
 
 export default function () {
   return {
-    projectTocPromise: null, // <Promise> Resolving this yields the project ToC document.
-    userTocPromise: null // <Promise> Resolving this yields the user ToC document.
+    projectTocPromise: null, // <Promise>: Resolving this yields the project ToC document.
+    userTocPromise: null, // <Promise>: Resolving this yields the user ToC document.
+    projectConfigPromise: null // <Promise>: Resolving gives project config document.
   }
 }
