@@ -85,6 +85,6 @@ export default function () {
     This also disables the editing of custom forms.
     */
     customFormEnabled: false,
-    ToC: null
+    tocPromise: null
   }
 }

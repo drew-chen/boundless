@@ -107,3 +107,7 @@ export function questionTemplates (state) {
 export function customFormEnabled (state) {
   return state.customFormEnabled
 }
+
+export function tocPromise (state) {
+  return state.tocPromise
+}

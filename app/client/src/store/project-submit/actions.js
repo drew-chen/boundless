@@ -451,6 +451,6 @@ export function resetProject ({ commit }) {
 }
 
 async function loadToC ({ commit, getters }) {
-  const ToC = await getters.db.collection('projects').doc('ToC').get()
-  commit('setToC', ToC)
+  const ToC = getters.db.collection('projects').doc('ToC').get()
+  commit('setTocPromise', ToC)
 }
