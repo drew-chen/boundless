@@ -20,8 +20,9 @@ Purpose:
 
 Methods:
 
-  Using the database reference from project-submit, various calls to the database
-  are made. These calls are stored in the state.
+  Using the database reference from project-submit (see rootGetters),
+  various calls to the database are made. These calls are stored in this
+  module's state.
 
 ## */
 
@@ -45,10 +46,11 @@ export async function initStoreProjectSubmit (context) {
  * @param {Object} context Exposes the same set of methods/properties as the
  *   store instance.
  * @param {Object} context.commit Allows this action to commit mutations
- * @param {Object} context.getters Gives access to state.
+ * @param {Object} context.rootGetters Gives access to state.
  */
-async function loadProjectTocPromise ({ commit, getters }) {
-  const tocPromise = getters.db.collection('projects').doc('ToC').get()
+async function loadProjectTocPromise ({ commit, rootGetters }) {
+  const tocPromise = rootGetters['project-submit/db']
+    .collection('projects').doc('ToC').get()
   commit('setProjectTocPromise', tocPromise)
 }
 
@@ -58,10 +60,11 @@ async function loadProjectTocPromise ({ commit, getters }) {
  * @param {Object} context Exposes the same set of methods/properties as the
  *   store instance.
  * @param {Object} context.commit Allows this action to commit mutations
- * @param {Object} context.getters Gives access to state.
+ * @param {Object} context.rootGetters Gives access to state for all modules.
  */
-async function loadProjectConfigPromise ({ commit, getters }) {
-  const tocPromise = getters.db.collection('config').doc('project').get()
+async function loadProjectConfigPromise ({ commit, rootGetters }) {
+  const tocPromise = rootGetters['project-submit/db']
+    .collection('config').doc('project').get()
   commit('setProjectConfigPromise', tocPromise)
 }
 
@@ -71,9 +74,10 @@ async function loadProjectConfigPromise ({ commit, getters }) {
  * @param {Object} context Exposes the same set of methods/properties as the
  *   store instance.
  * @param {Object} context.commit Allows this action to commit mutations
- * @param {Object} context.getters Gives access to state.
+ * @param {Object} context.rootGetters Gives access to state for all modules.
  */
-async function loadUserTocPromise ({ commit, getters }) {
-  const tocPromise = getters.db.collection('users').doc('ToC').get()
+async function loadUserTocPromise ({ commit, rootGetters }) {
+  const tocPromise = rootGetters['project-submit/db']
+    .collection('users').doc('ToC').get()
   commit('setUserTocPromise', tocPromise)
 }
