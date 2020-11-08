@@ -557,7 +557,7 @@ Methods:
 </template>
 
 <script>
-import deepClone from 'lodash.clonedeep'
+import cloneDeep from 'lodash/clonedeep'
 import Vue from 'vue'
 import isFirebaseError from '../../../errors/isFirebaseError'
 import { defaultImages } from '../../../../../client/boundless.config'
@@ -636,7 +636,7 @@ export default {
     await this.storageUrlFetcher('webpage', 'bannerImg')
     await this.storageUrlFetcher('webpage', 'mainImg')
 
-    this.dbData = deepClone(this.data)
+    this.dbData = cloneDeep(this.data)
   },
   data () {
     return {
@@ -921,7 +921,7 @@ export default {
         if (this.type === 'projects') {
           this.$refs.projectCreateCustomForm.submit()
         }
-        this.dbData = deepClone(this.data)
+        this.dbData = cloneDeep(this.data)
         this.updated = false
         this.$emit('submitting', false)
         this.$emit('submitted', this.data)
@@ -970,7 +970,7 @@ export default {
         if (this.type === 'projects') {
           this.$refs.projectCreateCustomForm.reset()
         }
-        Vue.set(this.$data, 'data', deepClone(this.dbData))
+        Vue.set(this.$data, 'data', cloneDeep(this.dbData))
         this.updated = false
       }
     },
