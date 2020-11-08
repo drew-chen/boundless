@@ -92,6 +92,10 @@ export function setCustomFormEnabled (state, customFormEnabled) {
   Vue.set(state, 'customFormEnabled', customFormEnabled)
 }
 
+export function setToC (state, ToC) {
+  Vue.set(state, 'ToC', ToC)
+}
+
 export function addEntryToEmailToUuidMap (state, { email, uuid }) {
   Vue.set(state.emailToUuidMap, email, uuid)
 }

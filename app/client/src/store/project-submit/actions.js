@@ -70,6 +70,7 @@ export async function initStoreProjectSubmit (context) {
   await callDependingOnBackend(context, loadFireRefs)
   await loadConfig(context)
   await loadUserList(context)
+  loadToC(context)
 }
 
 /**
@@ -447,4 +448,9 @@ export function resetProject ({ commit }) {
     chips: [],
     body: []
   })
+}
+
+async function loadToC ({ commit, getters }) {
+  const ToC = await getters.db.collection('projects').doc('ToC').get()
+  commit('setToC', ToC)
 }

@@ -84,6 +84,7 @@ export default function () {
     <Boolean>: Whether custom forms are used during project creation.
     This also disables the editing of custom forms.
     */
-    customFormEnabled: false
+    customFormEnabled: false,
+    ToC: null
   }
 }

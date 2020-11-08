@@ -36,7 +36,7 @@ export default {
    * by Vue's errorHandler, which needs the Vue instance.
    */
   async mounted () {
-    await this.initStoreProjectSubmit()
+    this.initStoreProjectSubmit()
   },
   methods: {
     ...mapActions([
