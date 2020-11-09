@@ -294,8 +294,8 @@ Methods:
 import { defaultImages } from '../../boundless.config'
 import isFirebaseError from '../../src/errors/isFirebaseError'
 
-import productionDb, { productionStorage } from '../firebase/init_production'
-import testingDb, { testingStorage } from '../firebase/init_testing'
+import { productionStorage } from '../firebase/init_production'
+import { testingStorage } from '../firebase/init_testing'
 import { createNamespacedHelpers } from 'vuex'
 // Ensures mapActions and mapGetters can only use the 'store/project-submit' module.
 const { mapGetters } = createNamespacedHelpers('projectDisplay')
@@ -451,24 +451,20 @@ export default {
         let sessionDb = this.$q.localStorage.getItem('boundless_db')
 
         if (sessionDb === 'testing') {
-          this.db = testingDb
           this.storage = testingStorage
         } else {
-          this.db = productionDb
           this.storage = productionStorage
         }
 
         return true
       } else {
         try {
-          let doc = await productionDb.collection('config').doc('project').get()
+          let doc = await this.projectConfigPromise
           if (doc.exists) {
             if (doc.data().db === 'testing') {
-              this.db = testingDb
               this.storage = testingStorage
               this.$q.localStorage.set('boundless_db', 'testing')
             } else {
-              this.db = productionDb
               this.storage = productionStorage
               this.$q.localStorage.set('boundless_db', 'production')
             }
@@ -478,7 +474,6 @@ export default {
             throw new Error('Required document not found!')
           }
         } catch (error) {
-          this.db = productionDb
           this.storage = productionStorage
           this.$q.localStorage.set('boundless_db', 'production')
 
