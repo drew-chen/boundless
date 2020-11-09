@@ -35,7 +35,7 @@ import callDependingOnBackend from '../../store/callDependingOnBackend'
  * @param {Object} context Exposes the same set of methods/properties as the
  *   store instance.
  */
-export async function initStoreProjectSubmit (context) {
+export async function initStore (context) {
   await callDependingOnBackend(context, loadFireRefs)
   await loadConfig(context)
   await loadUserList(context)

@@ -32,7 +32,7 @@ export function setProjectTocPromise (state, tocPromise) {
   state.projectTocPromise = tocPromise
 }
 
-export function setProjectConfig (state, projectConfigPromise) {
+export function setProjectConfigPromise (state, projectConfigPromise) {
   state.projectConfigPromise = projectConfigPromise
 }
 

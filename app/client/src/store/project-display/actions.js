@@ -34,10 +34,10 @@ import callDependingOnBackend from '../../store/callDependingOnBackend'
  * @param {Object} context Exposes the same set of methods/properties as the
  *   store instance.
  */
-export async function initStoreProjectSubmit (context) {
+export async function initStore (context) {
   callDependingOnBackend(context, loadProjectTocPromise)
-  callDependingOnBackend(context, loadUserTocPromise)
   callDependingOnBackend(context, loadProjectConfigPromise)
+  callDependingOnBackend(context, loadUserTocPromise)
 }
 
 /**
@@ -49,7 +49,7 @@ export async function initStoreProjectSubmit (context) {
  * @param {Object} context.rootGetters Gives access to state.
  */
 async function loadProjectTocPromise ({ commit, rootGetters }) {
-  const tocPromise = rootGetters['project-submit/db']
+  const tocPromise = rootGetters['projectSubmit/db']
     .collection('projects').doc('ToC').get()
   commit('setProjectTocPromise', tocPromise)
 }
@@ -63,7 +63,7 @@ async function loadProjectTocPromise ({ commit, rootGetters }) {
  * @param {Object} context.rootGetters Gives access to state for all modules.
  */
 async function loadProjectConfigPromise ({ commit, rootGetters }) {
-  const tocPromise = rootGetters['project-submit/db']
+  const tocPromise = rootGetters['projectSubmit/db']
     .collection('config').doc('project').get()
   commit('setProjectConfigPromise', tocPromise)
 }
@@ -77,7 +77,7 @@ async function loadProjectConfigPromise ({ commit, rootGetters }) {
  * @param {Object} context.rootGetters Gives access to state for all modules.
  */
 async function loadUserTocPromise ({ commit, rootGetters }) {
-  const tocPromise = rootGetters['project-submit/db']
+  const tocPromise = rootGetters['projectSubmit/db']
     .collection('users').doc('ToC').get()
   commit('setUserTocPromise', tocPromise)
 }

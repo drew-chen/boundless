@@ -298,7 +298,7 @@ import productionDb, { productionStorage } from '../firebase/init_production'
 import testingDb, { testingStorage } from '../firebase/init_testing'
 import { createNamespacedHelpers } from 'vuex'
 // Ensures mapActions and mapGetters can only use the 'store/project-submit' module.
-const { mapActions, mapGetters } = createNamespacedHelpers('projectSubmit')
+const { mapGetters } = createNamespacedHelpers('projectDisplay')
 
 import Banner from '../components/Banners/Banner'
 import ProgressBar from '../components/ProgressBar'
@@ -310,7 +310,9 @@ export default {
   },
   computed: {
     ...mapGetters([
-      'tocPromise'
+      'projectTocPromise',
+      'projectConfigPromise',
+      'userTocPromise'
     ])
   },
   async created () {
@@ -421,9 +423,6 @@ export default {
     }
   },
   methods: {
-    ...mapActions([
-      'loadTocPromise'
-    ]),
     loadProgressBarConf: function () {
       /**
        * loads progress bar configuration from session cache
@@ -560,8 +559,7 @@ export default {
        */
 
       try {
-        let doc
-        doc = await this.tocPromise
+        let doc = await this.projectTocPromise
         if (doc && doc.exists) {
           for (let project in doc.data()) {
             if (project !== 'alias') {
@@ -599,7 +597,7 @@ export default {
 
         this.gettingCount()
 
-        doc = await this.db.collection('users').doc('ToC').get()
+        doc = await this.userTocPromise
 
         if (doc.exists) {
           this.userToC = doc.data()
@@ -621,7 +619,7 @@ export default {
      * TODO: this should be replaced since config/project is cached in session
      */
     loadConfig: async function () {
-      let doc = await this.db.collection('config').doc('project').get()
+      let doc = await this.projectConfigPromise
       if (doc.exists) {
         let data = doc.data()
 
