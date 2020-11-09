@@ -230,7 +230,8 @@ async function submitNewUsersFirebase ({ commit, getters }) {
 
 /**
  * Submits the project to the database once all the required fields are checked
- * externally.
+ * externally. Since another project is submitted, DisplayProject.vue, which
+ * uses the projectDisplay Vuex module, must also be updated.
  *
  * Creates the new users who are not in the db, and notifies
  * the user on both success and failure.
@@ -242,6 +243,8 @@ async function submitNewUsersFirebase ({ commit, getters }) {
  */
 export async function submitProject (context) {
   await callDependingOnBackend(context, submitProjectFirebase)
+  // Payload is null.
+  context.dispatch('projectDisplay/initStore', null, { root: true })
 }
 
 /**
