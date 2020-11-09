@@ -25,26 +25,25 @@ Methods:
 </template>
 
 <script>
-import { mapActions } from 'vuex'
 
 export default {
   name: 'App',
   /**
-   * Initializes the projectSubmit Vuex module's store.
+   * Initializes Vuex modules.
    * This is done here instead of a boot file so errors can be handled
-   * by Vue's errorHandler, which needs the Vue instance.
+   * by Vue's errorHandler, which needs the Vue instance. Furthermore, this is
+   * useful to pre-load the store before the components are loaded.
+   *
+   * https://quasar.dev/quasar-cli/prefetch-feature
+   *
+   * @param {Object} context Exposes the following objects: store, currentRoute,
+   * previousRoute, redirect, ssrContext, urlPath, publicPath.
+   * @param {Object} context.store The Vuex store instance.
    */
-  async mounted () {
-    this.initStoreProjectSubmit()
-    this.initStoreProjectDisplay()
-  },
-  methods: {
-    ...mapActions('projectSubmit', {
-      initStoreProjectSubmit: 'initStore'
-    }),
-    ...mapActions('projectDisplay', {
-      initStoreProjectDisplay: 'initStore'
-    })
+  async preFetch ({ store }) {
+    // Payload is null.
+    store.dispatch('projectSubmit/initStore', null, { root: true })
+    store.dispatch('projectDisplay/initStore', null, { root: true })
   }
 }
 </script>
