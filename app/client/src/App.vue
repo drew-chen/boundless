@@ -25,8 +25,7 @@ Methods:
 </template>
 
 <script>
-import { createNamespacedHelpers } from 'vuex'
-const { mapActions } = createNamespacedHelpers('projectSubmit')
+import { mapActions } from 'vuex'
 
 export default {
   name: 'App',
@@ -37,11 +36,15 @@ export default {
    */
   async mounted () {
     this.initStoreProjectSubmit()
+    this.initStoreProjectDisplay()
   },
   methods: {
-    ...mapActions([
-      'initStoreProjectSubmit'
-    ])
+    ...mapActions('projectSubmit', {
+      initStoreProjectSubmit: 'initStore'
+    }),
+    ...mapActions('projectDisplay', {
+      initStoreProjectDisplay: 'initStore'
+    })
   }
 }
 </script>
