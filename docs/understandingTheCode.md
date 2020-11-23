@@ -21,10 +21,10 @@ You shouldn't modify state directly and must use these helpers. Furthermore,
 to be sure state is not mutated by accident, it's a safe choice to deep clone
 the data in the state before modifying it locally within a page. If you want
 to sync the mutated clone, use an action or mutation to set the state.
-
+ 
 ### project-submit
  
-The project submit module stores data related to project submission. Specifically,
+The project submit Vuex module stores data related to project submission. Specifically,
 `ProjectCreateCustomFrom.vue` is used by the admin to choose and modify what
 custom fields or questions a project submission form asks. The rest of the files
 within the `Forms/Project` directory and `SubmitProject.vue` are for the user
@@ -49,7 +49,7 @@ with Vuex, and an action within Vuex syncs Vuex data with Firebase. See
  
 ### project-display
  
-Used to store the database references (like Firebase related to displaying all
+This module is used to store the database references (like Firebase related to displaying all
 the projects, ie, `DisplayProjects.vue`. Unlike the project-submit module, this
 module doesn't store the data fields directly. To get the data, call the
 relevant Firebase methods. This was done since the `DisplayProjects.vue` page
@@ -63,6 +63,35 @@ help speed up the page. Vuex can be used with Quasar's Quasar's [PreFetch ](http
 For more info about the speed up, read pull request [#27](https://github.com/Wind-River/boundless/pull/27).
 For details on Vuex implementation, read comments for files in the directory 
 `store/project-submit`.
+ 
+### Abstracting the database
+ 
+Parts of this project are tightly coupled with Firebase's Cloud Firestore. Within
+Vuex, some room is given so that future backends/databases can be swapped in.
+The goal is that the backend/database can be changed without pages using Vuex
+ caring. Work on abstracting the database began with pull request
+[#20](https://github.com/Wind-River/boundless/pull/20). Some work needs to be
+done with the project-display module and `DisplayProjects.vue` to make them less 
+dependent on Firestore. Furthermore, methods outside of Vuex don't have this
+abstraction.
+ 
+Since pull request [#27](https://github.com/Wind-River/boundless/pull/27), abstraction
+is done with `callDependingOnBackend.js` in combination with constants defined in `backends.config.js`.
+For Firebase, this means `export const CURRENT_BACKEND = backendEnum.FIREBASE`.
+ 
+Example usage for a Vuex action:
+ 
+```JavaScript
+async function loadConfig (context) {
+  await callDependingOnBackend(context, loadConfigFirebase, loadConfigExpress)
+}
+```
+Outside Vuex, a page can call `loadConfig(context)` and the proper helper
+function will be called depending on the backend.
+ 
+Note: `backends.config.js` and `callDependingOnBackend.js` need to be modified
+(copy and paste more if statements for new constants) to handle more than two
+different backends in the future. More documentation can be found in these files.
  
 ## RouteWrappers
  
