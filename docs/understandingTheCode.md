@@ -16,15 +16,15 @@ Vuex is a centralized source of data. Change data in Vuex, and any other page
 which uses Vuex will have the data be updated. Vuex can also be split into
 modules for organization. Modules are [created by the Quasar CLI](https://quasar.dev/quasar-cli/vuex-store).
  
-In order to use and modify Vuex state, actions, getters, and mutation are used.
-You shouldn't modify state directly and must use these helpers. Furthermore,
-to be sure state is not mutated by accident, it's a safe choice to deep clone
+To use and modify Vuex state, actions, getters, and mutation are used.
+You shouldn't modify the state directly and must use these helpers. Furthermore,
+to be sure the state is not mutated by accident, it's a safe choice to deep clone
 the data in the state before modifying it locally within a page. If you want
 to sync the mutated clone, use an action or mutation to set the state.
  
 ### project-submit
  
-The project submit Vuex module stores data related to project submission. Specifically,
+The projectSubmit Vuex module under the directory `store/project-submit` stores data related to project submission. Specifically,
 `ProjectCreateCustomFrom.vue` is used by the admin to choose and modify what
 custom fields or questions a project submission form asks. The rest of the files
 within the `Forms/Project` directory and `SubmitProject.vue` are for the user
@@ -36,8 +36,7 @@ Data is stored as an object tree. A field is chosen to be stored here if:
   2. This field needs to be synced with Firebase, and
   3. This field is related to project submission.
  
-Pull request [#18](https://github.com/Wind-River/boundless/pull/18) details why Vuex was used for project submission. For details on implementation, read comments for files in 
-the directory `store/project-submit`. In essence, it made data syncing between
+Pull request [#18](https://github.com/Wind-River/boundless/pull/18) details why Vuex was used for project submission. For details on implementation, read comments for files in the directory `store/project-submit`. In essence, it made data syncing between
 pages more organized.
  
 Note that not all data needed for project submission needs to be stored into
@@ -94,7 +93,7 @@ Note: `backends.config.js` and `callDependingOnBackend.js` need to be modified
 (copy and paste more if statements for new constants) to handle more than two
 different backends in the future. More documentation can be found in these files.
  
-## RouteWrappers
+## <a name="RouteWrappers"></a>RouteWrappers
  
 RouteWrappers are introduced in pull request [#18](https://github.com/Wind-River/boundless/pull/18).
  
@@ -121,19 +120,19 @@ These props are sent to the relevant route wrapper, for example,
  
 Why use RouteWrappers? Why do props need to be passed dynamically depending on the route, when child
 components can be instead conditionally rendered with `v-if` without needing
-a RouteWrapper file? Basically, we need to use RouterWrappers because we need
+a RouteWrapper file? We need to use RouterWrappers because we need
 settings to use both props and routes.
  
 1. Firstly, we need props to reduce repeated code since all the sub-page settings
-share some data and callbacks from `ManageSettings.vue`. Thus, we reduce repeated
-code by getting what we need once in `ManageSettings.vue` then interacting with 
-the same data and callbacks via props.
+share some data and callbacks (triggered by various events) from `ManageSettings.vue`.
+Thus, we reduce repeated code by getting what we need once in `ManageSettings.vue`
+then interacting with the same data and callbacks via props.
  
 2. Another reason we need props is that both project and challenge settings use `SettingsProjectsAndChallenges.vue`. The only differentiator between project and
-challenge settings pages are the props passed in. Prior to the RouteWrapper changes
+challenge settings pages are the props passed in. Before the RouteWrapper changes
 in pull request [#18](https://github.com/Wind-River/boundless/pull/18), project and challenge
 settings were already in the same file. Thus, we need to pass in props
-to `SettingsProjectsAndChallenges.vue` in order to use it properly.
+to `SettingsProjectsAndChallenges.vue` to use it properly.
  
 3. We need to use a route because to check if someone is navigating away
 from a setting, the best way to do this is a [navigation guard](https://router.vuejs.org/guide/advanced/navigation-guards.html).
@@ -143,17 +142,21 @@ file to see how this navigation guard was done.
 4. Since we're using a route, we need to use Vue's `<router-view>` component.
 However, we also need to pass props to each of the sub-pages. Another problem
 is that the props aren't standardized. Some settings use more props and/or
-use different ones. Thus RouteWrapper files are used to conveniently pass
-the right props to the settings sub-pages.
+use different ones. Furthermore, some settings listen to different events than
+others. Thus RouteWrapper files are used to conveniently pass
+the right props to the settings sub-pages and define which events need to be
+listened to.
  
 More details can be found in the comments of each of the files mentioned.
 
 ## Undoing Settings
 
 RouteWrappers was used to prevent navigating away from settings forms when there
-were unsaved changes.
+were unsaved changes. # todo To summarize, a dialog is opened within a mixin so that
+it's only opened when navigating away from unsaved changed changes and so that
+the next() navigation callback can be used.
 
-### Dialog
+### <a name="Dialog"></a>Dialog
 
 If changes were unsaved and the user navigates away, navigation
 is interrupted with a dialog with three options:
@@ -168,14 +171,14 @@ changes are saved.
 There's a lot of things working behind the scenes to enable this. To detect
 changes, updating any savable setting, such as whether or not to enable
 custom submission questions, sets an updated flag to be true. We don't compare
-saved state with unsaved state to compute a value for the updated flag. Ie,
+the saved state with the unsaved state to compute a value for the updated flag. Ie,
 if original state = 4. We add 1, then subtract 1, then updated is set to true
-even though it's the same as the original state. This simplification is just done
-just because comparing state of every possible setting is computationally expensive
+even though it's the same as the original state. This simplification is done
+just because comparing the state of every possible setting is computationally expensive
 and potentially complicated if settings get updated in the future.
 
 1. To enable save functionally, we pass in a save callback to `DialogConfirmLeave.vue`.
-This save callback is the exact same method used to save to Vuex or the Database
+This save callback is the same method used to save to Vuex or the Database
 that would be used without the dialog's intervention. Once the save button is
 clicked, `DialogConfirmLeave.vue` closes the dialog, awaits the save to be finished,
 performs any other cleaning up needed (through the onLeave() callback), then finally
@@ -186,9 +189,9 @@ instead of using a save callback, a reset callback is used. When we don't save,
 we want to undo any unsaved changes. Within the settings sub-page, a (deep) copy
 of the most recently saved settings data is when the settings page is created or
 when the settings page is saved. When the reset callback is called, the settings
-state is set using Vue.set() to the older saved copied state.
+state is set using [Vue.set()](https://vuejs.org/v2/api/#Vue-set) to the older saved copied state.
 
-3. To cancel, the dialog is closed and navigation is cancelled.
+3. To cancel, the dialog is closed and navigation is canceled.
 
 ### Controlling navigation
 
@@ -196,9 +199,37 @@ How does this dialog control navigation? Within each RouteWrappers,
 `mixinSettingNavguard.js` is used. [Mixins](https://vuejs.org/v2/guide/mixins.html)
  are Vue's way to share code among
 components. They have access to local state and callbacks since they are conceptually
-inserted into components directly. This callback adds the [beforeRouteLeave()](https://router.vuejs.org/guide/advanced/navigation-guards.html#in-component-guards) navigation guard. This callback
-has the next() callback which is a function that can control navigation, as in, can
-control whether or not to continue or cancel navigation. Since this function is
-only accessible within the callback, it can't be passed to the mixin through a prop.
-Instead, it's passed whenever `DialogConfirmLeave.vue` is opened.
+inserted into components directly. `mixinSettingNavguard.js` adds the [beforeRouteLeave()](https://router.vuejs.org/guide/advanced/navigation-guards.html#in-component-guards) navigation guard.
+This callback has the next() callback which is a function that can control
+navigation, as in, can control whether or not to continue or cancel navigation.
+Since this function is only accessible within the callback, it can't be passed
+to the mixin through a prop. Instead, it's passed whenever `DialogConfirmLeave.vue`
+is opened. Thus, if the user navigates away while there are unsaved
+settings, the mixin passes the next() callback to `DialogConfirmLeave.vue` by
+opening the dialog.
 
+The dialog is opened programmatically with
+`this.$refs.settings.$refs.dialogConfirmLeave.open(next)`. The mixin is placed
+inside a RouteWrapper, which has reference to the settings sub-page component.
+Then, inside the settings sub-page component, the dialog reference is used to
+open the dialog. This would be slightly simpler without RouteWrapper
+(`$refs.dialogConfirmLeave.open(next)`) but RouterWrapper needs to be used
+for reasons defined [here](#RouteWrappers).
+Therefore, in order to enable undoing settings, the following
+must be set up:
+
+1. The mixin is used with a component that has a child setting component. This
+condition is satisfied by being placed in a RouteWrapper.
+
+2. The component with this mixin has a grandchild `DialogConfirmLeave.vue` 
+component. This is needed so that the dialog can be opened by the mixin. 
+
+
+One final detail is that `mixinSettingNavGuard.js` is a factory function that
+returns a mixin. This is a small detail, similar to a class constructor with a
+parameter. In this case, we pass the setting name to the mixin. This so that
+the navigation guard is only used if we're on the correct route and when
+data is loaded. We can detect whether or not data is loaded by passing in the
+setting name as a prop to the RouteWrapper. If the prop name is set to 'notLoaded'
+by 'ManageSettings.vue', and we're visiting the sub-page `SettingsGeneral.vue`,
+this mixin will do nothing.
