@@ -33,7 +33,7 @@ Methods:
  * setting name passed in as a prop (settingProps.name) do not match, then
  * navigation is not blocked.
  *
- * @param {String} SETTING_NAME: The name of the setting, ie, 'challenges' or 'general'.
+ * @param {String} SETTING_NAME The name of the setting, ie, 'challenges' or 'general'.
  * @returns {Object} A mixin object.
  */
 const mixinSettingNavGuard = SETTING_NAME => ({
