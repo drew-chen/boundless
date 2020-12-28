@@ -11,10 +11,7 @@
 
 Name:     errors/DbException.js
 Purpose:  Exception related to the database.
-Methods:
-
-  Inherits from Error and can be detected using 'instanceof'. See
-  store/project-submit/actions.js for example usage.
+Methods:  Inherits from Error and can be detected using 'instanceof'.
 
 ## */
 
