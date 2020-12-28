@@ -33,10 +33,10 @@ Methods:
  * setting name passed in as a prop (settingProps.name) do not match, then
  * navigation is not blocked.
  *
- * @param {String} The name of the setting, ie, 'challenges' or 'general'.
- * @returns {Object} Mixin object.
+ * @param {String} SETTING_NAME The name of the setting, ie, 'challenges' or 'general'.
+ * @returns {Object} A mixin object.
  */
-const mixinSettingNavGuard = settingName => ({
+const mixinSettingNavGuard = SETTING_NAME => ({
   /**
    * Block leaving with persistent dialog if changes have been made.
    * View specifics on navigation guards at:
@@ -52,7 +52,7 @@ const mixinSettingNavGuard = settingName => ({
     Note: this.settingProps.name is set to 'notLoaded' when in 'ManageSettings.vue'
     when data is not yet loaded.
     */
-    if (settingName === this.settingProps.name) {
+    if (SETTING_NAME === this.settingProps.name) {
       // Opens dialog if there are unsaved changes.
       if (this.$refs.settings && this.$refs.settings.updated) {
         this.$refs.settings.$refs.dialogConfirmLeave.open(next)
