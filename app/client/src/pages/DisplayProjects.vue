@@ -553,7 +553,8 @@ export default {
        */
 
       try {
-        let doc = await this.db.collection('projects').doc('ToC').get()
+        let tocRef = this.db.collection('projects').doc('ToC')
+        let doc = await tocRef.get()
         if (doc.exists) {
           for (let project in doc.data()) {
             if (project !== 'alias') {
