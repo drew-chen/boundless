@@ -137,7 +137,7 @@ Methods:
 
         </div>
         <div v-else>
-          <p>(No custom form questions for this project.)</p>
+          <p>(no custom form questions for this project)</p>
         </div>
       </div>
     </div>
