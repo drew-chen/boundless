@@ -81,7 +81,7 @@ Methods:
             class="col" @click="filter = key"
           >
             <strong class="text-blue-4" style="font-size: 20px" >
-              {{ keywordsCounter[key] ? keywordsCounter[key] : 0 }}
+              {{ keywordCounts[key] ? keywordCounts[key] : 0 }}
             </strong>
 
             <br>
@@ -178,7 +178,6 @@ Methods:
             <q-td
               key="new"
               :props="props"
-              style="width: 95px;"
             >
               <q-icon
                 v-if="todayDate <= (props.row.created ? props.row.created.substring(0, 10) : props.row.timestamp.substring(0, 10))"
@@ -194,7 +193,7 @@ Methods:
             <q-td
               key="project"
               :props="props">
-              {{ props.row.project }}
+              <p>{{ props.row.project }}</p>
             </q-td>
             <!-- Description column -->
             <q-td
@@ -203,18 +202,16 @@ Methods:
               style="max-width: 300px; min-width: 220px;"
             >
               <div class="row">
-                <div
+                <p
                   class="col"
-                  ref="descriptionDiv"
                   align="left"
-                  style="overflow: hidden;"
                 >
                   {{ props.row.description }}
-                </div>
+                </p>
 
                 <div
                   :hidden="!(props.row.description.length > 60)"
-                  class="col-2"
+                  class="col-1"
                 >
                   <div
                     class="text-blue cursor-pointer q-mx-sm"
@@ -297,8 +294,11 @@ Methods:
 import { defaultImages } from '../../boundless.config'
 import isFirebaseError from '../../src/errors/isFirebaseError'
 
-import productionDb, { productionStorage } from '../firebase/init_production'
-import testingDb, { testingStorage } from '../firebase/init_testing'
+import { productionStorage } from '../firebase/init_production'
+import { testingStorage } from '../firebase/init_testing'
+import { createNamespacedHelpers } from 'vuex'
+// Ensures mapActions and mapGetters can only use the 'store/project-submit' module.
+const { mapGetters } = createNamespacedHelpers('projectDisplay')
 
 import Banner from '../components/Banners/Banner'
 import ProgressBar from '../components/ProgressBar'
@@ -308,20 +308,23 @@ export default {
     Banner,
     ProgressBar
   },
+  computed: {
+    ...mapGetters([
+      'projectTocPromise',
+      'projectConfigPromise',
+      'userTocPromise'
+    ])
+  },
   async created () {
-    try {
-      // fetches data from database
-      await this.loadFireRefs()
-      await this.loadConfig()
-      await this.loadProjectList()
-      this.loadProgressBarConf()
+    // fetches data from database
+    await this.loadFireRefs()
+    await this.loadConfig()
+    await this.loadProjectList()
+    this.loadProgressBarConf()
 
-      this.keywordsInUse = this.keywordsInUse.filter(
-        v => v in this.keywordsValToKeyMap
-      )
-    } catch (error) {
-      throw error
-    }
+    this.keywordsInUse = this.keywordsInUse.filter(
+      v => v in this.keywordsValToKeyMap
+    )
   },
   beforeUpdate () {
     this.loadProgressBarConf()
@@ -342,7 +345,7 @@ export default {
       // keywords <Array<String>>: list of keywords appearing in all projects
       keywords: [],
       keywordsInUse: [], // <Array<String>>: list of keywords in use
-      keywordsCounter: {}, // <Map>: map of how many times each keywords appear
+      keywordCounts: {}, // <Map>: map of how many times each keywords appear
       keywordsValToKeyMap: {}, // <Map>: map of value to key of keywords
       keywordsImage: {}, // <Map>: map of keyword's images
       popkeywords: [], // <Array<Object>>: dropdown menu values
@@ -364,7 +367,9 @@ export default {
           field: row => row.created || row.timestamp,
           align: 'center',
           sortable: true,
-          sort: (a, b) => (b > a) ? 1 : ((a > b) ? -1 : 0)
+          sort: (a, b) => (b > a) ? 1 : ((a > b) ? -1 : 0),
+          headerClasses: 'project-new-col',
+          classes: 'project-new-col'
         },
         {
           name: 'project',
@@ -381,7 +386,9 @@ export default {
           name: 'description',
           align: 'center',
           label: 'Description',
-          field: row => row.description
+          field: row => row.description,
+          headerClasses: 'project-description-col',
+          classes: 'project-description-col'
         },
         {
           name: 'progress',
@@ -398,7 +405,6 @@ export default {
           align: 'center',
           label: 'Lead(s)',
           field: row => this.displayMembers(row.members),
-          sortable: true,
           headerClasses: 'lead-members-col',
           classes: 'lead-members-col'
         },
@@ -445,24 +451,20 @@ export default {
         let sessionDb = this.$q.localStorage.getItem('boundless_db')
 
         if (sessionDb === 'testing') {
-          this.db = testingDb
           this.storage = testingStorage
         } else {
-          this.db = productionDb
           this.storage = productionStorage
         }
 
         return true
       } else {
         try {
-          let doc = await productionDb.collection('config').doc('project').get()
+          let doc = await this.projectConfigPromise
           if (doc.exists) {
             if (doc.data().db === 'testing') {
-              this.db = testingDb
               this.storage = testingStorage
               this.$q.localStorage.set('boundless_db', 'testing')
             } else {
-              this.db = productionDb
               this.storage = productionStorage
               this.$q.localStorage.set('boundless_db', 'production')
             }
@@ -472,7 +474,6 @@ export default {
             throw new Error('Required document not found!')
           }
         } catch (error) {
-          this.db = productionDb
           this.storage = productionStorage
           this.$q.localStorage.set('boundless_db', 'production')
 
@@ -553,8 +554,8 @@ export default {
        */
 
       try {
-        let doc = await this.db.collection('projects').doc('ToC').get()
-        if (doc.exists) {
+        let doc = await this.projectTocPromise
+        if (doc && doc.exists) {
           for (let project in doc.data()) {
             if (project !== 'alias') {
               if (!doc.data()[project].hidden) {
@@ -577,9 +578,13 @@ export default {
                 }
 
                 // getting the keywords
-                if (doc.data()[project].keywords.length > 0) {
+                if (doc.data()[project].keywords && doc.data()[project].keywords.length > 0) {
                   doc.data()[project].keywords.forEach(keyword => {
-                    this.keywords.push(keyword)
+                    if (keyword in this.keywordCounts) {
+                      this.keywordCounts[keyword] += 1
+                    } else {
+                      this.keywordCounts[keyword] = 1
+                    }
                   })
                 }
               }
@@ -589,9 +594,7 @@ export default {
           throw new Error('ToC not found!')
         }
 
-        this.gettingCount()
-
-        doc = await this.db.collection('users').doc('ToC').get()
+        doc = await this.userTocPromise
 
         if (doc.exists) {
           this.userToC = doc.data()
@@ -608,93 +611,69 @@ export default {
         throw error
       }
     },
+    /**
+     * load the config from the db
+     * TODO: this should be replaced since config/project is cached in session
+     */
     loadConfig: async function () {
-      /**
-       * load the config from the db
-       * TODO: this should be replaced since config/project is cached in session
-       * @param {void}
-       * @return {Promise<Boolean>}
-       */
+      let doc = await this.projectConfigPromise
+      if (doc.exists) {
+        let data = doc.data()
 
-      try {
-        let doc = await this.db.collection('config').doc('project').get()
-        if (doc.exists) {
-          let data = doc.data()
+        // extracting keywords for the banner and dropdown filter
+        // non-sorted to maintain order for now
+        // let cachedKeywords = data.projectsConfig.keywords.sort()
+        // let cachedKeywords = data.projectsConfig.keywords
 
-          // extracting keywords for the banner and dropdown filter
-          // non-sorted to maintain order for now
-          // let cachedKeywords = data.projectsConfig.keywords.sort()
-          // let cachedKeywords = data.projectsConfig.keywords
+        for (let key in data['keywords']) {
+          this.popkeywords.push({
+            label: key,
+            value: data['keywords'][key]
+          })
 
-          for (let key in data['keywords']) {
-            this.popkeywords.push({
-              label: key,
-              value: data['keywords'][key]
-            })
+          this.keywordsValToKeyMap[data['keywords'][key]] = key
 
-            this.keywordsValToKeyMap[data['keywords'][key]] = key
+          // if (
+          //   !cachedKeywords.includes(data['keywords'][key]) &&
+          //   cachedKeywords.length < 5
+          // ) {
+          //   cachedKeywords.push(data['keywords'][key])
+          // }
+        }
+        // this.keywordsInUse = cachedKeywords
+        this.keywordsInUse = data.projectsConfig.keywords
 
-            // if (
-            //   !cachedKeywords.includes(data['keywords'][key]) &&
-            //   cachedKeywords.length < 5
-            // ) {
-            //   cachedKeywords.push(data['keywords'][key])
-            // }
-          }
-          // this.keywordsInUse = cachedKeywords
-          this.keywordsInUse = data.projectsConfig.keywords
+        // make sure the database response has extraKeywordsData
+        if (data.extraKeywordsData) {
+          // loading the image url from extraKeywordsData
+          let key = ''
+          for (let prop in data.extraKeywordsData) {
+            key = prop.toLowerCase()
 
-          // make sure the database response has extraKeywordsData
-          if (data.extraKeywordsData) {
-            // loading the image url from extraKeywordsData
-            let key = ''
-            for (let prop in data.extraKeywordsData) {
-              key = prop.toLowerCase()
-
-              try {
-                this.keywordsImage[key] = await this.storage.ref().child(
-                  data.extraKeywordsData[prop]
-                ).getDownloadURL()
-              } catch (error) {
-                if (isFirebaseError(error, 'storage/object-not-found')) {
-                  console.error(error)
-                  this.keywordsImage[key] = '../statics/images/other-icon.png'
-                } else {
-                  throw error
-                }
+            try {
+              this.keywordsImage[key] = await this.storage.ref().child(
+                data.extraKeywordsData[prop]
+              ).getDownloadURL()
+            } catch (error) {
+              if (isFirebaseError(error, 'storage/object-not-found')) {
+                console.error(error)
+                this.keywordsImage[key] = '../statics/images/other-icon.png'
+              } else {
+                throw error
               }
             }
           }
-
-          if (typeof data['pagination'] === 'number') {
-            this.pagination.rowsPerPage = data['pagination']
-          }
-          let expireDate = data.newFlag * 24 * 60 * 60 * 1000
-          this.todayDate = new Date(Date.now() - expireDate)
-          this.todayDate = this.todayDate.toISOString().substring(0, 10)
-
-          return true
-        } else {
-          throw new Error('File not found!')
         }
-      } catch (error) {
-        throw error
+
+        if (typeof data['pagination'] === 'number') {
+          this.pagination.rowsPerPage = data['pagination']
+        }
+        let expireDate = data.newFlag * 24 * 60 * 60 * 1000
+        this.todayDate = new Date(Date.now() - expireDate)
+        this.todayDate = this.todayDate.toISOString().substring(0, 10)
+      } else {
+        throw new Error('File not found!')
       }
-    },
-    gettingCount: function () {
-      /**
-       * counting how many times the keywords appear inside the ToC
-       * @param {void}
-       * @return {void}
-       */
-
-      this.keywords.forEach(val => {
-        if (val in this.keywordsCounter) {
-          this.keywordsCounter[val] = this.keywordsCounter[val] + 1
-        } else {
-          this.keywordsCounter[val] = 1
-        }
-      })
     }
   }
 }
@@ -702,16 +681,29 @@ export default {
 
 <style lang="stylus" scoped>
 
+.project-new-col
+  width 5%
+
 .project-name-col
-  width 22%
   font-weight bold
-  text-align left
+  text-align left // max width of max length name
+
+// Hide name overflow
+.project-description-col p,
+.project-name-col p
+  white-space nowrap
+  overflow hidden
+  text-overflow: ellipsis
+  width 300px
+
+.project-description-col
+  width 40%
 
 .progress-bar-col
-  width 12%
+  width 26%
 
 .lead-members-col
-  width 26%
+  width 20%
   overflow-wrap break-word
   overflow normal
 

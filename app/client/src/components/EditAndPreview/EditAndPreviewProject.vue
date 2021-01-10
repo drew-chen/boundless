@@ -1494,12 +1494,24 @@ Methods:
                     :customFormEnabled="true"
                   />
                   <!-- Export custom form as markdown -->
-                  <q-btn no-caps
-                    class="col q-my-sm"
-                    label="Copy additional questions"
-                    color="accent"
-                    @click="exportCustomFormResponse"
-                  />
+                  <div
+                    v-if="hasCustomFormResponse"
+                    class="col"
+                  >
+                    <q-btn no-caps
+                      class="q-ma-sm"
+                      label="Copy additional questions"
+                      color="accent"
+                      @click="exportCustomFormResponse"
+                    />
+                    <!-- Delete custom form response if present. -->
+                    <q-btn no-caps
+                      class="q-my-sm"
+                      label="Delete additional questions"
+                      color="secondary"
+                      @click="deleteCustomFormResponse"
+                    />
+                  </div>
                 </div>
               </q-tab-panel>
             </q-tab-panels>
@@ -1834,6 +1846,7 @@ Methods:
 import firebase from 'firebase/app'
 import 'firebase/firestore'
 import { cloneDeep, isEmpty } from 'lodash'
+import Vue from 'vue'
 
 import productionDb, { productionStorage } from '../../firebase/init_production'
 import testingDb, { testingStorage } from '../../firebase/init_testing'
@@ -1886,6 +1899,10 @@ export default {
      */
     isExportCustomFormBtnDisabled () {
       return isEmpty(this.curData) || isEmpty(this.curData.customFormResponse)
+    },
+    /** Whether this project has custom form questions. */
+    hasCustomFormResponse () {
+      return this.curData.customFormResponse && this.curData.customFormResponse.length > 0
     }
   },
   data () {
@@ -3084,7 +3101,7 @@ export default {
       window.open(url, '_blank', 'noopener')
     },
     /**
-     * helper function to display notfiy
+     * helper function to display notify
      * @return {String}
      */
     notifyError: function () {
@@ -3095,6 +3112,7 @@ export default {
       })
       return ''
     },
+    /** Exports custom form questions and responses as markdown and saves the the user's clipboard. */
     exportCustomFormResponse () {
       const customFormResponse = this.curData.customFormResponse || []
       let markdownStr = '## Additional Q&A\n\n'
@@ -3108,6 +3126,30 @@ export default {
         type: 'positive',
         timeout: 2000
       })
+    },
+    /** Delte the custom form response field. */
+    async deleteCustomFormResponse () {
+      if (this.hasCustomFormResponse) {
+        this.$q.dialog({
+          title: 'Confirm',
+          message: 'Delete custom form questions and responses?',
+          cancel: true
+        }).onOk(async () => {
+          // Create a document reference
+          const projectRef = this.db.collection('projects').doc(this.curData.uuid)
+
+          await projectRef.update({
+            customFormResponse: firebase.firestore.FieldValue.delete()
+          })
+          Vue.set(this.curData, 'customFormResponse', [])
+
+          this.$q.notify({
+            message: 'Additional questions and responses have been deleted.',
+            type: 'positive',
+            timeout: 2000
+          })
+        })
+      }
     }
   }
 }

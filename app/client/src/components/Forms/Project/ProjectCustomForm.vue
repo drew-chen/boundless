@@ -27,7 +27,7 @@ Methods:
 <template>
   <div>
     <div v-if="!questionTemplates || questionTemplates.length === 0">
-      There are no additional details
+      There are no additional questions.
     </div>
     <div v-else>
       <h5>Additional Questions</h5>
@@ -67,7 +67,7 @@ Methods:
 </template>
 
 <script>
-import cloneDeep from 'lodash.clonedeep'
+import cloneDeep from 'lodash/clonedeep'
 import { createNamespacedHelpers } from 'vuex'
 const { mapGetters, mapMutations } = createNamespacedHelpers('projectSubmit')
 
