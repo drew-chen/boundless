@@ -11,7 +11,7 @@ module.exports = function (ctx) {
     css: [
       'app.styl'
     ],
-
+    preFetch: true,
     extras: [
       'roboto-font',
       'material-icons', // optional, you are not bound to it

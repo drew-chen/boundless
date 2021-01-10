@@ -40,7 +40,7 @@ Methods:
         <p class="q-mb-xl">
           Submit a problem or challenge (an itch)  you would like solve or explore (scratch).
         </p>
-        <hr class="newLine2">
+        <q-separator color="grey-5" />
         <!-- -------------------- Project Name -------------------- -->
         <q-input
           filled lazy-rules clearable
@@ -79,7 +79,7 @@ Methods:
           </template>
         </q-input>
 
-        <hr class="newLine2">
+        <q-separator color="grey-5" />
 
         <!--  -------------------- Keywords -------------------- -->
         <div class="row q-pa-sm" align="left">
@@ -93,7 +93,7 @@ Methods:
           />
         </div>
 
-        <hr class="newLine2">
+        <q-separator color="grey-5" />
 
         <!-- -------------------- Team Member -------------------- -->
         <div>
@@ -175,7 +175,7 @@ Methods:
 
         <!-- -------------------- Admin Mode -------------------- -->
         <div :hidden="!adminMode">
-          <hr class="newLine2">
+          <q-separator color="grey-5" />
           <!-- -------------------- Chips -------------------- -->
           <div>
             <div class="row" align="left">
@@ -214,7 +214,7 @@ Methods:
                 <q-card class="q-pa-md">
                   <div class="row" align="left">
                     <strong>Source Chip</strong>
-                    <hr class="col q-ml-sm">
+                    <q-separator color="grey-5" class="col q-ml-sm" />
                   </div>
 
                   <q-input
@@ -237,7 +237,7 @@ Methods:
                 <q-card class="q-pa-md">
                   <div class="row" align="left">
                     <strong>Video Chip</strong>
-                    <hr class="col q-ml-sm">
+                    <q-separator color="grey-5" class="col q-ml-sm" />
                   </div>
 
                   <q-input
@@ -315,7 +315,7 @@ Methods:
                 <q-card class="q-pa-md">
                   <div class="row" align="left">
                     <strong>Text Box</strong>
-                    <hr class="col q-ml-sm">
+                    <q-separator color="grey-5" class="col q-ml-sm" />
                   </div>
 
                   <q-input
@@ -345,7 +345,7 @@ Methods:
                 <q-card class="q-pa-md">
                   <div class="row" align="left">
                     <strong>Unordered List</strong>
-                    <hr class="col q-ml-sm">
+                    <q-separator color="grey-5" class="col q-ml-sm" />
                   </div>
 
                   <q-input
@@ -359,7 +359,7 @@ Methods:
 
                   <div class="row inline full-width q-pa-md">
                     <strong>List</strong>
-                    <hr class="col q-ml-sm q-mr-sm">
+                    <q-separator color="grey-5" class="col q-ml-sm q-mr-sm" />
                     <div>
                       <q-btn
                         dense round
@@ -411,7 +411,7 @@ Methods:
                 <q-card class="q-pa-md">
                   <div class="row" align="left">
                     <strong>Ordered List</strong>
-                    <hr class="col q-ml-sm">
+                    <q-separator color="grey-5" class="col q-ml-sm" />
                   </div>
 
                   <q-input
@@ -426,7 +426,7 @@ Methods:
 
                   <div class="row inline full-width q-pa-md">
                     <strong>List</strong>
-                    <hr class="col q-ml-sm q-mr-sm">
+                    <q-separator color="grey-5" class="col q-ml-sm q-mr-sm" />
                     <div>
                       <q-btn
                         dense round
@@ -487,7 +487,7 @@ Methods:
                 <q-card class="q-pa-md">
                   <div class="row" align="left">
                     <strong>Event List</strong>
-                    <hr class="col q-ml-sm">
+                    <q-separator color="grey-5" class="col q-ml-sm" />
                   </div>
 
                   <q-input
@@ -501,7 +501,7 @@ Methods:
 
                   <div class="row inline full-width q-pa-md">
                     <strong>List</strong>
-                    <hr class="col q-ml-sm q-mr-sm">
+                    <q-separator color="grey-5" class="col q-ml-sm q-mr-sm" />
                     <div>
                       <q-btn
                         dense round
@@ -605,7 +605,7 @@ Methods:
 import { required, maxLength } from 'vuelidate/lib/validators'
 import { createNamespacedHelpers } from 'vuex'
 const { mapGetters, mapMutations } = createNamespacedHelpers('projectSubmit')
-import cloneDeep from 'lodash.clonedeep'
+import cloneDeep from 'lodash/clonedeep'
 
 export default {
   validations: {

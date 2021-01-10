@@ -24,6 +24,7 @@ import Vue from 'vue'
 import Vuex from 'vuex'
 
 import projectSubmit from './project-submit'
+import projectDisplay from './project-display'
 
 Vue.use(Vuex)
 
@@ -31,7 +32,8 @@ export default function () {
   const Store = new Vuex.Store({
     // The module name is 'projectSubmit' not 'project-submit'.
     modules: {
-      projectSubmit
+      projectSubmit,
+      projectDisplay
     },
 
     // enable strict mode (adds overhead!)
@@ -47,9 +49,13 @@ export default function () {
   */
 
   if (process.env.DEV && module.hot) {
-    module.hot.accept(['./project-submit'], () => {
+    module.hot.accept(['./project-submit', './project-display'], () => {
       const newProjectSubmit = require('./project-submit').default
-      Store.hoytUpdate({ modules: { projectSubmit: newProjectSubmit } })
+      const newProjectDisplay = require('./project-display').default
+      Store.hotUpdate({ modules: {
+        projectSubmit: newProjectSubmit,
+        projectDisplay: newProjectDisplay
+      } })
     })
   }
   return Store

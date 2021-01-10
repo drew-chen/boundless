@@ -27,46 +27,15 @@ Methods:
 import productionDb from '../../firebase/init_production'
 import DbException from '../../errors/DbException'
 import { LocalStorage } from 'quasar'
-import { backendEnum, CURRENT_BACKEND } from '../../../backends.config'
-
-/**
- * Calls the appropriate action depending on the backend type. Can be extended to
- * handle more backends by adding more cases and passing in more actions.
- *
- * Note: if the function wrapping 'callDependingOnBackend' is expected to
- * be awaited, then make sure the call to 'callDependingOnBackend' is also
- * awaited.
- *
- * @param {Object} context Exposes the same set of methods/properties as the
- *   store instance.
- *   For all the properties of the context object, see:
- *   https://vuex.vuejs.org/api/#actions.
- * @param {...Function} action An action which needs a context that will be called
- *   depending on the backend type. The order of the provided actions matters.
- *   Each action can only accept one parameter: context.
- */
-async function callDependingOnBackend (context, ...action) {
-  switch (CURRENT_BACKEND) {
-    case backendEnum.FIREBASE:
-      if (action[0]) {
-        await action[0](context)
-      }
-      break
-    case backendEnum.CUSTOM:
-      if (action[1]) {
-        await action[1](context)
-      }
-      break
-    default:
-      throw DbException('No matching backend type.')
-  }
-}
+import callDependingOnBackend from '../../store/callDependingOnBackend'
 
 /**
  * Initializes state in this Vuex module.
  *
+ * @param {Object} context Exposes the same set of methods/properties as the
+ *   store instance.
  */
-export async function initStoreProjectSubmit (context) {
+export async function initStore (context) {
   await callDependingOnBackend(context, loadFireRefs)
   await loadConfig(context)
   await loadUserList(context)
@@ -261,7 +230,8 @@ async function submitNewUsersFirebase ({ commit, getters }) {
 
 /**
  * Submits the project to the database once all the required fields are checked
- * externally.
+ * externally. Since another project is submitted, DisplayProject.vue, which
+ * uses the projectDisplay Vuex module, must also be updated.
  *
  * Creates the new users who are not in the db, and notifies
  * the user on both success and failure.
@@ -273,6 +243,8 @@ async function submitNewUsersFirebase ({ commit, getters }) {
  */
 export async function submitProject (context) {
   await callDependingOnBackend(context, submitProjectFirebase)
+  // Payload is null.
+  context.dispatch('projectDisplay/initStore', null, { root: true })
 }
 
 /**

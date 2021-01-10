@@ -539,7 +539,7 @@ Methods:
 </template>
 
 <script>
-import deepClone from 'lodash.clonedeep'
+import cloneDeep from 'lodash/clonedeep'
 import Vue from 'vue'
 import sha256 from 'sha256'
 
@@ -578,7 +578,7 @@ export default {
     }
     await this.storageUrlFetcher()
 
-    this.dbData = deepClone(this.data)
+    this.dbData = cloneDeep(this.data)
   },
   data () {
     return {
@@ -1148,7 +1148,7 @@ export default {
         await this.storageUrlFetcher()
 
         // finish loading
-        this.dbData = deepClone(this.data)
+        this.dbData = cloneDeep(this.data)
         this.$emit('submitting', false)
         this.updated = false
 
@@ -1257,7 +1257,7 @@ export default {
     openResetDialog () {
       this.$q.dialog({
         title: 'Confirm',
-        message: 'Would you like undo all unsaved changes?',
+        message: 'Undo all unsaved changes?',
         cancel: true
       }).onOk(() => {
         this.reset()
@@ -1266,7 +1266,7 @@ export default {
     /** Undo's local changes if there are changes to be saved. */
     reset () {
       if (this.updated) {
-        Vue.set(this.$data, 'data', deepClone(this.dbData))
+        Vue.set(this.$data, 'data', cloneDeep(this.dbData))
         Vue.set(this.$data, 'fileDeleteQueue', [])
         this.updated = false
       }
