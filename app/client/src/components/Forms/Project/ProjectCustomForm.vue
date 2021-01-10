@@ -67,7 +67,7 @@ Methods:
 </template>
 
 <script>
-import cloneDeep from 'lodash.clonedeep'
+import cloneDeep from 'lodash/clonedeep'
 import { createNamespacedHelpers } from 'vuex'
 const { mapGetters, mapMutations } = createNamespacedHelpers('projectSubmit')
 

@@ -81,7 +81,7 @@ Methods:
             class="col" @click="filter = key"
           >
             <strong class="text-blue-4" style="font-size: 20px" >
-              {{ keywordsCounter[key] ? keywordsCounter[key] : 0 }}
+              {{ keywordCounts[key] ? keywordCounts[key] : 0 }}
             </strong>
 
             <br>
@@ -294,8 +294,11 @@ Methods:
 import { defaultImages } from '../../boundless.config'
 import isFirebaseError from '../../src/errors/isFirebaseError'
 
-import productionDb, { productionStorage } from '../firebase/init_production'
-import testingDb, { testingStorage } from '../firebase/init_testing'
+import { productionStorage } from '../firebase/init_production'
+import { testingStorage } from '../firebase/init_testing'
+import { createNamespacedHelpers } from 'vuex'
+// Ensures mapActions and mapGetters can only use the 'store/project-submit' module.
+const { mapGetters } = createNamespacedHelpers('projectDisplay')
 
 import Banner from '../components/Banners/Banner'
 import ProgressBar from '../components/ProgressBar'
@@ -305,20 +308,23 @@ export default {
     Banner,
     ProgressBar
   },
+  computed: {
+    ...mapGetters([
+      'projectTocPromise',
+      'projectConfigPromise',
+      'userTocPromise'
+    ])
+  },
   async created () {
-    try {
-      // fetches data from database
-      await this.loadFireRefs()
-      await this.loadConfig()
-      await this.loadProjectList()
-      this.loadProgressBarConf()
+    // fetches data from database
+    await this.loadFireRefs()
+    await this.loadConfig()
+    await this.loadProjectList()
+    this.loadProgressBarConf()
 
-      this.keywordsInUse = this.keywordsInUse.filter(
-        v => v in this.keywordsValToKeyMap
-      )
-    } catch (error) {
-      throw error
-    }
+    this.keywordsInUse = this.keywordsInUse.filter(
+      v => v in this.keywordsValToKeyMap
+    )
   },
   beforeUpdate () {
     this.loadProgressBarConf()
@@ -339,7 +345,7 @@ export default {
       // keywords <Array<String>>: list of keywords appearing in all projects
       keywords: [],
       keywordsInUse: [], // <Array<String>>: list of keywords in use
-      keywordsCounter: {}, // <Map>: map of how many times each keywords appear
+      keywordCounts: {}, // <Map>: map of how many times each keywords appear
       keywordsValToKeyMap: {}, // <Map>: map of value to key of keywords
       keywordsImage: {}, // <Map>: map of keyword's images
       popkeywords: [], // <Array<Object>>: dropdown menu values
@@ -445,24 +451,20 @@ export default {
         let sessionDb = this.$q.localStorage.getItem('boundless_db')
 
         if (sessionDb === 'testing') {
-          this.db = testingDb
           this.storage = testingStorage
         } else {
-          this.db = productionDb
           this.storage = productionStorage
         }
 
         return true
       } else {
         try {
-          let doc = await productionDb.collection('config').doc('project').get()
+          let doc = await this.projectConfigPromise
           if (doc.exists) {
             if (doc.data().db === 'testing') {
-              this.db = testingDb
               this.storage = testingStorage
               this.$q.localStorage.set('boundless_db', 'testing')
             } else {
-              this.db = productionDb
               this.storage = productionStorage
               this.$q.localStorage.set('boundless_db', 'production')
             }
@@ -472,7 +474,6 @@ export default {
             throw new Error('Required document not found!')
           }
         } catch (error) {
-          this.db = productionDb
           this.storage = productionStorage
           this.$q.localStorage.set('boundless_db', 'production')
 
@@ -553,9 +554,8 @@ export default {
        */
 
       try {
-        let tocRef = this.db.collection('projects').doc('ToC')
-        let doc = await tocRef.get()
-        if (doc.exists) {
+        let doc = await this.projectTocPromise
+        if (doc && doc.exists) {
           for (let project in doc.data()) {
             if (project !== 'alias') {
               if (!doc.data()[project].hidden) {
@@ -578,9 +578,13 @@ export default {
                 }
 
                 // getting the keywords
-                if (doc.data()[project].keywords.length > 0) {
+                if (doc.data()[project].keywords && doc.data()[project].keywords.length > 0) {
                   doc.data()[project].keywords.forEach(keyword => {
-                    this.keywords.push(keyword)
+                    if (keyword in this.keywordCounts) {
+                      this.keywordCounts[keyword] += 1
+                    } else {
+                      this.keywordCounts[keyword] = 1
+                    }
                   })
                 }
               }
@@ -590,9 +594,7 @@ export default {
           throw new Error('ToC not found!')
         }
 
-        this.gettingCount()
-
-        doc = await this.db.collection('users').doc('ToC').get()
+        doc = await this.userTocPromise
 
         if (doc.exists) {
           this.userToC = doc.data()
@@ -614,7 +616,7 @@ export default {
      * TODO: this should be replaced since config/project is cached in session
      */
     loadConfig: async function () {
-      let doc = await this.db.collection('config').doc('project').get()
+      let doc = await this.projectConfigPromise
       if (doc.exists) {
         let data = doc.data()
 
@@ -672,21 +674,6 @@ export default {
       } else {
         throw new Error('File not found!')
       }
-    },
-    gettingCount: function () {
-      /**
-       * counting how many times the keywords appear inside the ToC
-       * @param {void}
-       * @return {void}
-       */
-
-      this.keywords.forEach(val => {
-        if (val in this.keywordsCounter) {
-          this.keywordsCounter[val] = this.keywordsCounter[val] + 1
-        } else {
-          this.keywordsCounter[val] = 1
-        }
-      })
     }
   }
 }

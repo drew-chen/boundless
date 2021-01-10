@@ -1956,7 +1956,7 @@ Methods:
 <script>
 import firebase from 'firebase/app'
 import 'firebase/firestore'
-import cloneDeep from 'lodash.cloneDeep'
+import cloneDeep from 'lodash/cloneDeep'
 
 import productionDb, { productionStorage } from '../../firebase/init_production'
 import testingDb, { testingStorage } from '../../firebase/init_testing'
