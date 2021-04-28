@@ -1,0 +1,25 @@
+version: 2
+updates:
+- package-ecosystem: npm
+  directory: "/app/server/firebase/functions"
+  schedule:
+    interval: daily
+  open-pull-requests-limit: 10
+  target-branch: update-dependencies
+  ignore:
+  - dependency-name: eslint
+    versions:
+    - 7.18.0
+    - 7.19.0
+    - 7.20.0
+    - 7.21.0
+    - 7.22.0
+    - 7.23.0
+    - 7.24.0
+  - dependency-name: firebase-admin
+    versions:
+    - 9.5.0
+    - 9.6.0
+  - dependency-name: firebase-functions
+    versions:
+    - 3.13.1
